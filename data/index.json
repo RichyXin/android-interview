@@ -1,14 +1,15 @@
 {
   "metadata": {
-    "version": "1.0",
-    "total_questions": 1250,
-    "categories_count": 15,
-    "days_count": 15,
-    "generated_date": "2026-03-22"
-  },
+    "version": "2.0",
+    "total_questions": 25,
+    "categories_count": 2,
+    "days_count": 2,
+    "generated_date": "2026-03-22",
+    "note": "高质量答案版本，逐步替换占位符答案"
+  }
   "categories": [
-    {"id": "android_basic", "name": "Android 基础", "day": 1, "question_count": 120, "files": ["day1/activity.json", "day1/fragment.json", "day1/service.json", "day1/broadcast.json", "day1/ui_ext.json", "day1/存储_ext.json"]},
-    {"id": "kotlin", "name": "Kotlin 基础与高级", "day": 2, "question_count": 125, "files": ["day2/kotlin_basic.json", "day2/kotlin_coroutine.json", "day2/kotlin基础.json", "day2/kotlin高级.json", "day2/协程进阶_ext.json"]},
+    {"id": "android_basic", "name": "Android 基础", "day": 1, "question_count": 15, "files": ["day1/android_core.json", "day1/service_broadcast.json"]}}
+    {"id": "kotlin", "name": "Kotlin 核心", "day": 2, "question_count": 10, "files": ["day2/kotlin_core.json"]}}
     {"id": "java", "name": "Java 基础与并发", "day": 3, "question_count": 120, "files": ["day3/java_basic.json", "day3/java_concurrent.json", "day3/java基础.json", "day3/java并发.json", "day3/io_ext.json"]},
     {"id": "jvm", "name": "JVM 原理", "day": 4, "question_count": 80, "files": ["day4/jvm_gc.json", "day4/jvm内存.json", "day4/垃圾回收.json", "day4/调优_ext.json"]},
     {"id": "system_arch", "name": "Android 系统架构", "day": 5, "question_count": 90, "files": ["day5/system_arch.json", "day5/系统架构.json", "day5/进程_ext.json"]},

@@ -17,7 +17,7 @@ class DataLoader {
         }
 
         try {
-            const response = await fetch('data/index.json');
+            const response = await fetch('data/index.json?v=' + Date.now());
             this.indexData = await response.json();
             return this.indexData;
         } catch (error) {
