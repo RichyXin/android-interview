@@ -1,0 +1,310 @@
+{
+  "metadata": {
+    "category": "设计模式",
+    "subcategory": "常用模式",
+    "day": 9,
+    "total_questions": 30
+  },
+  "questions": [
+    {
+      "id": "DP_001",
+      "question": "什么是Binder？",
+      "answer": "Binder是...（概念解释）",
+      "difficulty": 1,
+      "tags": [
+        "设计模式",
+        "Binder"
+      ]
+    },
+    {
+      "id": "DP_002",
+      "question": "Handler的工作原理？",
+      "answer": "Handler通过...实现，主要流程包括...",
+      "difficulty": 2,
+      "tags": [
+        "设计模式",
+        "Handler"
+      ]
+    },
+    {
+      "id": "DP_003",
+      "question": "AMS和WMS的区别？",
+      "answer": "AMS: ...; WMS: ...。主要区别在...",
+      "difficulty": 3,
+      "tags": [
+        "设计模式",
+        "AMS"
+      ]
+    },
+    {
+      "id": "DP_004",
+      "question": "WMS的使用场景？",
+      "answer": "适用于...场景，如...",
+      "difficulty": 1,
+      "tags": [
+        "设计模式",
+        "WMS"
+      ]
+    },
+    {
+      "id": "DP_005",
+      "question": "PMS的优缺点？",
+      "answer": "优点: ...; 缺点: ...",
+      "difficulty": 2,
+      "tags": [
+        "设计模式",
+        "PMS"
+      ]
+    },
+    {
+      "id": "DP_006",
+      "question": "如何优化Zygote？",
+      "answer": "1. ... 2. ... 3. ...",
+      "difficulty": 3,
+      "tags": [
+        "设计模式",
+        "Zygote"
+      ]
+    },
+    {
+      "id": "DP_007",
+      "question": "SurfaceFlinger的实现方式？",
+      "answer": "可以通过...实现，具体步骤...",
+      "difficulty": 1,
+      "tags": [
+        "设计模式",
+        "SurfaceFlinger"
+      ]
+    },
+    {
+      "id": "DP_008",
+      "question": "MessageQueue常见问题及解决方案？",
+      "answer": "问题1: ... 解决: ...",
+      "difficulty": 2,
+      "tags": [
+        "设计模式",
+        "MessageQueue"
+      ]
+    },
+    {
+      "id": "DP_009",
+      "question": "什么是Looper？",
+      "answer": "Looper是...（概念解释）",
+      "difficulty": 3,
+      "tags": [
+        "设计模式",
+        "Looper"
+      ]
+    },
+    {
+      "id": "DP_010",
+      "question": "Choreographer的工作原理？",
+      "answer": "Choreographer通过...实现，主要流程包括...",
+      "difficulty": 1,
+      "tags": [
+        "设计模式",
+        "Choreographer"
+      ]
+    },
+    {
+      "id": "DP_011",
+      "question": "ViewRootImpl和WindowManager的区别？",
+      "answer": "ViewRootImpl: ...; WindowManager: ...。主要区别在...",
+      "difficulty": 2,
+      "tags": [
+        "设计模式",
+        "ViewRootImpl"
+      ]
+    },
+    {
+      "id": "DP_012",
+      "question": "WindowManager的使用场景？",
+      "answer": "适用于...场景，如...",
+      "difficulty": 3,
+      "tags": [
+        "设计模式",
+        "WindowManager"
+      ]
+    },
+    {
+      "id": "DP_013",
+      "question": "Service的优缺点？",
+      "answer": "优点: ...; 缺点: ...",
+      "difficulty": 1,
+      "tags": [
+        "设计模式",
+        "Service"
+      ]
+    },
+    {
+      "id": "DP_014",
+      "question": "如何优化BroadcastReceiver？",
+      "answer": "1. ... 2. ... 3. ...",
+      "difficulty": 2,
+      "tags": [
+        "设计模式",
+        "BroadcastReceiver"
+      ]
+    },
+    {
+      "id": "DP_015",
+      "question": "ContentProvider的实现方式？",
+      "answer": "可以通过...实现，具体步骤...",
+      "difficulty": 3,
+      "tags": [
+        "设计模式",
+        "ContentProvider"
+      ]
+    },
+    {
+      "id": "DP_016",
+      "question": "Fragment常见问题及解决方案？",
+      "answer": "问题1: ... 解决: ...",
+      "difficulty": 1,
+      "tags": [
+        "设计模式",
+        "Fragment"
+      ]
+    },
+    {
+      "id": "DP_017",
+      "question": "什么是Activity？",
+      "answer": "Activity是...（概念解释）",
+      "difficulty": 2,
+      "tags": [
+        "设计模式",
+        "Activity"
+      ]
+    },
+    {
+      "id": "DP_018",
+      "question": "GC的工作原理？",
+      "answer": "GC通过...实现，主要流程包括...",
+      "difficulty": 3,
+      "tags": [
+        "设计模式",
+        "GC"
+      ]
+    },
+    {
+      "id": "DP_019",
+      "question": "ClassLoader和JIT的区别？",
+      "answer": "ClassLoader: ...; JIT: ...。主要区别在...",
+      "difficulty": 1,
+      "tags": [
+        "设计模式",
+        "ClassLoader"
+      ]
+    },
+    {
+      "id": "DP_020",
+      "question": "JIT的使用场景？",
+      "answer": "适用于...场景，如...",
+      "difficulty": 2,
+      "tags": [
+        "设计模式",
+        "JIT"
+      ]
+    },
+    {
+      "id": "DP_021",
+      "question": "AOT的优缺点？",
+      "answer": "优点: ...; 缺点: ...",
+      "difficulty": 3,
+      "tags": [
+        "设计模式",
+        "AOT"
+      ]
+    },
+    {
+      "id": "DP_022",
+      "question": "如何优化DEX？",
+      "answer": "1. ... 2. ... 3. ...",
+      "difficulty": 1,
+      "tags": [
+        "设计模式",
+        "DEX"
+      ]
+    },
+    {
+      "id": "DP_023",
+      "question": "ART的实现方式？",
+      "answer": "可以通过...实现，具体步骤...",
+      "difficulty": 2,
+      "tags": [
+        "设计模式",
+        "ART"
+      ]
+    },
+    {
+      "id": "DP_024",
+      "question": "Dalvik常见问题及解决方案？",
+      "answer": "问题1: ... 解决: ...",
+      "difficulty": 3,
+      "tags": [
+        "设计模式",
+        "Dalvik"
+      ]
+    },
+    {
+      "id": "DP_025",
+      "question": "什么是线程池？",
+      "answer": "线程池是...（概念解释）",
+      "difficulty": 1,
+      "tags": [
+        "设计模式",
+        "线程池"
+      ]
+    },
+    {
+      "id": "DP_026",
+      "question": "锁的工作原理？",
+      "answer": "锁通过...实现，主要流程包括...",
+      "difficulty": 2,
+      "tags": [
+        "设计模式",
+        "锁"
+      ]
+    },
+    {
+      "id": "DP_027",
+      "question": "CAS和AQS的区别？",
+      "answer": "CAS: ...; AQS: ...。主要区别在...",
+      "difficulty": 3,
+      "tags": [
+        "设计模式",
+        "CAS"
+      ]
+    },
+    {
+      "id": "DP_028",
+      "question": "AQS的使用场景？",
+      "answer": "适用于...场景，如...",
+      "difficulty": 1,
+      "tags": [
+        "设计模式",
+        "AQS"
+      ]
+    },
+    {
+      "id": "DP_029",
+      "question": "volatile的优缺点？",
+      "answer": "优点: ...; 缺点: ...",
+      "difficulty": 2,
+      "tags": [
+        "设计模式",
+        "volatile"
+      ]
+    },
+    {
+      "id": "DP_030",
+      "question": "如何优化ThreadLocal？",
+      "answer": "1. ... 2. ... 3. ...",
+      "difficulty": 3,
+      "tags": [
+        "设计模式",
+        "ThreadLocal"
+      ]
+    }
+  ]
+}

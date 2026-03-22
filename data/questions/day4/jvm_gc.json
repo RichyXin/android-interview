@@ -1,0 +1,110 @@
+{
+  "metadata": {
+    "category": "JVM",
+    "subcategory": "垃圾回收",
+    "day": 4,
+    "total_questions": 10
+  },
+  "questions": [
+    {
+      "id": "JVM_001",
+      "question": "JVM 内存分区有哪些？",
+      "answer": "堆(新生代、老年代)、方法区(元空间)、虚拟机栈、本地方法栈、程序计数器。",
+      "difficulty": 1,
+      "tags": [
+        "JVM",
+        "内存"
+      ]
+    },
+    {
+      "id": "JVM_002",
+      "question": "如何判断对象可回收？",
+      "answer": "可达性分析: 从 GC Roots 出发，不可达的对象可回收。GC Roots 包括栈引用、静态变量、常量等。",
+      "difficulty": 2,
+      "tags": [
+        "JVM",
+        "GC"
+      ]
+    },
+    {
+      "id": "JVM_003",
+      "question": "垃圾回收算法有哪些？",
+      "answer": "标记-清除、复制、标记-整理、分代收集。",
+      "difficulty": 2,
+      "tags": [
+        "JVM",
+        "GC"
+      ]
+    },
+    {
+      "id": "JVM_004",
+      "question": "CMS 和 G1 的区别？",
+      "answer": "CMS: 老年代、标记-清除、并发收集、内存碎片；G1: 整堆、标记-整理、可预测停顿、Region 划分。",
+      "difficulty": 3,
+      "tags": [
+        "JVM",
+        "GC"
+      ]
+    },
+    {
+      "id": "JVM_005",
+      "question": "双亲委派模型是什么？",
+      "answer": "类加载器层级: Bootstrap → Extension → Application → Custom。先让父加载器加载，避免重复加载。",
+      "difficulty": 2,
+      "tags": [
+        "JVM",
+        "类加载"
+      ]
+    },
+    {
+      "id": "JVM_006",
+      "question": "如何打破双亲委派？",
+      "answer": "重写 loadClass() 方法，如 Tomcat 的 WebAppClassLoader 优先加载 WEB-INF/classes 下的类。",
+      "difficulty": 3,
+      "tags": [
+        "JVM",
+        "类加载"
+      ]
+    },
+    {
+      "id": "JVM_007",
+      "question": "什么是 STW？",
+      "answer": "Stop The World，GC 时暂停所有用户线程，保证内存一致性。",
+      "difficulty": 2,
+      "tags": [
+        "JVM",
+        "GC"
+      ]
+    },
+    {
+      "id": "JVM_008",
+      "question": "Minor GC、Major GC、Full GC 的区别？",
+      "answer": "Minor GC: 新生代；Major GC: 老年代；Full GC: 整堆和方法区。",
+      "difficulty": 2,
+      "tags": [
+        "JVM",
+        "GC"
+      ]
+    },
+    {
+      "id": "JVM_009",
+      "question": "强引用、软引用、弱引用、虚引用的区别？",
+      "answer": "强: 不回收；软: 内存不足回收；弱: GC 时回收；虚: 随时回收，用于跟踪对象回收。",
+      "difficulty": 2,
+      "tags": [
+        "JVM",
+        "引用"
+      ]
+    },
+    {
+      "id": "JVM_010",
+      "question": "JVM 调优常用参数？",
+      "answer": "-Xms/-Xmx(堆大小)、-XX:NewRatio(新老比例)、-XX:+UseG1GC(使用G1)。",
+      "difficulty": 3,
+      "tags": [
+        "JVM",
+        "调优"
+      ]
+    }
+  ]
+}

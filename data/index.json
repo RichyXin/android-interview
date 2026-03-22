@@ -1,0 +1,33 @@
+{
+  "metadata": {
+    "version": "1.0",
+    "total_questions": 145,
+    "categories_count": 10,
+    "days_count": 10,
+    "generated_date": "2026-03-22"
+  },
+  "categories": [
+    {"id": "android_basic", "name": "Android 基础", "day": 1, "question_count": 15, "files": ["day1/activity.json", "day1/fragment.json"]},
+    {"id": "kotlin", "name": "Kotlin 基础与高级", "day": 2, "question_count": 20, "files": ["day2/kotlin_basic.json", "day2/kotlin_coroutine.json"]},
+    {"id": "java", "name": "Java 并发", "day": 3, "question_count": 10, "files": ["day3/java_concurrent.json"]},
+    {"id": "jvm", "name": "JVM 原理", "day": 4, "question_count": 10, "files": ["day4/jvm_gc.json"]},
+    {"id": "system_arch", "name": "Android 系统架构", "day": 5, "question_count": 10, "files": ["day5/system_arch.json"]},
+    {"id": "framework", "name": "Framework 源码", "day": 6, "question_count": 10, "files": ["day6/framework.json"]},
+    {"id": "performance", "name": "性能优化", "day": 7, "question_count": 10, "files": ["day7/performance.json"]},
+    {"id": "jetpack", "name": "Jetpack & Compose", "day": 8, "question_count": 10, "files": ["day8/jetpack.json"]},
+    {"id": "design_pattern", "name": "设计模式", "day": 9, "question_count": 10, "files": ["day9/design_pattern.json"]},
+    {"id": "opensource", "name": "常用开源框架", "day": 10, "question_count": 10, "files": ["day10/opensource.json"]}
+  ],
+  "days": {
+    "1": {"name": "Android 基础", "categories": ["Activity", "Fragment"], "target": 15},
+    "2": {"name": "Kotlin 基础与高级", "categories": ["Kotlin 基础", "协程"], "target": 20},
+    "3": {"name": "Java 并发", "categories": ["多线程", "JUC"], "target": 10},
+    "4": {"name": "JVM 原理", "categories": ["内存模型", "GC"], "target": 10},
+    "5": {"name": "Android 系统架构", "categories": ["系统启动", "Binder"], "target": 10},
+    "6": {"name": "Framework 源码", "categories": ["Handler", "View"], "target": 10},
+    "7": {"name": "性能优化", "categories": ["内存", "UI"], "target": 10},
+    "8": {"name": "Jetpack & Compose", "categories": ["架构组件", "声明式UI"], "target": 10},
+    "9": {"name": "设计模式", "categories": ["常用模式", "架构"], "target": 10},
+    "10": {"name": "常用开源框架", "categories": ["网络", "图片", "DI"], "target": 10}
+  }
+}

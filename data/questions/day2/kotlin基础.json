@@ -1,0 +1,210 @@
+{
+  "metadata": {
+    "category": "Kotlin",
+    "subcategory": "Kotlin基础",
+    "day": 2,
+    "total_questions": 20
+  },
+  "questions": [
+    {
+      "id": "KT_001",
+      "question": "什么是Binder？",
+      "answer": "Binder是...（概念解释）",
+      "difficulty": 1,
+      "tags": [
+        "Kotlin",
+        "Binder"
+      ]
+    },
+    {
+      "id": "KT_002",
+      "question": "Handler的工作原理？",
+      "answer": "Handler通过...实现，主要流程包括...",
+      "difficulty": 2,
+      "tags": [
+        "Kotlin",
+        "Handler"
+      ]
+    },
+    {
+      "id": "KT_003",
+      "question": "AMS和WMS的区别？",
+      "answer": "AMS: ...; WMS: ...。主要区别在...",
+      "difficulty": 3,
+      "tags": [
+        "Kotlin",
+        "AMS"
+      ]
+    },
+    {
+      "id": "KT_004",
+      "question": "WMS的使用场景？",
+      "answer": "适用于...场景，如...",
+      "difficulty": 1,
+      "tags": [
+        "Kotlin",
+        "WMS"
+      ]
+    },
+    {
+      "id": "KT_005",
+      "question": "PMS的优缺点？",
+      "answer": "优点: ...; 缺点: ...",
+      "difficulty": 2,
+      "tags": [
+        "Kotlin",
+        "PMS"
+      ]
+    },
+    {
+      "id": "KT_006",
+      "question": "如何优化Zygote？",
+      "answer": "1. ... 2. ... 3. ...",
+      "difficulty": 3,
+      "tags": [
+        "Kotlin",
+        "Zygote"
+      ]
+    },
+    {
+      "id": "KT_007",
+      "question": "SurfaceFlinger的实现方式？",
+      "answer": "可以通过...实现，具体步骤...",
+      "difficulty": 1,
+      "tags": [
+        "Kotlin",
+        "SurfaceFlinger"
+      ]
+    },
+    {
+      "id": "KT_008",
+      "question": "MessageQueue常见问题及解决方案？",
+      "answer": "问题1: ... 解决: ...",
+      "difficulty": 2,
+      "tags": [
+        "Kotlin",
+        "MessageQueue"
+      ]
+    },
+    {
+      "id": "KT_009",
+      "question": "什么是Looper？",
+      "answer": "Looper是...（概念解释）",
+      "difficulty": 3,
+      "tags": [
+        "Kotlin",
+        "Looper"
+      ]
+    },
+    {
+      "id": "KT_010",
+      "question": "Choreographer的工作原理？",
+      "answer": "Choreographer通过...实现，主要流程包括...",
+      "difficulty": 1,
+      "tags": [
+        "Kotlin",
+        "Choreographer"
+      ]
+    },
+    {
+      "id": "KT_011",
+      "question": "ViewRootImpl和WindowManager的区别？",
+      "answer": "ViewRootImpl: ...; WindowManager: ...。主要区别在...",
+      "difficulty": 2,
+      "tags": [
+        "Kotlin",
+        "ViewRootImpl"
+      ]
+    },
+    {
+      "id": "KT_012",
+      "question": "WindowManager的使用场景？",
+      "answer": "适用于...场景，如...",
+      "difficulty": 3,
+      "tags": [
+        "Kotlin",
+        "WindowManager"
+      ]
+    },
+    {
+      "id": "KT_013",
+      "question": "Service的优缺点？",
+      "answer": "优点: ...; 缺点: ...",
+      "difficulty": 1,
+      "tags": [
+        "Kotlin",
+        "Service"
+      ]
+    },
+    {
+      "id": "KT_014",
+      "question": "如何优化BroadcastReceiver？",
+      "answer": "1. ... 2. ... 3. ...",
+      "difficulty": 2,
+      "tags": [
+        "Kotlin",
+        "BroadcastReceiver"
+      ]
+    },
+    {
+      "id": "KT_015",
+      "question": "ContentProvider的实现方式？",
+      "answer": "可以通过...实现，具体步骤...",
+      "difficulty": 3,
+      "tags": [
+        "Kotlin",
+        "ContentProvider"
+      ]
+    },
+    {
+      "id": "KT_016",
+      "question": "Fragment常见问题及解决方案？",
+      "answer": "问题1: ... 解决: ...",
+      "difficulty": 1,
+      "tags": [
+        "Kotlin",
+        "Fragment"
+      ]
+    },
+    {
+      "id": "KT_017",
+      "question": "什么是Activity？",
+      "answer": "Activity是...（概念解释）",
+      "difficulty": 2,
+      "tags": [
+        "Kotlin",
+        "Activity"
+      ]
+    },
+    {
+      "id": "KT_018",
+      "question": "GC的工作原理？",
+      "answer": "GC通过...实现，主要流程包括...",
+      "difficulty": 3,
+      "tags": [
+        "Kotlin",
+        "GC"
+      ]
+    },
+    {
+      "id": "KT_019",
+      "question": "ClassLoader和JIT的区别？",
+      "answer": "ClassLoader: ...; JIT: ...。主要区别在...",
+      "difficulty": 1,
+      "tags": [
+        "Kotlin",
+        "ClassLoader"
+      ]
+    },
+    {
+      "id": "KT_020",
+      "question": "JIT的使用场景？",
+      "answer": "适用于...场景，如...",
+      "difficulty": 2,
+      "tags": [
+        "Kotlin",
+        "JIT"
+      ]
+    }
+  ]
+}

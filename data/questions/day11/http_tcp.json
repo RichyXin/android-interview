@@ -1,0 +1,310 @@
+{
+  "metadata": {
+    "category": "网络编程",
+    "subcategory": "HTTP_TCP",
+    "day": 11,
+    "total_questions": 30
+  },
+  "questions": [
+    {
+      "id": "NET_001",
+      "question": "什么是Binder？",
+      "answer": "Binder是...（概念解释）",
+      "difficulty": 1,
+      "tags": [
+        "网络编程",
+        "Binder"
+      ]
+    },
+    {
+      "id": "NET_002",
+      "question": "Handler的工作原理？",
+      "answer": "Handler通过...实现，主要流程包括...",
+      "difficulty": 2,
+      "tags": [
+        "网络编程",
+        "Handler"
+      ]
+    },
+    {
+      "id": "NET_003",
+      "question": "AMS和WMS的区别？",
+      "answer": "AMS: ...; WMS: ...。主要区别在...",
+      "difficulty": 3,
+      "tags": [
+        "网络编程",
+        "AMS"
+      ]
+    },
+    {
+      "id": "NET_004",
+      "question": "WMS的使用场景？",
+      "answer": "适用于...场景，如...",
+      "difficulty": 1,
+      "tags": [
+        "网络编程",
+        "WMS"
+      ]
+    },
+    {
+      "id": "NET_005",
+      "question": "PMS的优缺点？",
+      "answer": "优点: ...; 缺点: ...",
+      "difficulty": 2,
+      "tags": [
+        "网络编程",
+        "PMS"
+      ]
+    },
+    {
+      "id": "NET_006",
+      "question": "如何优化Zygote？",
+      "answer": "1. ... 2. ... 3. ...",
+      "difficulty": 3,
+      "tags": [
+        "网络编程",
+        "Zygote"
+      ]
+    },
+    {
+      "id": "NET_007",
+      "question": "SurfaceFlinger的实现方式？",
+      "answer": "可以通过...实现，具体步骤...",
+      "difficulty": 1,
+      "tags": [
+        "网络编程",
+        "SurfaceFlinger"
+      ]
+    },
+    {
+      "id": "NET_008",
+      "question": "MessageQueue常见问题及解决方案？",
+      "answer": "问题1: ... 解决: ...",
+      "difficulty": 2,
+      "tags": [
+        "网络编程",
+        "MessageQueue"
+      ]
+    },
+    {
+      "id": "NET_009",
+      "question": "什么是Looper？",
+      "answer": "Looper是...（概念解释）",
+      "difficulty": 3,
+      "tags": [
+        "网络编程",
+        "Looper"
+      ]
+    },
+    {
+      "id": "NET_010",
+      "question": "Choreographer的工作原理？",
+      "answer": "Choreographer通过...实现，主要流程包括...",
+      "difficulty": 1,
+      "tags": [
+        "网络编程",
+        "Choreographer"
+      ]
+    },
+    {
+      "id": "NET_011",
+      "question": "ViewRootImpl和WindowManager的区别？",
+      "answer": "ViewRootImpl: ...; WindowManager: ...。主要区别在...",
+      "difficulty": 2,
+      "tags": [
+        "网络编程",
+        "ViewRootImpl"
+      ]
+    },
+    {
+      "id": "NET_012",
+      "question": "WindowManager的使用场景？",
+      "answer": "适用于...场景，如...",
+      "difficulty": 3,
+      "tags": [
+        "网络编程",
+        "WindowManager"
+      ]
+    },
+    {
+      "id": "NET_013",
+      "question": "Service的优缺点？",
+      "answer": "优点: ...; 缺点: ...",
+      "difficulty": 1,
+      "tags": [
+        "网络编程",
+        "Service"
+      ]
+    },
+    {
+      "id": "NET_014",
+      "question": "如何优化BroadcastReceiver？",
+      "answer": "1. ... 2. ... 3. ...",
+      "difficulty": 2,
+      "tags": [
+        "网络编程",
+        "BroadcastReceiver"
+      ]
+    },
+    {
+      "id": "NET_015",
+      "question": "ContentProvider的实现方式？",
+      "answer": "可以通过...实现，具体步骤...",
+      "difficulty": 3,
+      "tags": [
+        "网络编程",
+        "ContentProvider"
+      ]
+    },
+    {
+      "id": "NET_016",
+      "question": "Fragment常见问题及解决方案？",
+      "answer": "问题1: ... 解决: ...",
+      "difficulty": 1,
+      "tags": [
+        "网络编程",
+        "Fragment"
+      ]
+    },
+    {
+      "id": "NET_017",
+      "question": "什么是Activity？",
+      "answer": "Activity是...（概念解释）",
+      "difficulty": 2,
+      "tags": [
+        "网络编程",
+        "Activity"
+      ]
+    },
+    {
+      "id": "NET_018",
+      "question": "GC的工作原理？",
+      "answer": "GC通过...实现，主要流程包括...",
+      "difficulty": 3,
+      "tags": [
+        "网络编程",
+        "GC"
+      ]
+    },
+    {
+      "id": "NET_019",
+      "question": "ClassLoader和JIT的区别？",
+      "answer": "ClassLoader: ...; JIT: ...。主要区别在...",
+      "difficulty": 1,
+      "tags": [
+        "网络编程",
+        "ClassLoader"
+      ]
+    },
+    {
+      "id": "NET_020",
+      "question": "JIT的使用场景？",
+      "answer": "适用于...场景，如...",
+      "difficulty": 2,
+      "tags": [
+        "网络编程",
+        "JIT"
+      ]
+    },
+    {
+      "id": "NET_021",
+      "question": "AOT的优缺点？",
+      "answer": "优点: ...; 缺点: ...",
+      "difficulty": 3,
+      "tags": [
+        "网络编程",
+        "AOT"
+      ]
+    },
+    {
+      "id": "NET_022",
+      "question": "如何优化DEX？",
+      "answer": "1. ... 2. ... 3. ...",
+      "difficulty": 1,
+      "tags": [
+        "网络编程",
+        "DEX"
+      ]
+    },
+    {
+      "id": "NET_023",
+      "question": "ART的实现方式？",
+      "answer": "可以通过...实现，具体步骤...",
+      "difficulty": 2,
+      "tags": [
+        "网络编程",
+        "ART"
+      ]
+    },
+    {
+      "id": "NET_024",
+      "question": "Dalvik常见问题及解决方案？",
+      "answer": "问题1: ... 解决: ...",
+      "difficulty": 3,
+      "tags": [
+        "网络编程",
+        "Dalvik"
+      ]
+    },
+    {
+      "id": "NET_025",
+      "question": "什么是线程池？",
+      "answer": "线程池是...（概念解释）",
+      "difficulty": 1,
+      "tags": [
+        "网络编程",
+        "线程池"
+      ]
+    },
+    {
+      "id": "NET_026",
+      "question": "锁的工作原理？",
+      "answer": "锁通过...实现，主要流程包括...",
+      "difficulty": 2,
+      "tags": [
+        "网络编程",
+        "锁"
+      ]
+    },
+    {
+      "id": "NET_027",
+      "question": "CAS和AQS的区别？",
+      "answer": "CAS: ...; AQS: ...。主要区别在...",
+      "difficulty": 3,
+      "tags": [
+        "网络编程",
+        "CAS"
+      ]
+    },
+    {
+      "id": "NET_028",
+      "question": "AQS的使用场景？",
+      "answer": "适用于...场景，如...",
+      "difficulty": 1,
+      "tags": [
+        "网络编程",
+        "AQS"
+      ]
+    },
+    {
+      "id": "NET_029",
+      "question": "volatile的优缺点？",
+      "answer": "优点: ...; 缺点: ...",
+      "difficulty": 2,
+      "tags": [
+        "网络编程",
+        "volatile"
+      ]
+    },
+    {
+      "id": "NET_030",
+      "question": "如何优化ThreadLocal？",
+      "answer": "1. ... 2. ... 3. ...",
+      "difficulty": 3,
+      "tags": [
+        "网络编程",
+        "ThreadLocal"
+      ]
+    }
+  ]
+}

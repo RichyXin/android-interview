@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Android 面试题大全 - 智能学习系统</title>
+    <link rel="stylesheet" href="src/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+</head>
+<body>
+    <div id="app">
+        <!-- Sidebar -->
+        <nav class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <span class="logo-icon">📱</span>
+                    <span class="logo-text">Android面试</span>
+                </div>
+            </div>
+            
+            <div class="user-stats">
+                <div class="progress-ring">
+                    <svg viewBox="0 0 100 100">
+                        <circle class="progress-bg" cx="50" cy="50" r="45"/>
+                        <circle class="progress-bar" id="progressCircle" cx="50" cy="50" r="45"/>
+                    </svg>
+                    <div class="progress-text">
+                        <span id="progressPercent">0%</span>
+                        <small>已掌握</small>
+                    </div>
+                </div>
+                <div class="stats-summary">
+                    <div class="stat-item">
+                        <span class="stat-value" id="masteredCount">0</span>
+                        <span class="stat-label">已掌握</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-value" id="reviewCount">0</span>
+                        <span class="stat-label">需复习</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-value" id="weakCount">0</span>
+                        <span class="stat-label">薄弱项</span>
+                    </div>
+                </div>
+            </div>
+
+            <ul class="nav-menu">
+                <li class="nav-item active" data-page="dashboard">
+                    <span class="nav-icon">📊</span>
+                    <span class="nav-text">学习概览</span>
+                </li>
+                <li class="nav-item" data-page="study">
+                    <span class="nav-icon">📚</span>
+                    <span class="nav-text">每日学习</span>
+                </li>
+                <li class="nav-item" data-page="cards">
+                    <span class="nav-icon">🎴</span>
+                    <span class="nav-text">记忆卡片</span>
+                </li>
+                <li class="nav-item" data-page="categories">
+                    <span class="nav-icon">📂</span>
+                    <span class="nav-text">分类浏览</span>
+                </li>
+                <li class="nav-item" data-page="weakness">
+                    <span class="nav-icon">🎯</span>
+                    <span class="nav-text">薄弱项分析</span>
+                </li>
+                <li class="nav-item" data-page="mock">
+                    <span class="nav-icon">🎤</span>
+                    <span class="nav-text">模拟面试</span>
+                </li>
+                <li class="nav-item" data-page="chat">
+                    <span class="nav-icon">💬</span>
+                    <span class="nav-text">AI 助手</span>
+                </li>
+            </ul>
+
+            <div class="sidebar-footer">
+                <button class="btn-export" id="exportData">💾 导出数据</button>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Top Bar -->
+            <header class="top-bar">
+                <div class="page-title">
+                    <h1 id="pageTitle">学习概览</h1>
+                    <p class="page-subtitle" id="pageSubtitle">欢迎使用 Android 面试智能学习系统</p>
+                </div>
+                <div class="top-actions">
+                    <div class="search-box">
+                        <input type="text" placeholder="搜索题目..." id="searchInput">
+                        <span class="search-icon">🔍</span>
+                    </div>
+                    <button class="btn-settings" id="settingsBtn">⚙️</button>
+                </div>
+            </header>
+
+            <!-- Content Area -->
+            <div class="content-area" id="contentArea">
+                <!-- Dashboard Page -->
+                <div class="page dashboard-page active" id="dashboardPage">
+                    <div class="dashboard-grid">
+                        <div class="dashboard-card progress-card">
+                            <h3>📅 今日学习进度</h3>
+                            <div class="day-progress">
+                                <div class="day-info">
+                                    <span class="current-day">Day <span id="currentDay">1</span></span>
+                                    <span class="day-title" id="dayTitle">Android 基础</span>
+                                </div>
+                                <div class="day-progress-bar">
+                                    <div class="progress-fill" id="dayProgress"></div>
+                                </div>
+                                <p class="day-summary">已完成 <span id="dayCompleted">0</span> / <span id="dayTotal">150</span> 题</p>
+                            </div>
+                            <button class="btn-primary" id="continueStudy">继续学习</button>
+                        </div>
+
+                        <div class="dashboard-card streak-card">
+                            <h3>🔥 学习连续天数</h3>
+                            <div class="streak-display">
+                                <span class="streak-number" id="streakDays">0</span>
+                                <span class="streak-label">天</span>
+                            </div>
+                            <p class="streak-message" id="streakMessage">开始你的学习之旅吧！</p>
+                        </div>
+
+                        <div class="dashboard-card category-progress-card">
+                            <h3>📊 分类进度</h3>
+                            <div class="category-chart-container">
+                                <canvas id="categoryChart"></canvas>
+                            </div>
+                        </div>
+
+                        <div class="dashboard-card weakness-card">
+                            <h3>🎯 薄弱知识点</h3>
+                            <ul class="weakness-list" id="weaknessList">
+                                <li class="empty-state">暂无薄弱项，继续加油！</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Study Page -->
+                <div class="page study-page" id="studyPage">
+                    <div class="study-container">
+                        <div class="study-header">
+                            <div class="study-nav">
+                                <button class="nav-btn" id="prevQuestion">← 上一题</button>
+                                <span class="question-counter">
+                                    <span id="currentNum">1</span> / <span id="totalNum">1200</span>
+                                </span>
+                                <button class="nav-btn" id="nextQuestion">下一题 →</button>
+                            </div>
+                            <div class="question-filters">
+                                <select id="dayFilter">
+                                    <option value="1">Day 1: Android 基础</option>
+                                    <option value="2">Day 2: Kotlin 基础</option>
+                                    <option value="3">Day 3: Kotlin 高级</option>
+                                    <option value="4">Day 4: Java 基础与并发</option>
+                                    <option value="5">Day 5: JVM 与系统架构</option>
+                                    <option value="6">Day 6: Framework 源码</option>
+                                    <option value="7">Day 7: 性能优化</option>
+                                    <option value="8">Day 8: Jetpack & Compose</option>
+                                    <option value="9">Day 9: 设计模式与框架</option>
+                                    <option value="10">Day 10: 进阶与算法</option>
+                                </select>
+                                <select id="difficultyFilter">
+                                    <option value="all">全部难度</option>
+                                    <option value="1">🟢 初级</option>
+                                    <option value="2">🟡 中级</option>
+                                    <option value="3">🔴 高级</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="question-card" id="questionCard">
+                            <div class="question-header">
+                                <div class="question-tags">
+                                    <span class="tag category-tag" id="qCategory">Android 基础</span>
+                                    <span class="tag subcategory-tag" id="qSubcategory">Activity</span>
+                                    <span class="tag difficulty-tag difficulty-1" id="qDifficulty">初级</span>
+                                    <span class="tag day-tag" id="qDay">Day 1</span>
+                                </div>
+                            </div>
+                            
+                            <div class="question-content">
+                                <h2 class="question-title" id="qTitle">题目加载中...</h2>
+                                <div class="question-body" id="qBody"></div>
+                            </div>
+
+                            <div class="answer-section" id="answerSection">
+                                <button class="btn-reveal" id="revealAnswer">
+                                    <span>👁️</span> 查看答案
+                                </button>
+                                <div class="answer-content" id="answerContent" style="display: none;">
+                                    <div class="answer-header">
+                                        <span class="answer-label">💡 参考答案</span>
+                                    </div>
+                                    <div class="answer-body" id="aBody"></div>
+                                    <div class="answer-diagram" id="aDiagram"></div>
+                                </div>
+                            </div>
+
+                            <div class="question-footer">
+                                <div class="mastery-rating">
+                                    <span class="rating-label">掌握程度：</span>
+                                    <div class="rating-buttons">
+                                        <button class="rating-btn weak" data-rating="weak" title="完全不熟">😵 不熟</button>
+                                        <button class="rating-btn review" data-rating="review" title="需要复习">🤔 模糊</button>
+                                        <button class="rating-btn mastered" data-rating="mastered" title="完全掌握">😊 掌握</button>
+                                    </div>
+                                </div>
+                                <button class="btn-ai-learn" id="aiLearnBtn">
+                                    <span>🤖</span> AI 深入学习
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Other Pages Placeholder -->
+                <div class="page cards-page" id="cardsPage">
+                    <div class="section-header">
+                        <h2>🎴 记忆卡片</h2>
+                        <p>翻转卡片，强化记忆效果</p>
+                    </div>
+                    
+                    <div class="cards-container">
+                        <div class="card-stats">
+                            <div class="stat-box">
+                                <span class="stat-number" id="cardsTotal">0</span>
+                                <span class="stat-label">总卡片</span>
+                            </div>
+                            <div class="stat-box">
+                                <span class="stat-number" id="cardsLearned">0</span>
+                                <span class="stat-label">已学习</span>
+                            </div>
+                            <div class="stat-box">
+                                <span class="stat-number" id="cardsMastered">0</span>
+                                <span class="stat-label">已掌握</span>
+                            </div>
+                        </div>
+                        
+                        <div class="card-filter">
+                            <select id="cardDayFilter">
+                                <option value="all">全部天数</option>
+                                <option value="1">Day 1: Android 基础</option>
+                                <option value="2">Day 2: Kotlin</option>
+                                <option value="3">Day 3: Java</option>
+                                <option value="4">Day 4: JVM</option>
+                                <option value="5">Day 5: 系统架构</option>
+                                <option value="6">Day 6: Framework</option>
+                                <option value="7">Day 7: 性能优化</option>
+                                <option value="8">Day 8: Jetpack</option>
+                                <option value="9">Day 9: 设计模式</option>
+                                <option value="10">Day 10: 开源框架</option>
+                            </select>
+                            <select id="cardStatusFilter">
+                                <option value="all">全部状态</option>
+                                <option value="new">未学习</option>
+                                <option value="learning">学习中</option>
+                                <option value="mastered">已掌握</option>
+                            </select>
+                        </div>
+                        
+                        <div class="flashcard-wrapper">
+                            <div class="flashcard" id="flashcard">
+                                <div class="flashcard-inner">
+                                    <div class="flashcard-front">
+                                        <div class="card-category" id="cardCategory">Android 基础</div>
+                                        <div class="card-question" id="cardQuestion">点击开始记忆卡片学习</div>
+                                        <div class="card-hint">点击翻转查看答案</div>
+                                    </div>
+                                    <div class="flashcard-back">
+                                        <div class="card-category" id="cardCategoryBack">Android 基础</div>
+                                        <div class="card-answer" id="cardAnswer">答案将显示在这里</div>
+                                        <div class="card-actions">
+                                            <button class="card-btn btn-again" data-rating="again">😵 重来</button>
+                                            <button class="card-btn btn-hard" data-rating="hard">🤔 困难</button>
+                                            <button class="card-btn btn-good" data-rating="good">🙂 良好</button>
+                                            <button class="card-btn btn-easy" data-rating="easy">😊 简单</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="card-progress">
+                            <span id="cardProgressText">准备就绪</span>
+                        </div>
+                        
+                        <div class="card-controls">
+                            <button class="btn-secondary" id="shuffleCards">🔀 随机洗牌</button>
+                            <button class="btn-primary" id="startCardStudy">🎯 开始学习</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="page categories-page" id="categoriesPage">
+                    <div class="placeholder">
+                        <span class="placeholder-icon">📂</span>
+                        <h2>分类浏览</h2>
+                        <p>功能开发中...</p>
+                    </div>
+                </div>
+
+                <div class="page weakness-page" id="weaknessPage">
+                    <div class="placeholder">
+                        <span class="placeholder-icon">🎯</span>
+                        <h2>薄弱项分析</h2>
+                        <p>功能开发中...</p>
+                    </div>
+                </div>
+
+                <div class="page mock-page" id="mockPage">
+                    <div class="placeholder">
+                        <span class="placeholder-icon">🎤</span>
+                        <h2>模拟面试</h2>
+                        <p>功能开发中...</p>
+                    </div>
+                </div>
+
+                <div class="page chat-page" id="chatPage">
+                    <div class="section-header">
+                        <h2>🤖 AI 助手</h2>
+                        <p>你的专属 Android 面试学习助手</p>
+                    </div>
+                    
+                    <div class="ai-chat-container">
+                        <div class="chat-quick-prompts" id="chatQuickPrompts">
+                            <!-- 快捷提示按钮由 JS 生成 -->
+                        </div>
+                        
+                        <div class="chat-messages" id="chatContainer">
+                            <!-- 聊天消息由 JS 生成 -->
+                        </div>
+                        
+                        <div class="chat-input-area">
+                            <textarea 
+                                class="chat-input" 
+                                id="chatInput" 
+                                placeholder="输入你想问的问题..."
+                                rows="1"
+                            ></textarea>
+                            <button class="chat-send-btn" id="sendMessage">发送</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Toast Container -->
+        <div class="toast-container" id="toastContainer"></div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="src/config.js"></script>
+    <script src="src/db.js"></script>
+    <script src="src/loader.js"></script>
+    <script src="src/app.js"></script>
+</body>
+</html>

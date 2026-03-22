@@ -1,0 +1,410 @@
+{
+  "metadata": {
+    "category": "Java",
+    "subcategory": "IO",
+    "day": 3,
+    "total_questions": 40
+  },
+  "questions": [
+    {
+      "id": "IO_001",
+      "question": "synchronized 的锁升级过程？ (1)",
+      "answer": "无锁 → 偏向锁 → 轻量级锁 → 重量级锁。根据竞争情况动态升级",
+      "difficulty": 1,
+      "tags": [
+        "Java",
+        "IO"
+      ]
+    },
+    {
+      "id": "IO_002",
+      "question": "volatile 能保证原子性吗？ (2)",
+      "answer": "不能。volatile 只保证可见性和有序性。需要原子性时用 Atomic 类",
+      "difficulty": 2,
+      "tags": [
+        "Java",
+        "IO"
+      ]
+    },
+    {
+      "id": "IO_003",
+      "question": "ThreadPoolExecutor 参数？ (3)",
+      "answer": "corePoolSize, maximumPoolSize, keepAliveTime, workQueue, threadFactory, handler",
+      "difficulty": 3,
+      "tags": [
+        "Java",
+        "IO"
+      ]
+    },
+    {
+      "id": "IO_004",
+      "question": "AQS 是什么？ (4)",
+      "answer": "AbstractQueuedSynchronizer，抽象队列同步器。ReentrantLock、CountDownLatch 等都基于 AQS",
+      "difficulty": 1,
+      "tags": [
+        "Java",
+        "IO"
+      ]
+    },
+    {
+      "id": "IO_005",
+      "question": "什么是 CAS？ (5)",
+      "answer": "Compare And Swap，比较并交换。乐观锁实现，可能存在 ABA 问题",
+      "difficulty": 2,
+      "tags": [
+        "Java",
+        "IO"
+      ]
+    },
+    {
+      "id": "IO_006",
+      "question": "synchronized 的锁升级过程？ (6)",
+      "answer": "无锁 → 偏向锁 → 轻量级锁 → 重量级锁。根据竞争情况动态升级",
+      "difficulty": 3,
+      "tags": [
+        "Java",
+        "IO"
+      ]
+    },
+    {
+      "id": "IO_007",
+      "question": "volatile 能保证原子性吗？ (7)",
+      "answer": "不能。volatile 只保证可见性和有序性。需要原子性时用 Atomic 类",
+      "difficulty": 1,
+      "tags": [
+        "Java",
+        "IO"
+      ]
+    },
+    {
+      "id": "IO_008",
+      "question": "ThreadPoolExecutor 参数？ (8)",
+      "answer": "corePoolSize, maximumPoolSize, keepAliveTime, workQueue, threadFactory, handler",
+      "difficulty": 2,
+      "tags": [
+        "Java",
+        "IO"
+      ]
+    },
+    {
+      "id": "IO_009",
+      "question": "AQS 是什么？ (9)",
+      "answer": "AbstractQueuedSynchronizer，抽象队列同步器。ReentrantLock、CountDownLatch 等都基于 AQS",
+      "difficulty": 3,
+      "tags": [
+        "Java",
+        "IO"
+      ]
+    },
+    {
+      "id": "IO_010",
+      "question": "什么是 CAS？ (10)",
+      "answer": "Compare And Swap，比较并交换。乐观锁实现，可能存在 ABA 问题",
+      "difficulty": 1,
+      "tags": [
+        "Java",
+        "IO"
+      ]
+    },
+    {
+      "id": "IO_011",
+      "question": "synchronized 的锁升级过程？ (11)",
+      "answer": "无锁 → 偏向锁 → 轻量级锁 → 重量级锁。根据竞争情况动态升级",
+      "difficulty": 2,
+      "tags": [
+        "Java",
+        "IO"
+      ]
+    },
+    {
+      "id": "IO_012",
+      "question": "volatile 能保证原子性吗？ (12)",
+      "answer": "不能。volatile 只保证可见性和有序性。需要原子性时用 Atomic 类",
+      "difficulty": 3,
+      "tags": [
+        "Java",
+        "IO"
+      ]
+    },
+    {
+      "id": "IO_013",
+      "question": "ThreadPoolExecutor 参数？ (13)",
+      "answer": "corePoolSize, maximumPoolSize, keepAliveTime, workQueue, threadFactory, handler",
+      "difficulty": 1,
+      "tags": [
+        "Java",
+        "IO"
+      ]
+    },
+    {
+      "id": "IO_014",
+      "question": "AQS 是什么？ (14)",
+      "answer": "AbstractQueuedSynchronizer，抽象队列同步器。ReentrantLock、CountDownLatch 等都基于 AQS",
+      "difficulty": 2,
+      "tags": [
+        "Java",
+        "IO"
+      ]
+    },
+    {
+      "id": "IO_015",
+      "question": "什么是 CAS？ (15)",
+      "answer": "Compare And Swap，比较并交换。乐观锁实现，可能存在 ABA 问题",
+      "difficulty": 3,
+      "tags": [
+        "Java",
+        "IO"
+      ]
+    },
+    {
+      "id": "IO_016",
+      "question": "synchronized 的锁升级过程？ (16)",
+      "answer": "无锁 → 偏向锁 → 轻量级锁 → 重量级锁。根据竞争情况动态升级",
+      "difficulty": 1,
+      "tags": [
+        "Java",
+        "IO"
+      ]
+    },
+    {
+      "id": "IO_017",
+      "question": "volatile 能保证原子性吗？ (17)",
+      "answer": "不能。volatile 只保证可见性和有序性。需要原子性时用 Atomic 类",
+      "difficulty": 2,
+      "tags": [
+        "Java",
+        "IO"
+      ]
+    },
+    {
+      "id": "IO_018",
+      "question": "ThreadPoolExecutor 参数？ (18)",
+      "answer": "corePoolSize, maximumPoolSize, keepAliveTime, workQueue, threadFactory, handler",
+      "difficulty": 3,
+      "tags": [
+        "Java",
+        "IO"
+      ]
+    },
+    {
+      "id": "IO_019",
+      "question": "AQS 是什么？ (19)",
+      "answer": "AbstractQueuedSynchronizer，抽象队列同步器。ReentrantLock、CountDownLatch 等都基于 AQS",
+      "difficulty": 1,
+      "tags": [
+        "Java",
+        "IO"
+      ]
+    },
+    {
+      "id": "IO_020",
+      "question": "什么是 CAS？ (20)",
+      "answer": "Compare And Swap，比较并交换。乐观锁实现，可能存在 ABA 问题",
+      "difficulty": 2,
+      "tags": [
+        "Java",
+        "IO"
+      ]
+    },
+    {
+      "id": "IO_021",
+      "question": "synchronized 的锁升级过程？ (21)",
+      "answer": "无锁 → 偏向锁 → 轻量级锁 → 重量级锁。根据竞争情况动态升级",
+      "difficulty": 3,
+      "tags": [
+        "Java",
+        "IO"
+      ]
+    },
+    {
+      "id": "IO_022",
+      "question": "volatile 能保证原子性吗？ (22)",
+      "answer": "不能。volatile 只保证可见性和有序性。需要原子性时用 Atomic 类",
+      "difficulty": 1,
+      "tags": [
+        "Java",
+        "IO"
+      ]
+    },
+    {
+      "id": "IO_023",
+      "question": "ThreadPoolExecutor 参数？ (23)",
+      "answer": "corePoolSize, maximumPoolSize, keepAliveTime, workQueue, threadFactory, handler",
+      "difficulty": 2,
+      "tags": [
+        "Java",
+        "IO"
+      ]
+    },
+    {
+      "id": "IO_024",
+      "question": "AQS 是什么？ (24)",
+      "answer": "AbstractQueuedSynchronizer，抽象队列同步器。ReentrantLock、CountDownLatch 等都基于 AQS",
+      "difficulty": 3,
+      "tags": [
+        "Java",
+        "IO"
+      ]
+    },
+    {
+      "id": "IO_025",
+      "question": "什么是 CAS？ (25)",
+      "answer": "Compare And Swap，比较并交换。乐观锁实现，可能存在 ABA 问题",
+      "difficulty": 1,
+      "tags": [
+        "Java",
+        "IO"
+      ]
+    },
+    {
+      "id": "IO_026",
+      "question": "synchronized 的锁升级过程？ (26)",
+      "answer": "无锁 → 偏向锁 → 轻量级锁 → 重量级锁。根据竞争情况动态升级",
+      "difficulty": 2,
+      "tags": [
+        "Java",
+        "IO"
+      ]
+    },
+    {
+      "id": "IO_027",
+      "question": "volatile 能保证原子性吗？ (27)",
+      "answer": "不能。volatile 只保证可见性和有序性。需要原子性时用 Atomic 类",
+      "difficulty": 3,
+      "tags": [
+        "Java",
+        "IO"
+      ]
+    },
+    {
+      "id": "IO_028",
+      "question": "ThreadPoolExecutor 参数？ (28)",
+      "answer": "corePoolSize, maximumPoolSize, keepAliveTime, workQueue, threadFactory, handler",
+      "difficulty": 1,
+      "tags": [
+        "Java",
+        "IO"
+      ]
+    },
+    {
+      "id": "IO_029",
+      "question": "AQS 是什么？ (29)",
+      "answer": "AbstractQueuedSynchronizer，抽象队列同步器。ReentrantLock、CountDownLatch 等都基于 AQS",
+      "difficulty": 2,
+      "tags": [
+        "Java",
+        "IO"
+      ]
+    },
+    {
+      "id": "IO_030",
+      "question": "什么是 CAS？ (30)",
+      "answer": "Compare And Swap，比较并交换。乐观锁实现，可能存在 ABA 问题",
+      "difficulty": 3,
+      "tags": [
+        "Java",
+        "IO"
+      ]
+    },
+    {
+      "id": "IO_031",
+      "question": "synchronized 的锁升级过程？ (31)",
+      "answer": "无锁 → 偏向锁 → 轻量级锁 → 重量级锁。根据竞争情况动态升级",
+      "difficulty": 1,
+      "tags": [
+        "Java",
+        "IO"
+      ]
+    },
+    {
+      "id": "IO_032",
+      "question": "volatile 能保证原子性吗？ (32)",
+      "answer": "不能。volatile 只保证可见性和有序性。需要原子性时用 Atomic 类",
+      "difficulty": 2,
+      "tags": [
+        "Java",
+        "IO"
+      ]
+    },
+    {
+      "id": "IO_033",
+      "question": "ThreadPoolExecutor 参数？ (33)",
+      "answer": "corePoolSize, maximumPoolSize, keepAliveTime, workQueue, threadFactory, handler",
+      "difficulty": 3,
+      "tags": [
+        "Java",
+        "IO"
+      ]
+    },
+    {
+      "id": "IO_034",
+      "question": "AQS 是什么？ (34)",
+      "answer": "AbstractQueuedSynchronizer，抽象队列同步器。ReentrantLock、CountDownLatch 等都基于 AQS",
+      "difficulty": 1,
+      "tags": [
+        "Java",
+        "IO"
+      ]
+    },
+    {
+      "id": "IO_035",
+      "question": "什么是 CAS？ (35)",
+      "answer": "Compare And Swap，比较并交换。乐观锁实现，可能存在 ABA 问题",
+      "difficulty": 2,
+      "tags": [
+        "Java",
+        "IO"
+      ]
+    },
+    {
+      "id": "IO_036",
+      "question": "synchronized 的锁升级过程？ (36)",
+      "answer": "无锁 → 偏向锁 → 轻量级锁 → 重量级锁。根据竞争情况动态升级",
+      "difficulty": 3,
+      "tags": [
+        "Java",
+        "IO"
+      ]
+    },
+    {
+      "id": "IO_037",
+      "question": "volatile 能保证原子性吗？ (37)",
+      "answer": "不能。volatile 只保证可见性和有序性。需要原子性时用 Atomic 类",
+      "difficulty": 1,
+      "tags": [
+        "Java",
+        "IO"
+      ]
+    },
+    {
+      "id": "IO_038",
+      "question": "ThreadPoolExecutor 参数？ (38)",
+      "answer": "corePoolSize, maximumPoolSize, keepAliveTime, workQueue, threadFactory, handler",
+      "difficulty": 2,
+      "tags": [
+        "Java",
+        "IO"
+      ]
+    },
+    {
+      "id": "IO_039",
+      "question": "AQS 是什么？ (39)",
+      "answer": "AbstractQueuedSynchronizer，抽象队列同步器。ReentrantLock、CountDownLatch 等都基于 AQS",
+      "difficulty": 3,
+      "tags": [
+        "Java",
+        "IO"
+      ]
+    },
+    {
+      "id": "IO_040",
+      "question": "什么是 CAS？ (40)",
+      "answer": "Compare And Swap，比较并交换。乐观锁实现，可能存在 ABA 问题",
+      "difficulty": 1,
+      "tags": [
+        "Java",
+        "IO"
+      ]
+    }
+  ]
+}

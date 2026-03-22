@@ -1,0 +1,310 @@
+{
+  "metadata": {
+    "category": "开源框架",
+    "subcategory": "第三方库",
+    "day": 10,
+    "total_questions": 30
+  },
+  "questions": [
+    {
+      "id": "LIB_001",
+      "question": "什么是Binder？",
+      "answer": "Binder是...（概念解释）",
+      "difficulty": 1,
+      "tags": [
+        "开源框架",
+        "Binder"
+      ]
+    },
+    {
+      "id": "LIB_002",
+      "question": "Handler的工作原理？",
+      "answer": "Handler通过...实现，主要流程包括...",
+      "difficulty": 2,
+      "tags": [
+        "开源框架",
+        "Handler"
+      ]
+    },
+    {
+      "id": "LIB_003",
+      "question": "AMS和WMS的区别？",
+      "answer": "AMS: ...; WMS: ...。主要区别在...",
+      "difficulty": 3,
+      "tags": [
+        "开源框架",
+        "AMS"
+      ]
+    },
+    {
+      "id": "LIB_004",
+      "question": "WMS的使用场景？",
+      "answer": "适用于...场景，如...",
+      "difficulty": 1,
+      "tags": [
+        "开源框架",
+        "WMS"
+      ]
+    },
+    {
+      "id": "LIB_005",
+      "question": "PMS的优缺点？",
+      "answer": "优点: ...; 缺点: ...",
+      "difficulty": 2,
+      "tags": [
+        "开源框架",
+        "PMS"
+      ]
+    },
+    {
+      "id": "LIB_006",
+      "question": "如何优化Zygote？",
+      "answer": "1. ... 2. ... 3. ...",
+      "difficulty": 3,
+      "tags": [
+        "开源框架",
+        "Zygote"
+      ]
+    },
+    {
+      "id": "LIB_007",
+      "question": "SurfaceFlinger的实现方式？",
+      "answer": "可以通过...实现，具体步骤...",
+      "difficulty": 1,
+      "tags": [
+        "开源框架",
+        "SurfaceFlinger"
+      ]
+    },
+    {
+      "id": "LIB_008",
+      "question": "MessageQueue常见问题及解决方案？",
+      "answer": "问题1: ... 解决: ...",
+      "difficulty": 2,
+      "tags": [
+        "开源框架",
+        "MessageQueue"
+      ]
+    },
+    {
+      "id": "LIB_009",
+      "question": "什么是Looper？",
+      "answer": "Looper是...（概念解释）",
+      "difficulty": 3,
+      "tags": [
+        "开源框架",
+        "Looper"
+      ]
+    },
+    {
+      "id": "LIB_010",
+      "question": "Choreographer的工作原理？",
+      "answer": "Choreographer通过...实现，主要流程包括...",
+      "difficulty": 1,
+      "tags": [
+        "开源框架",
+        "Choreographer"
+      ]
+    },
+    {
+      "id": "LIB_011",
+      "question": "ViewRootImpl和WindowManager的区别？",
+      "answer": "ViewRootImpl: ...; WindowManager: ...。主要区别在...",
+      "difficulty": 2,
+      "tags": [
+        "开源框架",
+        "ViewRootImpl"
+      ]
+    },
+    {
+      "id": "LIB_012",
+      "question": "WindowManager的使用场景？",
+      "answer": "适用于...场景，如...",
+      "difficulty": 3,
+      "tags": [
+        "开源框架",
+        "WindowManager"
+      ]
+    },
+    {
+      "id": "LIB_013",
+      "question": "Service的优缺点？",
+      "answer": "优点: ...; 缺点: ...",
+      "difficulty": 1,
+      "tags": [
+        "开源框架",
+        "Service"
+      ]
+    },
+    {
+      "id": "LIB_014",
+      "question": "如何优化BroadcastReceiver？",
+      "answer": "1. ... 2. ... 3. ...",
+      "difficulty": 2,
+      "tags": [
+        "开源框架",
+        "BroadcastReceiver"
+      ]
+    },
+    {
+      "id": "LIB_015",
+      "question": "ContentProvider的实现方式？",
+      "answer": "可以通过...实现，具体步骤...",
+      "difficulty": 3,
+      "tags": [
+        "开源框架",
+        "ContentProvider"
+      ]
+    },
+    {
+      "id": "LIB_016",
+      "question": "Fragment常见问题及解决方案？",
+      "answer": "问题1: ... 解决: ...",
+      "difficulty": 1,
+      "tags": [
+        "开源框架",
+        "Fragment"
+      ]
+    },
+    {
+      "id": "LIB_017",
+      "question": "什么是Activity？",
+      "answer": "Activity是...（概念解释）",
+      "difficulty": 2,
+      "tags": [
+        "开源框架",
+        "Activity"
+      ]
+    },
+    {
+      "id": "LIB_018",
+      "question": "GC的工作原理？",
+      "answer": "GC通过...实现，主要流程包括...",
+      "difficulty": 3,
+      "tags": [
+        "开源框架",
+        "GC"
+      ]
+    },
+    {
+      "id": "LIB_019",
+      "question": "ClassLoader和JIT的区别？",
+      "answer": "ClassLoader: ...; JIT: ...。主要区别在...",
+      "difficulty": 1,
+      "tags": [
+        "开源框架",
+        "ClassLoader"
+      ]
+    },
+    {
+      "id": "LIB_020",
+      "question": "JIT的使用场景？",
+      "answer": "适用于...场景，如...",
+      "difficulty": 2,
+      "tags": [
+        "开源框架",
+        "JIT"
+      ]
+    },
+    {
+      "id": "LIB_021",
+      "question": "AOT的优缺点？",
+      "answer": "优点: ...; 缺点: ...",
+      "difficulty": 3,
+      "tags": [
+        "开源框架",
+        "AOT"
+      ]
+    },
+    {
+      "id": "LIB_022",
+      "question": "如何优化DEX？",
+      "answer": "1. ... 2. ... 3. ...",
+      "difficulty": 1,
+      "tags": [
+        "开源框架",
+        "DEX"
+      ]
+    },
+    {
+      "id": "LIB_023",
+      "question": "ART的实现方式？",
+      "answer": "可以通过...实现，具体步骤...",
+      "difficulty": 2,
+      "tags": [
+        "开源框架",
+        "ART"
+      ]
+    },
+    {
+      "id": "LIB_024",
+      "question": "Dalvik常见问题及解决方案？",
+      "answer": "问题1: ... 解决: ...",
+      "difficulty": 3,
+      "tags": [
+        "开源框架",
+        "Dalvik"
+      ]
+    },
+    {
+      "id": "LIB_025",
+      "question": "什么是线程池？",
+      "answer": "线程池是...（概念解释）",
+      "difficulty": 1,
+      "tags": [
+        "开源框架",
+        "线程池"
+      ]
+    },
+    {
+      "id": "LIB_026",
+      "question": "锁的工作原理？",
+      "answer": "锁通过...实现，主要流程包括...",
+      "difficulty": 2,
+      "tags": [
+        "开源框架",
+        "锁"
+      ]
+    },
+    {
+      "id": "LIB_027",
+      "question": "CAS和AQS的区别？",
+      "answer": "CAS: ...; AQS: ...。主要区别在...",
+      "difficulty": 3,
+      "tags": [
+        "开源框架",
+        "CAS"
+      ]
+    },
+    {
+      "id": "LIB_028",
+      "question": "AQS的使用场景？",
+      "answer": "适用于...场景，如...",
+      "difficulty": 1,
+      "tags": [
+        "开源框架",
+        "AQS"
+      ]
+    },
+    {
+      "id": "LIB_029",
+      "question": "volatile的优缺点？",
+      "answer": "优点: ...; 缺点: ...",
+      "difficulty": 2,
+      "tags": [
+        "开源框架",
+        "volatile"
+      ]
+    },
+    {
+      "id": "LIB_030",
+      "question": "如何优化ThreadLocal？",
+      "answer": "1. ... 2. ... 3. ...",
+      "difficulty": 3,
+      "tags": [
+        "开源框架",
+        "ThreadLocal"
+      ]
+    }
+  ]
+}

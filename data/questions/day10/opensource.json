@@ -1,0 +1,110 @@
+{
+  "metadata": {
+    "category": "开源框架",
+    "subcategory": "常用库",
+    "day": 10,
+    "total_questions": 10
+  },
+  "questions": [
+    {
+      "id": "LIB_001",
+      "question": "OkHttp 的拦截器链原理？",
+      "answer": "Interceptor 按顺序执行，可修改请求和响应。应用拦截器(只一次)、网络拦截器(可能多次)。",
+      "difficulty": 3,
+      "tags": [
+        "框架",
+        "网络"
+      ]
+    },
+    {
+      "id": "LIB_002",
+      "question": "Retrofit 的动态代理原理？",
+      "answer": "通过 Proxy.newProxyInstance 生成接口实现，将方法调用转为 HTTP 请求。",
+      "difficulty": 3,
+      "tags": [
+        "框架",
+        "网络"
+      ]
+    },
+    {
+      "id": "LIB_003",
+      "question": "Glide 的图片缓存策略？",
+      "answer": "三级缓存: 活动资源(弱引用)、内存缓存(LRU)、磁盘缓存。",
+      "difficulty": 2,
+      "tags": [
+        "框架",
+        "图片"
+      ]
+    },
+    {
+      "id": "LIB_004",
+      "question": "RxJava 的线程切换操作符？",
+      "answer": "subscribeOn: 指定订阅线程；observeOn: 指定观察线程，可多次切换。",
+      "difficulty": 3,
+      "tags": [
+        "框架",
+        "RxJava"
+      ]
+    },
+    {
+      "id": "LIB_005",
+      "question": "EventBus 的线程模式？",
+      "answer": "POSTING(发送线程)、MAIN(主线程)、MAIN_ORDERED(主队列)、BACKGROUND(后台)、ASYNC(独立线程)。",
+      "difficulty": 2,
+      "tags": [
+        "框架",
+        "通信"
+      ]
+    },
+    {
+      "id": "LIB_006",
+      "question": "LeakCanary 的检测原理？",
+      "answer": "弱引用观察对象，触发 GC 后检查引用是否进入引用队列，未进入则判定泄漏。",
+      "difficulty": 3,
+      "tags": [
+        "框架",
+        "内存"
+      ]
+    },
+    {
+      "id": "LIB_007",
+      "question": "ARouter 的路由原理？",
+      "answer": "编译期生成路由表，运行期通过 APT 生成的类加载目标 Activity 并跳转。",
+      "difficulty": 3,
+      "tags": [
+        "框架",
+        "路由"
+      ]
+    },
+    {
+      "id": "LIB_008",
+      "question": "Dagger 的依赖注入过程？",
+      "answer": "编译期生成 Component、Module、Provider 代码，运行时通过生成的工厂类提供实例。",
+      "difficulty": 3,
+      "tags": [
+        "框架",
+        "DI"
+      ]
+    },
+    {
+      "id": "LIB_009",
+      "question": "Gson 和 Jackson 的区别？",
+      "answer": "Gson: 简洁易用；Jackson: 性能更好，功能更强。Gson 使用反射，Kotlin 推荐 Moshi。",
+      "difficulty": 2,
+      "tags": [
+        "框架",
+        "JSON"
+      ]
+    },
+    {
+      "id": "LIB_010",
+      "question": "Room 和 GreenDAO 的区别？",
+      "answer": "Room: 官方支持，编译期检查，与 LiveData/Flow 集成；GreenDAO: 性能高，但需额外配置。",
+      "difficulty": 2,
+      "tags": [
+        "框架",
+        "数据库"
+      ]
+    }
+  ]
+}

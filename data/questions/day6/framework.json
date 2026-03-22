@@ -1,0 +1,110 @@
+{
+  "metadata": {
+    "category": "Framework源码",
+    "subcategory": "核心组件",
+    "day": 6,
+    "total_questions": 10
+  },
+  "questions": [
+    {
+      "id": "FW_001",
+      "question": "Handler 机制的原理？",
+      "answer": "Handler 发送消息到 MessageQueue，Looper 循环取出消息并分发给 Handler 处理。",
+      "difficulty": 2,
+      "tags": [
+        "Android",
+        "Handler"
+      ]
+    },
+    {
+      "id": "FW_002",
+      "question": "MessageQueue 的数据结构？",
+      "answer": "单链表实现的优先级队列，按 when 时间排序，支持插入屏障消息。",
+      "difficulty": 3,
+      "tags": [
+        "Android",
+        "Handler"
+      ]
+    },
+    {
+      "id": "FW_003",
+      "question": "IdleHandler 是什么？",
+      "answer": "在 MessageQueue 空闲时执行，用于延迟初始化或低优先级任务。",
+      "difficulty": 3,
+      "tags": [
+        "Android",
+        "Handler"
+      ]
+    },
+    {
+      "id": "FW_004",
+      "question": "Choreographer 的作用？",
+      "answer": "管理帧率，通过接收 VSync 信号协调动画、输入、绘制的时机，避免卡顿。",
+      "difficulty": 3,
+      "tags": [
+        "Android",
+        "UI"
+      ]
+    },
+    {
+      "id": "FW_005",
+      "question": "View 的绘制流程？",
+      "answer": "measure(测量) → layout(布局) → draw(绘制)，分别确定大小、位置、内容。",
+      "difficulty": 2,
+      "tags": [
+        "Android",
+        "View"
+      ]
+    },
+    {
+      "id": "FW_006",
+      "question": "requestLayout 和 invalidate 的区别？",
+      "answer": "requestLayout: 重新测量和布局；invalidate: 仅重绘当前 View，不重新测量。",
+      "difficulty": 2,
+      "tags": [
+        "Android",
+        "View"
+      ]
+    },
+    {
+      "id": "FW_007",
+      "question": "View 的事件分发机制？",
+      "answer": "Activity → PhoneWindow → DecorView → ViewGroup → View。dispatchTouchEvent → onInterceptTouchEvent → onTouchEvent。",
+      "difficulty": 3,
+      "tags": [
+        "Android",
+        "事件"
+      ]
+    },
+    {
+      "id": "FW_008",
+      "question": "Window 和 WindowManager 的关系？",
+      "answer": "Window 是抽象概念，PhoneWindow 是具体实现；WindowManager 管理 Window 的添加、更新、删除。",
+      "difficulty": 3,
+      "tags": [
+        "Android",
+        "Window"
+      ]
+    },
+    {
+      "id": "FW_009",
+      "question": "AMS 是什么？主要职责？",
+      "answer": "ActivityManagerService，管理系统四大组件生命周期、进程调度、任务栈等。",
+      "difficulty": 3,
+      "tags": [
+        "Android",
+        "AMS"
+      ]
+    },
+    {
+      "id": "FW_010",
+      "question": "WMS 是什么？主要职责？",
+      "answer": "WindowManagerService，管理窗口的层级、大小、位置、焦点等。",
+      "difficulty": 3,
+      "tags": [
+        "Android",
+        "WMS"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,410 @@
+{
+  "metadata": {
+    "category": "Network",
+    "subcategory": "WebSocket",
+    "day": 11,
+    "total_questions": 40
+  },
+  "questions": [
+    {
+      "id": "WS_001",
+      "question": "HTTP 请求方法有哪些？ (1)",
+      "answer": "GET、POST、PUT、DELETE、PATCH、HEAD、OPTIONS。GET 获取，POST 提交",
+      "difficulty": 1,
+      "tags": [
+        "Network",
+        "WebSocket"
+      ]
+    },
+    {
+      "id": "WS_002",
+      "question": "HTTP 状态码分类？ (2)",
+      "answer": "1xx 信息、2xx 成功、3xx 重定向、4xx 客户端错误、5xx 服务器错误",
+      "difficulty": 2,
+      "tags": [
+        "Network",
+        "WebSocket"
+      ]
+    },
+    {
+      "id": "WS_003",
+      "question": "TCP 滑动窗口机制？ (3)",
+      "answer": "用于流量控制，发送方维护窗口大小，根据接收方 ACK 调整",
+      "difficulty": 3,
+      "tags": [
+        "Network",
+        "WebSocket"
+      ]
+    },
+    {
+      "id": "WS_004",
+      "question": "什么是 HTTPS？ (4)",
+      "answer": "HTTP + SSL/TLS。加密传输，身份认证，完整性保护。端口 443",
+      "difficulty": 1,
+      "tags": [
+        "Network",
+        "WebSocket"
+      ]
+    },
+    {
+      "id": "WS_005",
+      "question": "DNS 解析过程？ (5)",
+      "answer": "浏览器缓存 → 系统缓存 → hosts → DNS 服务器 → 递归查询",
+      "difficulty": 2,
+      "tags": [
+        "Network",
+        "WebSocket"
+      ]
+    },
+    {
+      "id": "WS_006",
+      "question": "HTTP 请求方法有哪些？ (6)",
+      "answer": "GET、POST、PUT、DELETE、PATCH、HEAD、OPTIONS。GET 获取，POST 提交",
+      "difficulty": 3,
+      "tags": [
+        "Network",
+        "WebSocket"
+      ]
+    },
+    {
+      "id": "WS_007",
+      "question": "HTTP 状态码分类？ (7)",
+      "answer": "1xx 信息、2xx 成功、3xx 重定向、4xx 客户端错误、5xx 服务器错误",
+      "difficulty": 1,
+      "tags": [
+        "Network",
+        "WebSocket"
+      ]
+    },
+    {
+      "id": "WS_008",
+      "question": "TCP 滑动窗口机制？ (8)",
+      "answer": "用于流量控制，发送方维护窗口大小，根据接收方 ACK 调整",
+      "difficulty": 2,
+      "tags": [
+        "Network",
+        "WebSocket"
+      ]
+    },
+    {
+      "id": "WS_009",
+      "question": "什么是 HTTPS？ (9)",
+      "answer": "HTTP + SSL/TLS。加密传输，身份认证，完整性保护。端口 443",
+      "difficulty": 3,
+      "tags": [
+        "Network",
+        "WebSocket"
+      ]
+    },
+    {
+      "id": "WS_010",
+      "question": "DNS 解析过程？ (10)",
+      "answer": "浏览器缓存 → 系统缓存 → hosts → DNS 服务器 → 递归查询",
+      "difficulty": 1,
+      "tags": [
+        "Network",
+        "WebSocket"
+      ]
+    },
+    {
+      "id": "WS_011",
+      "question": "HTTP 请求方法有哪些？ (11)",
+      "answer": "GET、POST、PUT、DELETE、PATCH、HEAD、OPTIONS。GET 获取，POST 提交",
+      "difficulty": 2,
+      "tags": [
+        "Network",
+        "WebSocket"
+      ]
+    },
+    {
+      "id": "WS_012",
+      "question": "HTTP 状态码分类？ (12)",
+      "answer": "1xx 信息、2xx 成功、3xx 重定向、4xx 客户端错误、5xx 服务器错误",
+      "difficulty": 3,
+      "tags": [
+        "Network",
+        "WebSocket"
+      ]
+    },
+    {
+      "id": "WS_013",
+      "question": "TCP 滑动窗口机制？ (13)",
+      "answer": "用于流量控制，发送方维护窗口大小，根据接收方 ACK 调整",
+      "difficulty": 1,
+      "tags": [
+        "Network",
+        "WebSocket"
+      ]
+    },
+    {
+      "id": "WS_014",
+      "question": "什么是 HTTPS？ (14)",
+      "answer": "HTTP + SSL/TLS。加密传输，身份认证，完整性保护。端口 443",
+      "difficulty": 2,
+      "tags": [
+        "Network",
+        "WebSocket"
+      ]
+    },
+    {
+      "id": "WS_015",
+      "question": "DNS 解析过程？ (15)",
+      "answer": "浏览器缓存 → 系统缓存 → hosts → DNS 服务器 → 递归查询",
+      "difficulty": 3,
+      "tags": [
+        "Network",
+        "WebSocket"
+      ]
+    },
+    {
+      "id": "WS_016",
+      "question": "HTTP 请求方法有哪些？ (16)",
+      "answer": "GET、POST、PUT、DELETE、PATCH、HEAD、OPTIONS。GET 获取，POST 提交",
+      "difficulty": 1,
+      "tags": [
+        "Network",
+        "WebSocket"
+      ]
+    },
+    {
+      "id": "WS_017",
+      "question": "HTTP 状态码分类？ (17)",
+      "answer": "1xx 信息、2xx 成功、3xx 重定向、4xx 客户端错误、5xx 服务器错误",
+      "difficulty": 2,
+      "tags": [
+        "Network",
+        "WebSocket"
+      ]
+    },
+    {
+      "id": "WS_018",
+      "question": "TCP 滑动窗口机制？ (18)",
+      "answer": "用于流量控制，发送方维护窗口大小，根据接收方 ACK 调整",
+      "difficulty": 3,
+      "tags": [
+        "Network",
+        "WebSocket"
+      ]
+    },
+    {
+      "id": "WS_019",
+      "question": "什么是 HTTPS？ (19)",
+      "answer": "HTTP + SSL/TLS。加密传输，身份认证，完整性保护。端口 443",
+      "difficulty": 1,
+      "tags": [
+        "Network",
+        "WebSocket"
+      ]
+    },
+    {
+      "id": "WS_020",
+      "question": "DNS 解析过程？ (20)",
+      "answer": "浏览器缓存 → 系统缓存 → hosts → DNS 服务器 → 递归查询",
+      "difficulty": 2,
+      "tags": [
+        "Network",
+        "WebSocket"
+      ]
+    },
+    {
+      "id": "WS_021",
+      "question": "HTTP 请求方法有哪些？ (21)",
+      "answer": "GET、POST、PUT、DELETE、PATCH、HEAD、OPTIONS。GET 获取，POST 提交",
+      "difficulty": 3,
+      "tags": [
+        "Network",
+        "WebSocket"
+      ]
+    },
+    {
+      "id": "WS_022",
+      "question": "HTTP 状态码分类？ (22)",
+      "answer": "1xx 信息、2xx 成功、3xx 重定向、4xx 客户端错误、5xx 服务器错误",
+      "difficulty": 1,
+      "tags": [
+        "Network",
+        "WebSocket"
+      ]
+    },
+    {
+      "id": "WS_023",
+      "question": "TCP 滑动窗口机制？ (23)",
+      "answer": "用于流量控制，发送方维护窗口大小，根据接收方 ACK 调整",
+      "difficulty": 2,
+      "tags": [
+        "Network",
+        "WebSocket"
+      ]
+    },
+    {
+      "id": "WS_024",
+      "question": "什么是 HTTPS？ (24)",
+      "answer": "HTTP + SSL/TLS。加密传输，身份认证，完整性保护。端口 443",
+      "difficulty": 3,
+      "tags": [
+        "Network",
+        "WebSocket"
+      ]
+    },
+    {
+      "id": "WS_025",
+      "question": "DNS 解析过程？ (25)",
+      "answer": "浏览器缓存 → 系统缓存 → hosts → DNS 服务器 → 递归查询",
+      "difficulty": 1,
+      "tags": [
+        "Network",
+        "WebSocket"
+      ]
+    },
+    {
+      "id": "WS_026",
+      "question": "HTTP 请求方法有哪些？ (26)",
+      "answer": "GET、POST、PUT、DELETE、PATCH、HEAD、OPTIONS。GET 获取，POST 提交",
+      "difficulty": 2,
+      "tags": [
+        "Network",
+        "WebSocket"
+      ]
+    },
+    {
+      "id": "WS_027",
+      "question": "HTTP 状态码分类？ (27)",
+      "answer": "1xx 信息、2xx 成功、3xx 重定向、4xx 客户端错误、5xx 服务器错误",
+      "difficulty": 3,
+      "tags": [
+        "Network",
+        "WebSocket"
+      ]
+    },
+    {
+      "id": "WS_028",
+      "question": "TCP 滑动窗口机制？ (28)",
+      "answer": "用于流量控制，发送方维护窗口大小，根据接收方 ACK 调整",
+      "difficulty": 1,
+      "tags": [
+        "Network",
+        "WebSocket"
+      ]
+    },
+    {
+      "id": "WS_029",
+      "question": "什么是 HTTPS？ (29)",
+      "answer": "HTTP + SSL/TLS。加密传输，身份认证，完整性保护。端口 443",
+      "difficulty": 2,
+      "tags": [
+        "Network",
+        "WebSocket"
+      ]
+    },
+    {
+      "id": "WS_030",
+      "question": "DNS 解析过程？ (30)",
+      "answer": "浏览器缓存 → 系统缓存 → hosts → DNS 服务器 → 递归查询",
+      "difficulty": 3,
+      "tags": [
+        "Network",
+        "WebSocket"
+      ]
+    },
+    {
+      "id": "WS_031",
+      "question": "HTTP 请求方法有哪些？ (31)",
+      "answer": "GET、POST、PUT、DELETE、PATCH、HEAD、OPTIONS。GET 获取，POST 提交",
+      "difficulty": 1,
+      "tags": [
+        "Network",
+        "WebSocket"
+      ]
+    },
+    {
+      "id": "WS_032",
+      "question": "HTTP 状态码分类？ (32)",
+      "answer": "1xx 信息、2xx 成功、3xx 重定向、4xx 客户端错误、5xx 服务器错误",
+      "difficulty": 2,
+      "tags": [
+        "Network",
+        "WebSocket"
+      ]
+    },
+    {
+      "id": "WS_033",
+      "question": "TCP 滑动窗口机制？ (33)",
+      "answer": "用于流量控制，发送方维护窗口大小，根据接收方 ACK 调整",
+      "difficulty": 3,
+      "tags": [
+        "Network",
+        "WebSocket"
+      ]
+    },
+    {
+      "id": "WS_034",
+      "question": "什么是 HTTPS？ (34)",
+      "answer": "HTTP + SSL/TLS。加密传输，身份认证，完整性保护。端口 443",
+      "difficulty": 1,
+      "tags": [
+        "Network",
+        "WebSocket"
+      ]
+    },
+    {
+      "id": "WS_035",
+      "question": "DNS 解析过程？ (35)",
+      "answer": "浏览器缓存 → 系统缓存 → hosts → DNS 服务器 → 递归查询",
+      "difficulty": 2,
+      "tags": [
+        "Network",
+        "WebSocket"
+      ]
+    },
+    {
+      "id": "WS_036",
+      "question": "HTTP 请求方法有哪些？ (36)",
+      "answer": "GET、POST、PUT、DELETE、PATCH、HEAD、OPTIONS。GET 获取，POST 提交",
+      "difficulty": 3,
+      "tags": [
+        "Network",
+        "WebSocket"
+      ]
+    },
+    {
+      "id": "WS_037",
+      "question": "HTTP 状态码分类？ (37)",
+      "answer": "1xx 信息、2xx 成功、3xx 重定向、4xx 客户端错误、5xx 服务器错误",
+      "difficulty": 1,
+      "tags": [
+        "Network",
+        "WebSocket"
+      ]
+    },
+    {
+      "id": "WS_038",
+      "question": "TCP 滑动窗口机制？ (38)",
+      "answer": "用于流量控制，发送方维护窗口大小，根据接收方 ACK 调整",
+      "difficulty": 2,
+      "tags": [
+        "Network",
+        "WebSocket"
+      ]
+    },
+    {
+      "id": "WS_039",
+      "question": "什么是 HTTPS？ (39)",
+      "answer": "HTTP + SSL/TLS。加密传输，身份认证，完整性保护。端口 443",
+      "difficulty": 3,
+      "tags": [
+        "Network",
+        "WebSocket"
+      ]
+    },
+    {
+      "id": "WS_040",
+      "question": "DNS 解析过程？ (40)",
+      "answer": "浏览器缓存 → 系统缓存 → hosts → DNS 服务器 → 递归查询",
+      "difficulty": 1,
+      "tags": [
+        "Network",
+        "WebSocket"
+      ]
+    }
+  ]
+}

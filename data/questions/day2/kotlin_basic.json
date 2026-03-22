@@ -1,0 +1,110 @@
+{
+  "metadata": {
+    "category": "Kotlin基础",
+    "subcategory": "基础语法",
+    "day": 2,
+    "total_questions": 10
+  },
+  "questions": [
+    {
+      "id": "KT_001",
+      "question": "val 和 var 的区别？",
+      "answer": "val: 只读变量，相当于 Java final；var: 可变变量。",
+      "difficulty": 1,
+      "tags": [
+        "Kotlin",
+        "变量"
+      ]
+    },
+    {
+      "id": "KT_002",
+      "question": "Kotlin 的空安全机制有哪些？",
+      "answer": "?. 安全调用、?: Elvis运算符、!! 非空断言、let 安全调用块。",
+      "difficulty": 1,
+      "tags": [
+        "Kotlin",
+        "空安全"
+      ]
+    },
+    {
+      "id": "KT_003",
+      "question": "什么是扩展函数？",
+      "answer": "在不继承的情况下为类添加新函数。定义方式：fun 类名.函数名() {}",
+      "difficulty": 2,
+      "tags": [
+        "Kotlin",
+        "扩展函数"
+      ]
+    },
+    {
+      "id": "KT_004",
+      "question": "data class 的作用？",
+      "answer": "自动生成 equals、hashCode、toString、copy、componentN 方法。",
+      "difficulty": 1,
+      "tags": [
+        "Kotlin",
+        "数据类"
+      ]
+    },
+    {
+      "id": "KT_005",
+      "question": "sealed class 是什么？",
+      "answer": "密封类，限制继承层次，子类必须在同一文件。用于 when 表达式时无需 else 分支。",
+      "difficulty": 2,
+      "tags": [
+        "Kotlin",
+        "密封类"
+      ]
+    },
+    {
+      "id": "KT_006",
+      "question": "object 和 companion object 的区别？",
+      "answer": "object: 单例类；companion object: 伴生对象，类似 Java static 方法。",
+      "difficulty": 2,
+      "tags": [
+        "Kotlin",
+        "单例"
+      ]
+    },
+    {
+      "id": "KT_007",
+      "question": "lateinit 和 lazy 的区别？",
+      "answer": "lateinit: 延迟初始化，用于 var；lazy: 惰性加载，用于 val，线程安全。",
+      "difficulty": 2,
+      "tags": [
+        "Kotlin",
+        "延迟初始化"
+      ]
+    },
+    {
+      "id": "KT_008",
+      "question": "inline function 的作用？",
+      "answer": "内联函数，编译时将函数体插入调用处，减少函数调用开销。",
+      "difficulty": 3,
+      "tags": [
+        "Kotlin",
+        "内联函数"
+      ]
+    },
+    {
+      "id": "KT_009",
+      "question": "高阶函数是什么？",
+      "answer": "接收函数作为参数或返回函数的函数。例如: fun foo(callback: () -> Unit) {}",
+      "difficulty": 2,
+      "tags": [
+        "Kotlin",
+        "高阶函数"
+      ]
+    },
+    {
+      "id": "KT_010",
+      "question": "Kotlin 与 Java 互调用的注意事项？",
+      "answer": "Kotlin 调用 Java 注意空安全；Java 调用 Kotlin 注意默认参数、扩展函数等。",
+      "difficulty": 2,
+      "tags": [
+        "Kotlin",
+        "互操作"
+      ]
+    }
+  ]
+}

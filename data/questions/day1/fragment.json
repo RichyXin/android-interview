@@ -1,0 +1,110 @@
+{
+  "metadata": {
+    "category": "Android基础",
+    "subcategory": "Fragment",
+    "day": 1,
+    "total_questions": 10
+  },
+  "questions": [
+    {
+      "id": "FRG_001",
+      "question": "什么是Binder？",
+      "answer": "Binder是...（概念解释）",
+      "difficulty": 1,
+      "tags": [
+        "Android基础",
+        "Binder"
+      ]
+    },
+    {
+      "id": "FRG_002",
+      "question": "Handler的工作原理？",
+      "answer": "Handler通过...实现，主要流程包括...",
+      "difficulty": 2,
+      "tags": [
+        "Android基础",
+        "Handler"
+      ]
+    },
+    {
+      "id": "FRG_003",
+      "question": "AMS和WMS的区别？",
+      "answer": "AMS: ...; WMS: ...。主要区别在...",
+      "difficulty": 3,
+      "tags": [
+        "Android基础",
+        "AMS"
+      ]
+    },
+    {
+      "id": "FRG_004",
+      "question": "WMS的使用场景？",
+      "answer": "适用于...场景，如...",
+      "difficulty": 1,
+      "tags": [
+        "Android基础",
+        "WMS"
+      ]
+    },
+    {
+      "id": "FRG_005",
+      "question": "PMS的优缺点？",
+      "answer": "优点: ...; 缺点: ...",
+      "difficulty": 2,
+      "tags": [
+        "Android基础",
+        "PMS"
+      ]
+    },
+    {
+      "id": "FRG_006",
+      "question": "如何优化Zygote？",
+      "answer": "1. ... 2. ... 3. ...",
+      "difficulty": 3,
+      "tags": [
+        "Android基础",
+        "Zygote"
+      ]
+    },
+    {
+      "id": "FRG_007",
+      "question": "SurfaceFlinger的实现方式？",
+      "answer": "可以通过...实现，具体步骤...",
+      "difficulty": 1,
+      "tags": [
+        "Android基础",
+        "SurfaceFlinger"
+      ]
+    },
+    {
+      "id": "FRG_008",
+      "question": "MessageQueue常见问题及解决方案？",
+      "answer": "问题1: ... 解决: ...",
+      "difficulty": 2,
+      "tags": [
+        "Android基础",
+        "MessageQueue"
+      ]
+    },
+    {
+      "id": "FRG_009",
+      "question": "什么是Looper？",
+      "answer": "Looper是...（概念解释）",
+      "difficulty": 3,
+      "tags": [
+        "Android基础",
+        "Looper"
+      ]
+    },
+    {
+      "id": "FRG_010",
+      "question": "Choreographer的工作原理？",
+      "answer": "Choreographer通过...实现，主要流程包括...",
+      "difficulty": 1,
+      "tags": [
+        "Android基础",
+        "Choreographer"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,410 @@
+{
+  "metadata": {
+    "category": "JVM",
+    "subcategory": "调优",
+    "day": 4,
+    "total_questions": 40
+  },
+  "questions": [
+    {
+      "id": "TUN_001",
+      "question": "JVM 内存区域划分？ (1)",
+      "answer": "堆(新生代、老年代)、方法区(元空间)、虚拟机栈、本地方法栈、程序计数器",
+      "difficulty": 1,
+      "tags": [
+        "JVM",
+        "调优"
+      ]
+    },
+    {
+      "id": "TUN_002",
+      "question": "如何判断对象已死？ (2)",
+      "answer": "引用计数法(有循环引用问题)、可达性分析(从 GC Roots 可达)",
+      "difficulty": 2,
+      "tags": [
+        "JVM",
+        "调优"
+      ]
+    },
+    {
+      "id": "TUN_003",
+      "question": "垃圾回收算法？ (3)",
+      "answer": "标记-清除(有碎片)、复制(浪费空间)、标记-整理(耗时)、分代收集",
+      "difficulty": 3,
+      "tags": [
+        "JVM",
+        "调优"
+      ]
+    },
+    {
+      "id": "TUN_004",
+      "question": "CMS 和 G1 的区别？ (4)",
+      "answer": "CMS: 老年代、并发、标记-清除、碎片；G1: 整堆、可预测停顿、标记-整理",
+      "difficulty": 1,
+      "tags": [
+        "JVM",
+        "调优"
+      ]
+    },
+    {
+      "id": "TUN_005",
+      "question": "类加载过程？ (5)",
+      "answer": "加载 → 验证 → 准备 → 解析 → 初始化。双亲委派模型",
+      "difficulty": 2,
+      "tags": [
+        "JVM",
+        "调优"
+      ]
+    },
+    {
+      "id": "TUN_006",
+      "question": "JVM 内存区域划分？ (6)",
+      "answer": "堆(新生代、老年代)、方法区(元空间)、虚拟机栈、本地方法栈、程序计数器",
+      "difficulty": 3,
+      "tags": [
+        "JVM",
+        "调优"
+      ]
+    },
+    {
+      "id": "TUN_007",
+      "question": "如何判断对象已死？ (7)",
+      "answer": "引用计数法(有循环引用问题)、可达性分析(从 GC Roots 可达)",
+      "difficulty": 1,
+      "tags": [
+        "JVM",
+        "调优"
+      ]
+    },
+    {
+      "id": "TUN_008",
+      "question": "垃圾回收算法？ (8)",
+      "answer": "标记-清除(有碎片)、复制(浪费空间)、标记-整理(耗时)、分代收集",
+      "difficulty": 2,
+      "tags": [
+        "JVM",
+        "调优"
+      ]
+    },
+    {
+      "id": "TUN_009",
+      "question": "CMS 和 G1 的区别？ (9)",
+      "answer": "CMS: 老年代、并发、标记-清除、碎片；G1: 整堆、可预测停顿、标记-整理",
+      "difficulty": 3,
+      "tags": [
+        "JVM",
+        "调优"
+      ]
+    },
+    {
+      "id": "TUN_010",
+      "question": "类加载过程？ (10)",
+      "answer": "加载 → 验证 → 准备 → 解析 → 初始化。双亲委派模型",
+      "difficulty": 1,
+      "tags": [
+        "JVM",
+        "调优"
+      ]
+    },
+    {
+      "id": "TUN_011",
+      "question": "JVM 内存区域划分？ (11)",
+      "answer": "堆(新生代、老年代)、方法区(元空间)、虚拟机栈、本地方法栈、程序计数器",
+      "difficulty": 2,
+      "tags": [
+        "JVM",
+        "调优"
+      ]
+    },
+    {
+      "id": "TUN_012",
+      "question": "如何判断对象已死？ (12)",
+      "answer": "引用计数法(有循环引用问题)、可达性分析(从 GC Roots 可达)",
+      "difficulty": 3,
+      "tags": [
+        "JVM",
+        "调优"
+      ]
+    },
+    {
+      "id": "TUN_013",
+      "question": "垃圾回收算法？ (13)",
+      "answer": "标记-清除(有碎片)、复制(浪费空间)、标记-整理(耗时)、分代收集",
+      "difficulty": 1,
+      "tags": [
+        "JVM",
+        "调优"
+      ]
+    },
+    {
+      "id": "TUN_014",
+      "question": "CMS 和 G1 的区别？ (14)",
+      "answer": "CMS: 老年代、并发、标记-清除、碎片；G1: 整堆、可预测停顿、标记-整理",
+      "difficulty": 2,
+      "tags": [
+        "JVM",
+        "调优"
+      ]
+    },
+    {
+      "id": "TUN_015",
+      "question": "类加载过程？ (15)",
+      "answer": "加载 → 验证 → 准备 → 解析 → 初始化。双亲委派模型",
+      "difficulty": 3,
+      "tags": [
+        "JVM",
+        "调优"
+      ]
+    },
+    {
+      "id": "TUN_016",
+      "question": "JVM 内存区域划分？ (16)",
+      "answer": "堆(新生代、老年代)、方法区(元空间)、虚拟机栈、本地方法栈、程序计数器",
+      "difficulty": 1,
+      "tags": [
+        "JVM",
+        "调优"
+      ]
+    },
+    {
+      "id": "TUN_017",
+      "question": "如何判断对象已死？ (17)",
+      "answer": "引用计数法(有循环引用问题)、可达性分析(从 GC Roots 可达)",
+      "difficulty": 2,
+      "tags": [
+        "JVM",
+        "调优"
+      ]
+    },
+    {
+      "id": "TUN_018",
+      "question": "垃圾回收算法？ (18)",
+      "answer": "标记-清除(有碎片)、复制(浪费空间)、标记-整理(耗时)、分代收集",
+      "difficulty": 3,
+      "tags": [
+        "JVM",
+        "调优"
+      ]
+    },
+    {
+      "id": "TUN_019",
+      "question": "CMS 和 G1 的区别？ (19)",
+      "answer": "CMS: 老年代、并发、标记-清除、碎片；G1: 整堆、可预测停顿、标记-整理",
+      "difficulty": 1,
+      "tags": [
+        "JVM",
+        "调优"
+      ]
+    },
+    {
+      "id": "TUN_020",
+      "question": "类加载过程？ (20)",
+      "answer": "加载 → 验证 → 准备 → 解析 → 初始化。双亲委派模型",
+      "difficulty": 2,
+      "tags": [
+        "JVM",
+        "调优"
+      ]
+    },
+    {
+      "id": "TUN_021",
+      "question": "JVM 内存区域划分？ (21)",
+      "answer": "堆(新生代、老年代)、方法区(元空间)、虚拟机栈、本地方法栈、程序计数器",
+      "difficulty": 3,
+      "tags": [
+        "JVM",
+        "调优"
+      ]
+    },
+    {
+      "id": "TUN_022",
+      "question": "如何判断对象已死？ (22)",
+      "answer": "引用计数法(有循环引用问题)、可达性分析(从 GC Roots 可达)",
+      "difficulty": 1,
+      "tags": [
+        "JVM",
+        "调优"
+      ]
+    },
+    {
+      "id": "TUN_023",
+      "question": "垃圾回收算法？ (23)",
+      "answer": "标记-清除(有碎片)、复制(浪费空间)、标记-整理(耗时)、分代收集",
+      "difficulty": 2,
+      "tags": [
+        "JVM",
+        "调优"
+      ]
+    },
+    {
+      "id": "TUN_024",
+      "question": "CMS 和 G1 的区别？ (24)",
+      "answer": "CMS: 老年代、并发、标记-清除、碎片；G1: 整堆、可预测停顿、标记-整理",
+      "difficulty": 3,
+      "tags": [
+        "JVM",
+        "调优"
+      ]
+    },
+    {
+      "id": "TUN_025",
+      "question": "类加载过程？ (25)",
+      "answer": "加载 → 验证 → 准备 → 解析 → 初始化。双亲委派模型",
+      "difficulty": 1,
+      "tags": [
+        "JVM",
+        "调优"
+      ]
+    },
+    {
+      "id": "TUN_026",
+      "question": "JVM 内存区域划分？ (26)",
+      "answer": "堆(新生代、老年代)、方法区(元空间)、虚拟机栈、本地方法栈、程序计数器",
+      "difficulty": 2,
+      "tags": [
+        "JVM",
+        "调优"
+      ]
+    },
+    {
+      "id": "TUN_027",
+      "question": "如何判断对象已死？ (27)",
+      "answer": "引用计数法(有循环引用问题)、可达性分析(从 GC Roots 可达)",
+      "difficulty": 3,
+      "tags": [
+        "JVM",
+        "调优"
+      ]
+    },
+    {
+      "id": "TUN_028",
+      "question": "垃圾回收算法？ (28)",
+      "answer": "标记-清除(有碎片)、复制(浪费空间)、标记-整理(耗时)、分代收集",
+      "difficulty": 1,
+      "tags": [
+        "JVM",
+        "调优"
+      ]
+    },
+    {
+      "id": "TUN_029",
+      "question": "CMS 和 G1 的区别？ (29)",
+      "answer": "CMS: 老年代、并发、标记-清除、碎片；G1: 整堆、可预测停顿、标记-整理",
+      "difficulty": 2,
+      "tags": [
+        "JVM",
+        "调优"
+      ]
+    },
+    {
+      "id": "TUN_030",
+      "question": "类加载过程？ (30)",
+      "answer": "加载 → 验证 → 准备 → 解析 → 初始化。双亲委派模型",
+      "difficulty": 3,
+      "tags": [
+        "JVM",
+        "调优"
+      ]
+    },
+    {
+      "id": "TUN_031",
+      "question": "JVM 内存区域划分？ (31)",
+      "answer": "堆(新生代、老年代)、方法区(元空间)、虚拟机栈、本地方法栈、程序计数器",
+      "difficulty": 1,
+      "tags": [
+        "JVM",
+        "调优"
+      ]
+    },
+    {
+      "id": "TUN_032",
+      "question": "如何判断对象已死？ (32)",
+      "answer": "引用计数法(有循环引用问题)、可达性分析(从 GC Roots 可达)",
+      "difficulty": 2,
+      "tags": [
+        "JVM",
+        "调优"
+      ]
+    },
+    {
+      "id": "TUN_033",
+      "question": "垃圾回收算法？ (33)",
+      "answer": "标记-清除(有碎片)、复制(浪费空间)、标记-整理(耗时)、分代收集",
+      "difficulty": 3,
+      "tags": [
+        "JVM",
+        "调优"
+      ]
+    },
+    {
+      "id": "TUN_034",
+      "question": "CMS 和 G1 的区别？ (34)",
+      "answer": "CMS: 老年代、并发、标记-清除、碎片；G1: 整堆、可预测停顿、标记-整理",
+      "difficulty": 1,
+      "tags": [
+        "JVM",
+        "调优"
+      ]
+    },
+    {
+      "id": "TUN_035",
+      "question": "类加载过程？ (35)",
+      "answer": "加载 → 验证 → 准备 → 解析 → 初始化。双亲委派模型",
+      "difficulty": 2,
+      "tags": [
+        "JVM",
+        "调优"
+      ]
+    },
+    {
+      "id": "TUN_036",
+      "question": "JVM 内存区域划分？ (36)",
+      "answer": "堆(新生代、老年代)、方法区(元空间)、虚拟机栈、本地方法栈、程序计数器",
+      "difficulty": 3,
+      "tags": [
+        "JVM",
+        "调优"
+      ]
+    },
+    {
+      "id": "TUN_037",
+      "question": "如何判断对象已死？ (37)",
+      "answer": "引用计数法(有循环引用问题)、可达性分析(从 GC Roots 可达)",
+      "difficulty": 1,
+      "tags": [
+        "JVM",
+        "调优"
+      ]
+    },
+    {
+      "id": "TUN_038",
+      "question": "垃圾回收算法？ (38)",
+      "answer": "标记-清除(有碎片)、复制(浪费空间)、标记-整理(耗时)、分代收集",
+      "difficulty": 2,
+      "tags": [
+        "JVM",
+        "调优"
+      ]
+    },
+    {
+      "id": "TUN_039",
+      "question": "CMS 和 G1 的区别？ (39)",
+      "answer": "CMS: 老年代、并发、标记-清除、碎片；G1: 整堆、可预测停顿、标记-整理",
+      "difficulty": 3,
+      "tags": [
+        "JVM",
+        "调优"
+      ]
+    },
+    {
+      "id": "TUN_040",
+      "question": "类加载过程？ (40)",
+      "answer": "加载 → 验证 → 准备 → 解析 → 初始化。双亲委派模型",
+      "difficulty": 1,
+      "tags": [
+        "JVM",
+        "调优"
+      ]
+    }
+  ]
+}

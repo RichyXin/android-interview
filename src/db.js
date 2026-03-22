@@ -1,0 +1,212 @@
+/**
+ * IndexedDB Database Manager
+ */
+class DatabaseManager {
+    constructor() {
+        this.db = null;
+        this.DB_NAME = 'AndroidInterviewDB';
+        this.DB_VERSION = 2;
+    }
+
+    async init() {
+        return new Promise((resolve, reject) => {
+            const request = indexedDB.open(this.DB_NAME, this.DB_VERSION);
+            
+            request.onerror = () => reject(request.error);
+            request.onsuccess = () => {
+                this.db = request.result;
+                resolve(this.db);
+            };
+            
+            request.onupgradeneeded = (event) => {
+                const db = event.target.result;
+                
+                if (!db.objectStoreNames.contains('progress')) {
+                    const progressStore = db.createObjectStore('progress', { keyPath: 'questionId' });
+                    progressStore.createIndex('status', 'status', { unique: false });
+                    progressStore.createIndex('day', 'day', { unique: false });
+                }
+                
+                if (!db.objectStoreNames.contains('bookmarks')) {
+                    db.createObjectStore('bookmarks', { keyPath: 'questionId' });
+                }
+                
+                if (!db.objectStoreNames.contains('stats')) {
+                    db.createObjectStore('stats', { keyPath: 'key' });
+                }
+                
+                if (!db.objectStoreNames.contains('cards')) {
+                    const cardStore = db.createObjectStore('cards', { keyPath: 'id' });
+                    cardStore.createIndex('status', 'status', { unique: false });
+                }
+            };
+        });
+    }
+
+    async updateProgress(questionId, status, data = {}) {
+        if (!this.db) return;
+        const transaction = this.db.transaction(['progress'], 'readwrite');
+        const store = transaction.objectStore('progress');
+        const record = { questionId, status, timestamp: Date.now(), ...data };
+        return new Promise((resolve, reject) => {
+            const request = store.put(record);
+            request.onsuccess = () => resolve(record);
+            request.onerror = () => reject(request.error);
+        });
+    }
+
+    async getProgress(questionId) {
+        if (!this.db) return null;
+        const transaction = this.db.transaction(['progress'], 'readonly');
+        const store = transaction.objectStore('progress');
+        return new Promise((resolve, reject) => {
+            const request = store.get(questionId);
+            request.onsuccess = () => resolve(request.result);
+            request.onerror = () => reject(request.error);
+        });
+    }
+
+    async getAllProgress() {
+        if (!this.db) return [];
+        const transaction = this.db.transaction(['progress'], 'readonly');
+        const store = transaction.objectStore('progress');
+        return new Promise((resolve, reject) => {
+            const request = store.getAll();
+            request.onsuccess = () => resolve(request.result || []);
+            request.onerror = () => reject(request.error);
+        });
+    }
+
+    async countByStatus() {
+        const all = await this.getAllProgress();
+        const counts = { mastered: 0, review: 0, weak: 0, unanswered: 0 };
+        all.forEach(p => { if (counts[p.status] !== undefined) counts[p.status]++; });
+        return counts;
+    }
+
+    // ==================== Card Progress ====================
+    async saveCardProgress(progress) {
+        if (!this.db) return;
+        
+        if (!this.db.objectStoreNames.contains('cards')) {
+            console.warn('Cards store not found');
+            return;
+        }
+        
+        const transaction = this.db.transaction(['cards'], 'readwrite');
+        const store = transaction.objectStore('cards');
+        return new Promise((resolve, reject) => {
+            const request = store.put(progress);
+            request.onsuccess = () => resolve(progress);
+            request.onerror = () => reject(request.error);
+        });
+    }
+
+    async getCardProgress() {
+        if (!this.db) return [];
+        
+        if (!this.db.objectStoreNames.contains('cards')) {
+            return [];
+        }
+        
+        const transaction = this.db.transaction(['cards'], 'readonly');
+        const store = transaction.objectStore('cards');
+        return new Promise((resolve, reject) => {
+            const request = store.getAll();
+            request.onsuccess = () => resolve(request.result);
+            request.onerror = () => reject(request.error);
+        });
+    }
+}
+
+// Data Loader
+class DataLoader {
+    constructor() {
+        this.cache = new Map();
+        this.indexData = null;
+    }
+
+    async loadIndex() {
+        if (this.indexData) return this.indexData;
+        try {
+            const response = await fetch('data/index.json');
+            this.indexData = await response.json();
+            return this.indexData;
+        } catch (error) {
+            console.error('Failed to load index:', error);
+            // Return minimal fallback data
+            return {
+                metadata: { total_questions: 1200, categories: 15 },
+                categories: [
+                    { id: 'android_basic', name: 'Android 基础', day: 1, files: ['day1/activity.json'] }
+                ],
+                questions_index: []
+            };
+        }
+    }
+
+    async loadQuestions(filePath) {
+        if (this.cache.has(filePath)) return this.cache.get(filePath);
+        try {
+            const response = await fetch(`data/questions/${filePath}`);
+            const data = await response.json();
+            const questions = data.questions || [];
+            this.cache.set(filePath, questions);
+            return questions;
+        } catch (error) {
+            console.error('Failed to load questions:', filePath, error);
+            return [];
+        }
+    }
+
+    async loadDay(day) {
+        const index = await this.loadIndex();
+        const dayCategories = index.categories.filter(c => c.day === day);
+        const allQuestions = [];
+        for (const category of dayCategories) {
+            for (const file of category.files || []) {
+                const questions = await this.loadQuestions(file);
+                questions.forEach(q => { q.day = day; q.category = category.name; });
+                allQuestions.push(...questions);
+            }
+        }
+        return allQuestions;
+    }
+
+    async loadDayQuestions(day) {
+        // 加载指定天的所有题目
+        const files = [
+            `day${day}/activity.json`,
+            `day${day}/fragment.json`,
+            `day${day}/service.json`,
+            `day${day}/broadcast.json`,
+            `day${day}/kotlin_basic.json`,
+            `day${day}/kotlin_coroutine.json`,
+            `day${day}/java_basic.json`,
+            `day${day}/java_concurrent.json`,
+            `day${day}/jvm_gc.json`,
+            `day${day}/system_arch.json`,
+            `day${day}/framework.json`,
+            `day${day}/performance.json`,
+            `day${day}/jetpack.json`,
+            `day${day}/design_pattern.json`,
+            `day${day}/opensource.json`
+        ];
+        
+        const allQuestions = [];
+        for (const file of files) {
+            try {
+                const questions = await this.loadQuestions(file);
+                if (questions && questions.length > 0) {
+                    questions.forEach(q => {
+                        q.day = day;
+                        allQuestions.push(q);
+                    });
+                }
+            } catch (e) {
+                // 文件可能不存在，跳过
+            }
+        }
+        return allQuestions;
+    }
+}
