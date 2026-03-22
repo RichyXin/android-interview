@@ -1,0 +1,95 @@
+{
+  "metadata": {
+    "category": "JVM",
+    "subcategory": "JVM原理",
+    "day": 4,
+    "total_questions": 25
+  },
+  "questions": [
+    {
+      "id": "JVM_001",
+      "question": "JVM 内存区域分为哪些部分？各自的作用是什么？",
+      "answer": "## JVM 内存区域\n\n### 📌 运行时数据区\n\n```\n┌─────────────────────────────────────────┐\n│              方法区 (Method Area)         │\n│  存储类信息、常量、静态变量、方法代码        │\n│  JDK 8+ 为元空间 (Metaspace)              │\n└─────────────────────────────────────────┘\n│              堆 (Heap)                    │\n│  对象实例、数组，GC 主要区域               │\n│  ├─ 新生代 (Young)                       │\n│  │   ├─ Eden                             │\n│  │   ├─ Survivor 0                       │\n│  │   └─ Survivor 1                       │\n│  └─ 老年代 (Old)                         │\n└─────────────────────────────────────────┘\n│          虚拟机栈 (VM Stack)              │\n│  线程私有，方法执行的内存模型              │\n│  每个方法对应一个栈帧                      │\n└─────────────────────────────────────────┘\n│        本地方法栈 (Native Method Stack)   │\n│  Native 方法执行                          │\n└─────────────────────────────────────────┘\n│      程序计数器 (Program Counter)         │\n│  当前线程执行的字节码行号指示器            │\n└─────────────────────────────────────────┘\n```\n\n### 📋 各区域详解\n\n| 区域 | 线程共享 | 存储内容 | 异常 |\n|------|----------|----------|------|\n| 堆 | ✅ | 对象实例 | OutOfMemoryError |\n| 方法区 | ✅ | 类元数据、常量 | OutOfMemoryError |\n| 虚拟机栈 | ❌ | 栈帧、局部变量 | StackOverflowError |\n| 本地方法栈 | ❌ | Native 方法 | StackOverflowError |\n| 程序计数器 | ❌ | 字节码行号 | 无 |\n\n### 🔧 堆内存划分\n\n```java\n// 新生代 : 老年代 = 1 : 2（默认）\n// Eden : Survivor = 8 : 1 : 1（默认）\n\n-Xms20m    // 堆初始大小\n-Xmx20m    // 堆最大大小\n-Xmn10m    // 新生代大小\n-XX:SurvivorRatio=8  // Eden/Survivor 比例\n```\n\n### 🎯 栈帧结构\n\n```\n栈帧 (Stack Frame)\n├─ 局部变量表 (Local Variables)\n│     ├─ 基本数据类型\n│     ├─ 对象引用\n│     └─ returnAddress\n├─ 操作数栈 (Operand Stack)\n│     └─ 方法执行的工作区\n├─ 动态链接 (Dynamic Linking)\n│     └─ 指向运行时常量池的方法引用\n└─ 方法返回地址 (Return Address)\n      └─ 方法执行完的返回位置\n```",
+      "difficulty": 3,
+      "tags": ["JVM", "内存模型"]
+    },
+    {
+      "id": "JVM_002",
+      "question": "垃圾回收算法有哪些？各自的优缺点是什么？",
+      "answer": "## 垃圾回收算法\n\n### 1️⃣ 标记-清除算法 (Mark-Sweep)\n\n```\n┌─────────────────────────────────────────┐\n│ 1. 标记阶段：遍历对象图，标记存活对象      │\n│ 2. 清除阶段：清除未标记的对象              │\n└─────────────────────────────────────────┘\n```\n
+**优点：**\n- 简单直观\n- 不需要移动对象\n
+**缺点：**\n- 产生内存碎片\n- 标记和清除效率都不高\n
+---
+
+### 2️⃣ 复制算法 (Copying)\n
+```\n┌─────────────────────────────────────────┐\n│ Eden + Survivor 使用复制算法             │\n│                                           │\n│ Eden (90%)     Survivor (10%)            │\n│ [存活对象] ──────────→ [新区域]          │\n│ [垃圾对象]         直接清除              │\n└─────────────────────────────────────────┘\n```\n
+**优点：**\n- 无内存碎片\n- 回收效率高
+
+**缺点：**\n- 内存利用率低（需要预留空间）\n- 不适合老年代（存活对象多）
+
+---
+
+### 3️⃣ 标记-整理算法 (Mark-Compact)\n
+```\n┌─────────────────────────────────────────┐\n│ 1. 标记存活对象                            │\n│ 2. 将存活对象向一端移动                    │\n│ 3. 清理边界外的内存                        │\n└─────────────────────────────────────────┘\n```\n
+**优点：**\n- 无内存碎片\n- 内存利用率高
+
+**缺点：**\n- 需要移动对象，效率较低\n- STW（Stop The World）时间较长
+
+---
+
+### 4️⃣ 分代收集算法 (Generational Collection)\n
+**实际使用的算法，结合上述三种：**
+
+| 代 | 算法 | 原因 |\n|---|------|------|\n| 新生代 | 复制算法 | 对象存活率低，复制成本低 |\n| 老年代 | 标记-清除/整理 | 对象存活率高，复制成本高 |\n\n### 📊 算法对比\n\n| 算法 | 速度 | 空间利用率 | 碎片 | 适用场景 |\n|------|------|-----------|------|----------|\n| 标记-清除 | 中等 | 高 | 有 | 老年代（CMS）|\n| 复制 | 快 | 低 | 无 | 新生代 |\n| 标记-整理 | 慢 | 高 | 无 | 老年代（G1、ZGC）|\n
+
+### 💡 JVM 垃圾收集器
+
+| 收集器 | 新生代算法 | 老年代算法 | 特点 |\n|--------|-----------|-----------|------|\n| Serial | 复制 | 标记-整理 | 单线程，简单 |\n| Parallel | 复制 | 标记-整理 | 多线程，吞吐量大 |\n| CMS | 复制 | 标记-清除 | 并发，低延迟 |\n| G1 | 复制 | 标记-整理 | 分区管理，可预测停顿 |\n| ZGC | 复制 | 复制 | 超低延迟，并发 |",
+      "difficulty": 3,
+      "tags": ["JVM", "GC", "垃圾回收"]
+    },
+    {
+      "id": "JVM_003",
+      "question": "G1 垃圾收集器的工作原理是什么？与 CMS 有什么区别？",
+      "answer": "## G1 (Garbage First) 收集器\n\n### 📌 设计目标\n
+- 可预测的停顿时间模型
+- 面向服务端应用的大堆内存
+- 替代 CMS 收集器
+
+### 🏗️ 内存布局
+
+```\n传统收集器：\n├─ 新生代（固定大小）\n└─ 老年代（固定大小）\n\nG1 收集器：\n├─ Region 1 (E - Eden)\n├─ Region 2 (S - Survivor)\n├─ Region 3 (O - Old)\n├─ Region 4 (O - Old)\n├─ Region 5 (H - Humongous)\n└─ ...\n```\n
+**Region 大小：** 1MB ~ 32MB（2的幂）
+
+### 🔄 收集过程
+
+**Young GC：**\n1. 标记 Eden 和 Survivor 区的存活对象\n2. 将存活对象复制到空闲 Region（作为新 Survivor）\n3. 清空原 Eden/Survivor 区
+
+**Mixed GC：**\n1. 初始标记（Initial Mark）- STW\n2. 根区域扫描（Root Region Scanning）\n3. 并发标记（Concurrent Marking）\n4. 最终标记（Remark）- STW\n5. 筛选回收（Cleanup）- STW\n6. 复制存活对象到空 Region
+
+### 📊 G1 vs CMS
+
+| 特性 | G1 | CMS |\n|------|-----|-----|\n| **内存布局** | 分区（Region） | 分代（固定大小） |\n| **算法** | 标记-整理 | 标记-清除 |\n| **碎片** | 无 | 有（需要Full GC整理） |\n| **停顿时间** | 可预测 | 不可预测 |\n| **适用堆大小** | 大堆（6G+） | 中堆（<4G） |\n| **JDK版本** | JDK 7+ | JDK 5-8 |\n| **维护状态** | 活跃维护 | 已废弃（JDK 14） |\n
+### 🔧 JVM 参数
+
+```bash
+# 启用 G1
+-XX:+UseG1GC\n\n# 目标停顿时间（默认200ms）\n-XX:MaxGCPauseMillis=200\n\n# Region大小（默认根据堆大小计算）\n-XX:G1HeapRegionSize=16m\n\n# 并发线程数\n-XX:ConcGCThreads=4\n```\n\n### 💡 什么时候用 G1？\n\n- ✅ 堆内存 6GB 以上\n- ✅ 需要可预测的停顿时间\n- ✅ 替代 CMS（JDK 9+ 默认）\n- ❌ 堆内存较小（< 4GB 用 Parallel）",
+      "difficulty": 3,
+      "tags": ["JVM", "G1", "垃圾回收"]
+    },
+    {
+      "id": "JVM_004",
+      "question": "类加载的过程是什么？双亲委派模型是什么？",
+      "answer": "## 类加载过程\n\n### 📌 加载流程\n\n```\n加载 → 验证 → 准备 → 解析 → 初始化 → 使用 → 卸载\n```\n\n**1. 加载 (Loading)**\n- 通过全限定名获取二进制字节流\n- 将字节流转化为方法区的运行时数据结构\n- 生成 Class 对象作为访问入口\n\n**2. 验证 (Verification)**\n- 文件格式验证\n- 元数据验证\n- 字节码验证\n- 符号引用验证\n\n**3. 准备 (Preparation)**\n- 为类变量分配内存\n- 设置类变量初始值（零值）\n\n**4. 解析 (Resolution)**\n- 符号引用转换为直接引用\n\n**5. 初始化 (Initialization)**\n- 执行类构造器 <clinit>() 方法\n- 执行静态变量赋值和静态代码块\n\n### 🏗️ 双亲委派模型\n\n```\n┌─────────────────────────────────────────┐\n│         自定义类加载器 (Custom)           │\n│             ↑ 委派                       │\n├─────────────────────────────────────────┤\n│       应用程序类加载器 (AppClassLoader)    │\n│   加载 classpath 下的类                  │\n│             ↑ 委派                       │\n├─────────────────────────────────────────┤\n│       扩展类加载器 (ExtClassLoader)        │\n│   加载 <JAVA_HOME>/lib/ext 下的类         │\n│             ↑ 委派                       │\n├─────────────────────────────────────────┤\n│     启动类加载器 (BootstrapClassLoader)     │\n│   加载 <JAVA_HOME>/lib 下的核心类库        │\n└─────────────────────────────────────────┘\n```\n\n### 🔧 工作流程\n\n```java
+// 类加载器加载类时的逻辑\nprotected Class<?> loadClass(String name, boolean resolve) {\n    // 1. 检查类是否已加载\n    Class<?> c = findLoadedClass(name);\n    if (c == null) {\n        // 2. 委派给父类加载器\n        if (parent != null) {\n            c = parent.loadClass(name, false);\n        } else {\n            // 3. 委派到启动类加载器\n            c = findBootstrapClassOrNull(name);\n        }\n        // 4. 父加载器无法加载，自己加载\n        if (c == null) {\n            c = findClass(name);\n        }\n    }\n    return c;\n}\n```\n\n### 💡 双亲委派的优点\n
+1. **避免重复加载** - 先查父加载器，确保只加载一次\n2. **安全性** - 核心类由启动类加载器加载，防止篡改\n\n### 🎯 打破双亲委派
+
+**Tomcat 的类加载器：**\n```\nCommonClassLoader\n    ├── CatalinaClassLoader (Tomcat 私有)\n    └── SharedClassLoader\n            └── WebAppClassLoader (Web 应用隔离)\n                    └── /WEB-INF/classes\n                    └── /WEB-INF/lib\n```\n\n**SPI 机制：**\n- Service Provider Interface\n- 父类加载器请求子类加载器完成类加载\n- JDBC、JNDI 等使用",
+      "difficulty": 3,
+      "tags": ["JVM", "类加载", "双亲委派"]
+    },
+    {
+      "id": "JVM_005",
+      "question": "Java 内存模型（JMM）是什么？volatile 如何保证可见性？",
+      "answer": "## Java 内存模型 (JMM)\n\n### 📌 概念\n\nJMM 定义了多线程环境下共享变量的访问规则，保证并发程序的正确性。\n\n###

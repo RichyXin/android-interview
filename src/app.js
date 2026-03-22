@@ -216,16 +216,30 @@ class AndroidInterviewApp {
         try {
             // 加载 Day 1 题目
             const questions = await this.loader.loadDay(this.currentDay);
-            this.currentQuestions = questions;
+            
+            // 过滤掉已掌握的题目（避免重复学习）
+            const filteredQuestions = [];
+            for (const q of questions) {
+                const progress = await this.db.getProgress(q.id);
+                if (!progress || progress.status !== 'mastered') {
+                    filteredQuestions.push(q);
+                }
+            }
+            
+            this.currentQuestions = filteredQuestions;
             
             // 显示第一题
-            if (questions.length > 0) {
-                await this.showQuestion(questions[0]);
+            if (filteredQuestions.length > 0) {
+                await this.showQuestion(filteredQuestions[0]);
+            } else {
+                // 该 Day 所有题目都已掌握
+                document.getElementById('qTitle').textContent = '🎉 该章节所有题目都已掌握！';
+                document.getElementById('aBody').innerHTML = '<p>你可以选择其他天数继续学习，或查看已掌握的题目。</p>';
             }
 
             // 更新计数
-            document.getElementById('currentNum').textContent = '1';
-            document.getElementById('totalNum').textContent = questions.length;
+            document.getElementById('currentNum').textContent = filteredQuestions.length > 0 ? '1' : '0';
+            document.getElementById('totalNum').textContent = filteredQuestions.length;
 
             // 绑定学习页面事件
             this.bindStudyEvents();
@@ -464,6 +478,14 @@ class AndroidInterviewApp {
         document.getElementById('cardStatusFilter')?.addEventListener('change', (e) => {
             this.cardState.filter.status = e.target.value;
             this.filterCards();
+            
+            // 提示用户筛选结果
+            const filteredCount = this.cardState.cards.length;
+            if (filteredCount === 0) {
+                this.showToast('没有符合条件的卡片', 'info');
+            } else {
+                this.showToast(`已加载 ${filteredCount} 张卡片`, 'success');
+            }
         });
 
         // 控制按钮
@@ -582,9 +604,12 @@ class AndroidInterviewApp {
         }
         
         // 按状态筛选
-        if (this.cardState.filter.status !== 'all') {
+        if (this.cardState.filter.status && this.cardState.filter.status !== 'all') {
+            // 选择了特定状态
             filtered = filtered.filter(c => c.cardStatus === this.cardState.filter.status);
         }
+        // 注意：如果没有选择状态或选择 "all"，则显示所有卡片（包括已掌握）
+        // 这样可以避免误过滤
         
         this.cardState.cards = filtered;
         this.cardState.currentIndex = 0;

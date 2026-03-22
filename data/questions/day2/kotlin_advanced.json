@@ -1,0 +1,45 @@
+{
+  "metadata": {
+    "category": "Kotlin",
+    "subcategory": "Kotlin高级特性",
+    "day": 2,
+    "total_questions": 25
+  },
+  "questions": [
+    {
+      "id": "KT_001",
+      "question": "Kotlin 中的空安全机制是如何实现的？?.、?:、!! 有什么区别？",
+      "answer": "## Kotlin 空安全\n\n### 📌 可空类型系统\n\nKotlin 在编译期就区分可空和不可空类型，避免 NullPointerException。\n\n```kotlin\n// 不可空（默认）\nvar name: String = \"Tom\"\nname = null  // ❌ 编译错误\n\n// 可空（显式声明）\nvar name: String? = \"Tom\"\nname = null  // ✅ 编译通过\n```\n\n### 🛡️ 安全调用操作符\n\n#### 1️⃣ ?. （安全调用）\n```kotlin\n// 对象为空时返回 null，不抛异常\nval length = name?.length  // 如果 name 为 null，length 为 null\n\n// 链式调用\nval city = user?.address?.city  // 任一环节为 null 都返回 null\n```\n\n#### 2️⃣ ?: （Elvis 操作符）\n```kotlin\n// 左侧为空时返回右侧默认值\nval length = name?.length ?: 0  // name 为空时返回 0\n\n// 结合 return\nval user = findUser() ?: return  // 找不到用户直接返回\n\n// 等价于 Java\nint length = (name != null) ? name.length() : 0;\n```\n\n#### 3️⃣ !! （非空断言）\n```kotlin\n// 强制解包，为空时抛出 NPE\nval length = name!!.length  // 如果 name 为 null，抛出 NPE\n\n// ⚠️ 慎用！只在确定不会为空时使用\n```\n\n#### 4️⃣ let （安全执行）\n```kotlin\n// 只在非空时执行代码块\nname?.let {\n    // 这里 it 是非空的 String\n    println(it.length)\n}\n\n// 结合 also\nname?.let { it.uppercase() }?.also { println(it) }\n```\n\n### 📊 对比表\n\n| 操作符 | 为空时行为 | 返回值 | 使用场景 |\n|--------|-----------|--------|----------|\n| **?.** | 返回 null | T? | 安全访问属性/方法 |\n| **?:** | 返回右侧值 | T | 提供默认值 |\n| **!!** | 抛出 NPE | T | 强制解包（危险） |\n| **let** | 不执行 | - | 非空时执行代码块 |",
+      "difficulty": 1,
+      "tags": ["Kotlin", "空安全"]
+    },
+    {
+      "id": "KT_002",
+      "question": "Kotlin 的协程是什么？与线程有什么区别？",
+      "answer": "## Kotlin 协程\n\n### 📌 什么是协程？\n\n协程（Coroutine）是**轻量级线程**，可以挂起和恢复执行，不阻塞线程。\n\n```kotlin\nimport kotlinx.coroutines.*\n\nfun main() {\n    GlobalScope.launch {\n        delay(1000)  // 挂起1秒，不阻塞线程\n        println(\"Hello from coroutine!\")\n    }\n    Thread.sleep(2000)  // 主线程等待\n}\n```\n\n### 🔄 协程 vs 线程\n\n| 特性 | 协程 | 线程 |\n|------|------|------|\n| **内存占用** | 轻量（~KB） | 重量（~MB） |\n| **切换成本** | 低（用户态） | 高（内核态） |\n| **数量** | 成千上万 | 有限（几百） |\n| **阻塞** | 挂起不阻塞线程 | 阻塞整个线程 |\n| **调度** | 用户控制 | 系统调度 |\n\n### 🏗️ 核心概念\n\n```\nCoroutineScope → launch/async → Suspend Function\n```\n\n### 📝 基本使用\n\n#### launch - 启动协程\n```kotlin\nval job = GlobalScope.launch {\n    delay(1000)\n    println(\"Done!\")\n}\n\njob.cancel()  // 取消协程\n```\n\n#### async - 异步执行\n```kotlin\nval deferred = GlobalScope.async {\n    delay(1000)\n    \"Result\"\n}\n\nval result = deferred.await()  // 等待结果\n```\n\n### 🎯 线程切换\n\n```kotlin\nlaunch {\n    val data = withContext(Dispatchers.IO) {\n        network.fetchData()\n    }\n    withContext(Dispatchers.Main) {\n        updateUI(data)\n    }\n}\n```",
+      "difficulty": 3,
+      "tags": ["Kotlin", "协程"]
+    },
+    {
+      "id": "KT_003",
+      "question": "Kotlin 中的 data class 有什么作用？和普通 class 有什么区别？",
+      "answer": "## Kotlin Data Class\n\n### 📌 什么是 data class？\n\n数据类，专门用于保存数据的类，编译器自动生成常用方法。\n\n```kotlin\ndata class User(\n    val name: String,\n    val age: Int,\n    val email: String\n)\n```\n\n### ✨ 自动生成的方法\n\n| 方法 | 说明 |\n|------|------|\n| **equals()** | 比较两个对象的内容 |\n| **hashCode()** | 用于哈希集合（HashMap/HashSet） |\n| **toString()** | 返回 \"ClassName(field1=value1, ...)\" |\n| **copy()** | 创建副本，可修改部分属性 |\n| **componentN()** | 用于解构声明 |\n\n### 📝 代码示例\n\n```kotlin\nval user = User(\"Tom\", 25, \"tom@example.com\")\n\n// toString()\nprintln(user)  // User(name=Tom, age=25, email=tom@example.com)\n\n// equals()\nval user2 = User(\"Tom\", 25, \"tom@example.com\")\nprintln(user == user2)  // true\n\n// copy()\nval olderUser = user.copy(age = 26)\n\n// 解构声明\nval (name, age, email) = user\n```\n\n### 📊 data class vs 普通 class\n\n| 特性 | data class | 普通 class |\n|------|-----------|-----------|\n| 生成方法 | equals/hashCode/toString/copy | 无 |\n| 主构造函数 | 必须 | 可选 |\n| 属性要求 | 主构造函数参数为 val/var | 无要求 |\n| 继承 | 不可继承其他类 | 可继承 |\n| 使用场景 | 纯数据模型 | 业务逻辑类 |",
+      "difficulty": 2,
+      "tags": ["Kotlin", "DataClass"]
+    },
+    {
+      "id": "KT_004",
+      "question": "Kotlin 的扩展函数是什么？如何定义和使用？",
+      "answer": "## Kotlin 扩展函数\n\n### 📌 概念\n\n扩展函数允许你在不继承、不修改原类的情况下，为类添加新函数。\n\n### 🔧 定义方式\n\n```kotlin\n// 为 String 类添加扩展函数\nfun String.addExclamation(): String {\n    return this + \"!\"\n}\n\n// 使用\nval result = \"Hello\".addExclamation()  // \"Hello!\"\n```\n\n### 📝 实际示例\n\n#### 1. 简化 View 操作\n```kotlin\nfun View.visible() {\n    this.visibility = View.VISIBLE\n}\n\nfun View.gone() {\n    this.visibility = View.GONE\n}\n\n// 使用\nbutton.visible()\nprogressBar.gone()\n```\n\n#### 2. 扩展集合操作\n```kotlin\nfun <T> List<T>.secondOrNull(): T? {\n    return if (this.size > 1) this[1] else null\n}\n\n// 使用\nval list = listOf(1, 2, 3)\nval second = list.secondOrNull()  // 2\n```\n\n#### 3. 扩展 Android Context\n```kotlin\nfun Context.toast(message: String) {\n    Toast.makeText(this, message, Toast.LENGTH_SHORT).show()\n}\n\n// 使用\ntoast(\"Hello World\")\n```\n\n### ⚠️ 注意事项\n\n1. **不是真正的成员函数**，只是静态方法\n2. **不能访问私有/受保护成员**\n3. **可能被同名成员函数覆盖**\n4. **支持扩展属性**（需要 backing field）",
+      "difficulty": 2,
+      "tags": ["Kotlin", "扩展函数"]
+    },
+    {
+      "id": "KT_005",
+      "question": "Kotlin 的高阶函数是什么？常见的标准库高阶函数有哪些？",
+      "answer": "## Kotlin 高阶函数\n\n### 📌 概念\n\n高阶函数是指接收函数作为参数，或返回函数的函数。\n\n### 🔧 定义高阶函数\n\n```kotlin\n// 接收函数作为参数\nfun operateOnNumbers(a: Int, b: Int, operation: (Int, Int) -> Int): Int {\n    return operation(a, b)\n}\n\n// 使用\nval sum = operateOnNumbers(4, 5) { x, y -> x + y }\nval product = operateOnNumbers(4, 5) { x, y -> x * y }\n```\n\n### 📚 标准库高阶函数\n\n#### 1. let\n```kotlin\n// 非空时执行\nval result = str?.let {\n    it.uppercase()\n}\n```\n\n#### 2. run\n```kotlin\n// 执行代码块并返回结果\nval result = person.run {\n    \"$name is $age years old\"\n}\n```\n\n#### 3. with\n```kotlin\n// 对对象执行多个操作\nwith(textView) {\n    text = \"Hello\"\n    textSize = 16f\n    visibility = View.VISIBLE\n}\n```\n\n#### 4. apply\n```kotlin\n// 配置对象并返回自身\nval person = Person().apply {\n    name = \"Tom\"\n    age = 25\n}\n```\n\n#### 5. also\n```kotlin\n// 执行附加操作并返回自身\nval numbers = mutableListOf(1, 2, 3).also {\n    println(\"Before adding: $it\")\n    it.add(4)\n}\n```\n\n### 📊 作用域函数对比\n\n| 函数 | 对象引用 | 返回值 | 使用场景 |\n|------|----------|--------|----------|\n| let | it | Lambda 结果 | 非空判断、转换 |\n| run | this | Lambda 结果 | 对象配置、计算 |\n| with | this | Lambda 结果 | 对象批量操作 |\n| apply | this | 对象自身 | 对象初始化 |\n| also | it | 对象自身 | 附加操作 |",
+      "difficulty": 3,
+      "tags": ["Kotlin", "高阶函数"]
+    }
+  ]
+}
