@@ -306,6 +306,11 @@ class AndroidInterviewApp {
         return map[level] || '中级';
     }
 
+    getDifficultyClass(level) {
+        const map = { 1: 'difficulty-easy', 2: 'difficulty-medium', 3: 'difficulty-hard' };
+        return map[level] || 'difficulty-medium';
+    }
+
     updateRatingButtons(status) {
         document.querySelectorAll('.rating-btn').forEach(btn => {
             btn.classList.remove('active');
@@ -600,8 +605,310 @@ class AndroidInterviewApp {
         document.getElementById('cardsMastered').textContent = stats.mastered;
     }
 
+    // ==================== Categories ====================
     async loadCategories() {
-        this.showToast('分类浏览功能开发中', 'info');
+        this.initCategoryState();
+        await this.loadCategoryData();
+        this.renderCategoryTree();
+        this.bindCategoryEvents();
+    }
+
+    initCategoryState() {
+        this.categoryState = {
+            categories: [],
+            currentCategory: null,
+            questions: [],
+            filter: {
+                search: '',
+                difficulty: 'all',
+                status: 'all'
+            },
+            expandedCategories: new Set()
+        };
+    }
+
+    async loadCategoryData() {
+        try {
+            const index = await this.loader.loadIndex();
+            
+            // 构建分类树结构
+            this.categoryState.categories = index.categories.map(cat => ({
+                id: cat.id,
+                name: cat.name,
+                day: cat.day,
+                count: cat.question_count || 0,
+                files: cat.files || [],
+                expanded: false,
+                selected: false
+            }));
+            
+            // 默认选择第一个分类
+            if (this.categoryState.categories.length > 0) {
+                this.selectCategory(this.categoryState.categories[0].id);
+            }
+        } catch (error) {
+            console.error('Failed to load category data:', error);
+            this.showToast('加载分类数据失败', 'error');
+        }
+    }
+
+    renderCategoryTree() {
+        const treeContainer = document.getElementById('categoryTree');
+        if (!treeContainer) return;
+        
+        const buildTree = (categories) => {
+            return categories.map(cat => `
+                <div class="category-item ${cat.selected ? 'selected' : ''}" data-id="${cat.id}">
+                    <div class="category-item-header">
+                        <span class="category-icon">📁</span>
+                        <span class="category-name">${cat.name}</span>
+                        <span class="category-count">(${cat.count})</span>
+                    </div>
+                    <div class="category-day">Day ${cat.day}</div>
+                </div>
+            `).join('');
+        };
+        
+        treeContainer.innerHTML = buildTree(this.categoryState.categories);
+    }
+
+    bindCategoryEvents() {
+        // 分类点击
+        document.getElementById('categoryTree')?.addEventListener('click', (e) => {
+            const item = e.target.closest('.category-item');
+            if (item) {
+                const categoryId = item.dataset.id;
+                this.selectCategory(categoryId);
+            }
+        });
+        
+        // 搜索筛选
+        document.getElementById('categorySearch')?.addEventListener('input', (e) => {
+            this.categoryState.filter.search = e.target.value.toLowerCase();
+            this.filterCategories();
+        });
+    }
+
+    async selectCategory(categoryId) {
+        // 更新选中状态
+        this.categoryState.categories.forEach(cat => {
+            cat.selected = cat.id === categoryId;
+        });
+        
+        this.renderCategoryTree();
+        
+        // 加载该分类的题目
+        const category = this.categoryState.categories.find(c => c.id === categoryId);
+        if (category) {
+            this.categoryState.currentCategory = category;
+            await this.loadCategoryQuestions(category);
+            this.updateCategoryHeader(category);
+        }
+    }
+
+    async loadCategoryQuestions(category) {
+        try {
+            const questions = [];
+            
+            // 加载该分类的所有题目文件
+            for (const file of category.files) {
+                const fileQuestions = await this.loader.loadQuestions(file);
+                fileQuestions.forEach(q => {
+                    q.categoryName = category.name;
+                    q.categoryId = category.id;
+                });
+                questions.push(...fileQuestions);
+            }
+            
+            this.categoryState.questions = questions;
+            this.renderCategoryQuestions();
+        } catch (error) {
+            console.error('Failed to load category questions:', error);
+            this.showToast('加载题目失败', 'error');
+        }
+    }
+
+    renderCategoryQuestions() {
+        const container = document.getElementById('categoryQuestionsList');
+        if (!container) return;
+        
+        let questions = this.categoryState.questions;
+        
+        // 应用筛选
+        if (this.categoryState.filter.search) {
+            questions = questions.filter(q => 
+                q.question.toLowerCase().includes(this.categoryState.filter.search) ||
+                q.answer.toLowerCase().includes(this.categoryState.filter.search)
+            );
+        }
+        
+        if (questions.length === 0) {
+            container.innerHTML = `
+                <div class="empty-state">
+                    <span class="empty-icon">📭</span>
+                    <p>暂无题目</p>
+                </div>
+            `;
+            return;
+        }
+        
+        container.innerHTML = questions.map((q, idx) => `
+            <div class="question-list-item" data-id="${q.id}">
+                <div class="question-header">
+                    <span class="question-number">#${idx + 1}</span>
+                    <span class="question-difficulty ${this.getDifficultyClass(q.difficulty)}">
+                        ${this.getDifficultyText(q.difficulty)}
+                    </span>
+                    <span class="question-id">${q.id}</span>
+                </div>
+                <div class="question-content">${q.question}</div>
+                <div class="question-answer-preview">
+                    ${q.answer.substring(0, 100)}${q.answer.length > 100 ? '...' : ''}
+                </div>
+                <div class="question-tags">
+                    ${(q.tags || []).map(tag => `<span class="tag">${tag}</span>`).join('')}
+                </div>
+                <div class="question-actions">
+                    <button class="btn-view-answer" data-id="${q.id}">查看答案</button>
+                    <button class="btn-study-now" data-id="${q.id}">去学习</button>
+                </div>
+            </div>
+        `).join('');
+        
+        // 绑定按钮事件
+        container.querySelectorAll('.btn-view-answer').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const id = e.target.dataset.id;
+                this.showQuestionAnswer(id);
+            });
+        });
+        
+        container.querySelectorAll('.btn-study-now').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const id = e.target.dataset.id;
+                this.goToStudyQuestion(id);
+            });
+        });
+        
+        // 更新统计
+        document.getElementById('categoryQuestionCount').textContent = `${questions.length} 题`;
+    }
+
+    showQuestionAnswer(questionId) {
+        const question = this.categoryState.questions.find(q => q.id === questionId);
+        if (!question) return;
+        
+        // 创建模态框显示答案
+        const modal = document.createElement('div');
+        modal.className = 'modal active';
+        modal.innerHTML = `
+            <div class="modal-content question-modal">
+                <div class="modal-header">
+                    <h3>${question.id}</h3>
+                    <button class="modal-close">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="question-section">
+                        <h4>题目</h4>
+                        <div class="question-text">${question.question}</div>
+                    </div>
+                    <div class="answer-section">
+                        <h4>答案</h4>
+                        <div class="answer-text">${this.renderMarkdown(question.answer)}</div>
+                    </div>
+                    <div class="question-meta">
+                        <span>难度: ${this.getDifficultyText(question.difficulty)}</span>
+                        <span>分类: ${question.categoryName}</span>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn-primary" id="closeModal">关闭</button>
+                    <button class="btn-secondary" id="goToStudy">去学习此题</button>
+                </div>
+            </div>
+        `;
+        
+        document.body.appendChild(modal);
+        
+        // 绑定关闭事件
+        modal.querySelector('.modal-close').addEventListener('click', () => {
+            modal.remove();
+        });
+        modal.querySelector('#closeModal').addEventListener('click', () => {
+            modal.remove();
+        });
+        modal.querySelector('#goToStudy').addEventListener('click', () => {
+            modal.remove();
+            this.goToStudyQuestion(questionId);
+        });
+        
+        // 点击外部关闭
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) modal.remove();
+        });
+    }
+
+    goToStudyQuestion(questionId) {
+        // 跳转到学习页面并定位到该题目
+        const question = this.categoryState.questions.find(q => q.id === questionId);
+        if (!question) return;
+        
+        // 切换到学习页面
+        this.navigateTo('study');
+        
+        // 设置天数和题目
+        setTimeout(() => {
+            document.getElementById('dayFilter').value = question.day;
+            this.currentDay = question.day;
+            this.loadQuestionsForDay(question.day);
+            
+            // 找到并高亮该题目
+            const targetQuestion = this.questionsCache.get(question.day)?.find(q => q.id === questionId);
+            if (targetQuestion) {
+                this.currentQuestion = targetQuestion;
+                this.displayQuestion();
+            }
+        }, 100);
+    }
+
+    filterCategories() {
+        const search = this.categoryState.filter.search.toLowerCase();
+        
+        if (!search) {
+            this.renderCategoryTree();
+            return;
+        }
+        
+        // 筛选分类
+        const filtered = this.categoryState.categories.filter(cat => 
+            cat.name.toLowerCase().includes(search)
+        );
+        
+        // 重新渲染树
+        const treeContainer = document.getElementById('categoryTree');
+        if (treeContainer) {
+            treeContainer.innerHTML = filtered.map(cat => `
+                <div class="category-item ${cat.selected ? 'selected' : ''}" data-id="${cat.id}">
+                    <div class="category-item-header">
+                        <span class="category-icon">📁</span>
+                        <span class="category-name">${cat.name}</span>
+                        <span class="category-count">(${cat.count})</span>
+                    </div>
+                    <div class="category-day">Day ${cat.day}</div>
+                </div>
+            `).join('');
+        }
+    }
+
+    updateCategoryHeader(category) {
+        document.getElementById('currentCategoryTitle').textContent = category.name;
+        document.getElementById('categoryQuestionCount').textContent = `${category.count} 题`;
+        
+        // 计算已掌握数量
+        const mastered = this.categoryState.questions.filter(q => 
+            this.progressCache.get(q.id)?.status === 'mastered'
+        ).length;
+        document.getElementById('categoryMasteredCount').textContent = `已掌握 ${mastered}`;
     }
 
     async loadWeakness() {

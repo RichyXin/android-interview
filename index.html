@@ -303,10 +303,40 @@
                 </div>
 
                 <div class="page categories-page" id="categoriesPage">
-                    <div class="placeholder">
-                        <span class="placeholder-icon">📂</span>
-                        <h2>分类浏览</h2>
-                        <p>功能开发中...</p>
+                    <div class="section-header">
+                        <h2>📂 分类浏览</h2>
+                        <p>按类别系统学习面试知识点</p>
+                    </div>
+                    
+                    <div class="categories-container">
+                        <div class="categories-layout">
+                            <div class="categories-sidebar">
+                                <div class="category-filter">
+                                    <input type="text" id="categorySearch" placeholder="🔍 搜索分类...">
+                                </div>
+                                <div class="category-tree" id="categoryTree">
+                                    <!-- 分类树由 JS 生成 -->
+                                </div>
+                            </div>
+                            
+                            <div class="categories-content">
+                                <div class="category-header">
+                                    <h3 id="currentCategoryTitle">全部题目</h3>
+                                    <div class="category-stats">
+                                        <span id="categoryQuestionCount">0 题</span>
+                                        <span id="categoryMasteredCount">已掌握 0</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="category-tags" id="categoryTags">
+                                    <!-- 标签筛选 -->
+                                </div>
+                                
+                                <div class="questions-list" id="categoryQuestionsList">
+                                    <!-- 题目列表由 JS 生成 -->
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
