@@ -1,38 +1,38 @@
 {
   "metadata": {
-    "version": "2.1",
-    "total_questions": 25,
+    "version": "2.2",
+    "total_questions": 15,
     "categories_count": 2,
     "days_count": 2,
     "generated_date": "2026-03-22",
-    "note": "高质量答案版本，逐步完善中"
+    "note": "高质量答案版本"
   },
   "categories": [
     {
-      "id": "android_basic", 
-      "name": "Android 基础", 
-      "day": 1, 
-      "question_count": 15, 
+      "id": "android_basic",
+      "name": "Android 基础",
+      "day": 1,
+      "question_count": 5,
       "files": ["day1/service_broadcast.json"]
     },
     {
-      "id": "kotlin", 
-      "name": "Kotlin 核心", 
-      "day": 2, 
-      "question_count": 10, 
+      "id": "kotlin",
+      "name": "Kotlin 核心",
+      "day": 2,
+      "question_count": 4,
       "files": ["day2/kotlin_core.json"]
     }
   ],
   "days": {
     "1": {
-      "name": "Android 基础", 
-      "categories": ["Activity", "Service", "Broadcast"], 
-      "target": 15
+      "name": "Android 基础",
+      "categories": ["Service", "Broadcast"],
+      "target": 5
     },
     "2": {
-      "name": "Kotlin 核心", 
-      "categories": ["Kotlin 基础", "协程"], 
-      "target": 10
+      "name": "Kotlin 核心",
+      "categories": ["Kotlin 基础", "协程"],
+      "target": 4
     }
   }
 }

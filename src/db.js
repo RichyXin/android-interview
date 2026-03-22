@@ -174,37 +174,26 @@ class DataLoader {
     }
 
     async loadDayQuestions(day) {
-        // 加载指定天的所有题目
-        const files = [
-            `day${day}/activity.json`,
-            `day${day}/fragment.json`,
-            `day${day}/service.json`,
-            `day${day}/broadcast.json`,
-            `day${day}/kotlin_basic.json`,
-            `day${day}/kotlin_coroutine.json`,
-            `day${day}/java_basic.json`,
-            `day${day}/java_concurrent.json`,
-            `day${day}/jvm_gc.json`,
-            `day${day}/system_arch.json`,
-            `day${day}/framework.json`,
-            `day${day}/performance.json`,
-            `day${day}/jetpack.json`,
-            `day${day}/design_pattern.json`,
-            `day${day}/opensource.json`
-        ];
+        // 从 index.json 获取该天的文件列表
+        const index = await this.loadIndex();
+        const dayCategories = index.categories.filter(c => c.day === day);
         
         const allQuestions = [];
-        for (const file of files) {
-            try {
-                const questions = await this.loadQuestions(file);
-                if (questions && questions.length > 0) {
-                    questions.forEach(q => {
-                        q.day = day;
-                        allQuestions.push(q);
-                    });
+        for (const category of dayCategories) {
+            for (const file of category.files || []) {
+                try {
+                    const questions = await this.loadQuestions(file);
+                    if (questions && questions.length > 0) {
+                        questions.forEach(q => {
+                            q.day = day;
+                            q.category = category.name;
+                            allQuestions.push(q);
+                        });
+                    }
+                } catch (e) {
+                    // 文件可能不存在，跳过
+                    console.warn(`Failed to load ${file}:`, e.message);
                 }
-            } catch (e) {
-                // 文件可能不存在，跳过
             }
         }
         return allQuestions;
