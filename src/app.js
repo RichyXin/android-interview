@@ -342,13 +342,37 @@ class AndroidInterviewApp {
     }
 
     prevQuestion() {
-        // 实现上一题逻辑
-        this.showToast('上一题', 'info');
+        if (!this.currentQuestions || this.currentQuestions.length === 0) return;
+        
+        // 找到当前题目的索引
+        const currentIndex = this.currentQuestions.findIndex(q => q.id === this.currentQuestion?.id);
+        if (currentIndex === -1) return;
+        
+        // 计算上一题索引
+        const prevIndex = currentIndex === 0 ? this.currentQuestions.length - 1 : currentIndex - 1;
+        
+        // 显示上一题
+        this.showQuestion(this.currentQuestions[prevIndex]);
+        
+        // 更新计数显示
+        document.getElementById('currentNum').textContent = prevIndex + 1;
     }
 
     nextQuestion() {
-        // 实现下一题逻辑
-        this.showToast('下一题', 'info');
+        if (!this.currentQuestions || this.currentQuestions.length === 0) return;
+        
+        // 找到当前题目的索引
+        const currentIndex = this.currentQuestions.findIndex(q => q.id === this.currentQuestion?.id);
+        if (currentIndex === -1) return;
+        
+        // 计算下一题索引
+        const nextIndex = currentIndex === this.currentQuestions.length - 1 ? 0 : currentIndex + 1;
+        
+        // 显示下一题
+        this.showQuestion(this.currentQuestions[nextIndex]);
+        
+        // 更新计数显示
+        document.getElementById('currentNum').textContent = nextIndex + 1;
     }
 
     // ==================== Flash Cards ====================
