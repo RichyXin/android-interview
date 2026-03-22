@@ -354,7 +354,8 @@ class AndroidInterviewApp {
     // ==================== Flash Cards ====================
     initCardState() {
         this.cardState = {
-            cards: [],
+            allCards: [],      // 原始卡片数据
+            cards: [],         // 当前显示的卡片（筛选后）
             currentIndex: 0,
             isFlipped: false,
             filter: { day: 'all', status: 'all' },
@@ -389,20 +390,22 @@ class AndroidInterviewApp {
                 }
             }
             
-            this.cardState.cards = allQuestions;
+            this.cardState.allCards = allQuestions;
             this.cardState.stats.total = allQuestions.length;
             
             // 尝试从数据库加载卡片进度
             const savedProgress = await this.db.getCardProgress();
             if (savedProgress) {
                 savedProgress.forEach(progress => {
-                    const card = this.cardState.cards.find(c => c.uniqueId === progress.id);
+                    const card = this.cardState.allCards.find(c => c.uniqueId === progress.id);
                     if (card) {
                         card.cardStatus = progress.status;
                     }
                 });
             }
             
+            // 应用筛选并显示
+            this.filterCards();
             this.updateCardStats();
         } catch (error) {
             console.error('Failed to load card data:', error);
@@ -546,7 +549,8 @@ class AndroidInterviewApp {
     }
 
     filterCards() {
-        let filtered = [...this.cardState.cards];
+        // 从原始数据筛选，避免重复筛选导致数据丢失
+        let filtered = [...this.cardState.allCards];
         
         // 按天数筛选
         if (this.cardState.filter.day !== 'all') {
