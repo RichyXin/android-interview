@@ -1,5 +1,6 @@
 /**
  * Android 面试学习系统 - 主应用逻辑
+ * Enhanced AI Integration
  */
 
 class AndroidInterviewApp {
@@ -8,9 +9,11 @@ class AndroidInterviewApp {
         this.loader = null;
         this.currentPage = 'dashboard';
         this.currentQuestion = null;
+        this.currentQuestions = [];
         this.currentDay = 1;
         this.questionsCache = new Map();
         this.progressCache = new Map();
+        this.aiConfig = this.loadAiConfig();
         
         this.init();
     }
@@ -28,6 +31,9 @@ class AndroidInterviewApp {
             // 绑定事件
             this.bindEvents();
             
+            // 初始化 AI 配置
+            this.initAiConfig();
+            
             // 加载初始数据
             await this.loadDashboard();
             
@@ -38,6 +44,147 @@ class AndroidInterviewApp {
         }
     }
 
+    // ==================== AI Configuration ====================
+    loadAiConfig() {
+        const saved = localStorage.getItem('ai_config');
+        if (saved) {
+            try {
+                return JSON.parse(saved);
+            } catch (e) {
+                console.error('Failed to parse AI config:', e);
+            }
+        }
+        return {
+            apiKey: '',
+            model: 'qwen-turbo',
+            temperature: 0.7,
+            provider: 'dashscope' // dashscope, openai, etc.
+        };
+    }
+
+    saveAiConfig() {
+        localStorage.setItem('ai_config', JSON.stringify(this.aiConfig));
+    }
+
+    initAiConfig() {
+        // AI 配置按钮
+        document.getElementById('settingsBtn')?.addEventListener('click', () => {
+            this.openAiConfigModal();
+        });
+
+        // 绑定 AI 配置模态框事件
+        this.bindAiConfigEvents();
+    }
+
+    bindAiConfigEvents() {
+        const modal = document.getElementById('aiConfigModal');
+        const closeBtn = document.getElementById('closeAiConfig');
+        const saveBtn = document.getElementById('saveAiConfig');
+        const testBtn = document.getElementById('testAiConnection');
+        const toggleBtn = document.getElementById('toggleApiKey');
+        const apiKeyInput = document.getElementById('aiApiKey');
+        const modelSelect = document.getElementById('aiModel');
+        const tempSlider = document.getElementById('aiTemperature');
+
+        // 关闭模态框
+        closeBtn?.addEventListener('click', () => {
+            modal.classList.remove('active');
+        });
+
+        // 点击外部关闭
+        modal?.addEventListener('click', (e) => {
+            if (e.target === modal) modal.classList.remove('active');
+        });
+
+        // 切换 API Key 可见性
+        toggleBtn?.addEventListener('click', () => {
+            const type = apiKeyInput.type === 'password' ? 'text' : 'password';
+            apiKeyInput.type = type;
+            toggleBtn.textContent = type === 'password' ? '👁️' : '🙈';
+        });
+
+        // 温度滑块
+        tempSlider?.addEventListener('input', (e) => {
+            const value = e.target.value / 100;
+            document.getElementById('temperatureValue').textContent = value.toFixed(1);
+        });
+
+        // 保存配置
+        saveBtn?.addEventListener('click', () => {
+            this.aiConfig = {
+                apiKey: apiKeyInput.value.trim(),
+                model: modelSelect.value,
+                temperature: parseInt(tempSlider.value) / 100,
+                provider: this.getProviderFromModel(modelSelect.value)
+            };
+            this.saveAiConfig();
+            this.showConfigStatus('配置已保存', 'success');
+            setTimeout(() => modal.classList.remove('active'), 1000);
+        });
+
+        // 测试连接
+        testBtn?.addEventListener('click', () => {
+            this.testAiConnection();
+        });
+    }
+
+    getProviderFromModel(model) {
+        if (model.startsWith('qwen')) return 'dashscope';
+        if (model.startsWith('gpt')) return 'openai';
+        if (model.startsWith('claude')) return 'anthropic';
+        if (model.startsWith('deepseek')) return 'deepseek';
+        return 'dashscope';
+    }
+
+    openAiConfigModal() {
+        const modal = document.getElementById('aiConfigModal');
+        const apiKeyInput = document.getElementById('aiApiKey');
+        const modelSelect = document.getElementById('aiModel');
+        const tempSlider = document.getElementById('aiTemperature');
+
+        // 填充当前配置
+        apiKeyInput.value = this.aiConfig.apiKey || '';
+        modelSelect.value = this.aiConfig.model || 'qwen-turbo';
+        tempSlider.value = (this.aiConfig.temperature || 0.7) * 100;
+        document.getElementById('temperatureValue').textContent = 
+            (this.aiConfig.temperature || 0.7).toFixed(1);
+
+        modal.classList.add('active');
+    }
+
+    async testAiConnection() {
+        const apiKey = document.getElementById('aiApiKey').value.trim();
+        if (!apiKey) {
+            this.showConfigStatus('请输入 API Key', 'error');
+            return;
+        }
+
+        this.showConfigStatus('正在测试连接...', 'info');
+
+        try {
+            const response = await this.callAiApi('Hello', true);
+            if (response && !response.includes('错误')) {
+                this.showConfigStatus('连接成功！', 'success');
+            } else {
+                this.showConfigStatus('连接失败，请检查 API Key', 'error');
+            }
+        } catch (error) {
+            this.showConfigStatus(`连接失败: ${error.message}`, 'error');
+        }
+    }
+
+    showConfigStatus(message, type) {
+        const statusEl = document.getElementById('aiConfigStatus');
+        statusEl.textContent = message;
+        statusEl.className = 'config-status ' + type;
+        
+        setTimeout(() => {
+            statusEl.textContent = '';
+            statusEl.className = 'config-status';
+        }, 5000);
+    }
+
+    // ==================== Core Events ====================
     bindEvents() {
         // 侧边栏导航
         document.querySelectorAll('.nav-item').forEach(item => {
@@ -55,11 +202,6 @@ class AndroidInterviewApp {
         // 搜索
         document.getElementById('searchInput')?.addEventListener('input', (e) => {
             this.handleSearch(e.target.value);
-        });
-
-        // 设置按钮
-        document.getElementById('settingsBtn')?.addEventListener('click', () => {
-            this.openSettings();
         });
 
         // 导出数据
@@ -151,7 +293,6 @@ class AndroidInterviewApp {
             document.getElementById('masteredCount').textContent = mastered;
             document.getElementById('reviewCount').textContent = review;
             document.getElementById('weakCount').textContent = weak;
-            document.getElementById('weakBadge').textContent = weak;
 
             // 加载 Day 1 进度
             const day1Questions = await this.loader.loadDay(1);
@@ -187,14 +328,13 @@ class AndroidInterviewApp {
         const ctx = document.getElementById('categoryChart');
         if (!ctx) return;
         
-        // 简化版图表数据
         new Chart(ctx, {
             type: 'doughnut',
             data: {
                 labels: ['已掌握', '学习中', '未开始'],
                 datasets: [{
                     data: [10, 20, 70],
-                    backgroundColor: ['#3DDC84', '#FFA726', '#2D333B'],
+                    backgroundColor: ['#00D26A', '#F59E0B', '#1F2937'],
                     borderWidth: 0
                 }]
             },
@@ -204,7 +344,7 @@ class AndroidInterviewApp {
                 plugins: {
                     legend: {
                         position: 'bottom',
-                        labels: { color: '#B0B8C4' }
+                        labels: { color: '#9CA3AF' }
                     }
                 }
             }
@@ -214,10 +354,10 @@ class AndroidInterviewApp {
     // ==================== Study ====================
     async loadStudy() {
         try {
-            // 加载 Day 1 题目
+            // 加载当前天数的题目
             const questions = await this.loader.loadDay(this.currentDay);
             
-            // 过滤掉已掌握的题目（避免重复学习）
+            // 过滤掉已掌握的题目
             const filteredQuestions = [];
             for (const q of questions) {
                 const progress = await this.db.getProgress(q.id);
@@ -232,9 +372,8 @@ class AndroidInterviewApp {
             if (filteredQuestions.length > 0) {
                 await this.showQuestion(filteredQuestions[0]);
             } else {
-                // 该 Day 所有题目都已掌握
                 document.getElementById('qTitle').textContent = '🎉 该章节所有题目都已掌握！';
-                document.getElementById('aBody').innerHTML = '<p>你可以选择其他天数继续学习，或查看已掌握的题目。</p>';
+                document.getElementById('aBody').innerHTML = '<p>你可以选择其他天数继续学习。</p>';
             }
 
             // 更新计数
@@ -251,34 +390,81 @@ class AndroidInterviewApp {
     }
 
     bindStudyEvents() {
-        // 上一题/下一题
-        document.getElementById('prevQuestion')?.addEventListener('click', () => {
-            this.prevQuestion();
-        });
-        document.getElementById('nextQuestion')?.addEventListener('click', () => {
-            this.nextQuestion();
-        });
-
-        // 显示答案
-        document.getElementById('revealAnswer')?.addEventListener('click', () => {
-            document.getElementById('answerContent').style.display = 'block';
-            document.getElementById('revealAnswer').style.display = 'none';
-        });
-
-        // 掌握程度按钮
-        document.querySelectorAll('.rating-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                const rating = e.currentTarget.dataset.rating;
-                this.rateQuestion(rating);
+        // 避免重复绑定，先移除旧的事件监听器
+        const prevBtn = document.getElementById('prevQuestion');
+        const nextBtn = document.getElementById('nextQuestion');
+        const revealBtn = document.getElementById('revealAnswer');
+        
+        // 使用新的处理方式，避免重复绑定
+        if (prevBtn && !prevBtn._hasEvent) {
+            prevBtn.addEventListener('click', () => this.prevQuestion());
+            prevBtn._hasEvent = true;
+        }
+        if (nextBtn && !nextBtn._hasEvent) {
+            nextBtn.addEventListener('click', () => this.nextQuestion());
+            nextBtn._hasEvent = true;
+        }
+        if (revealBtn && !revealBtn._hasEvent) {
+            revealBtn.addEventListener('click', () => {
+                document.getElementById('answerContent').style.display = 'block';
+                document.getElementById('revealAnswer').style.display = 'none';
             });
-        });
+            revealBtn._hasEvent = true;
+        }
 
-        // AI 学习按钮
-        document.getElementById('aiLearnBtn')?.addEventListener('click', () => {
-            this.openAiModal();
-        });
+        // 掌握程度按钮 - 使用事件委托
+        const ratingContainer = document.querySelector('.rating-buttons');
+        if (ratingContainer && !ratingContainer._hasEvent) {
+            ratingContainer.addEventListener('click', (e) => {
+                const btn = e.target.closest('.rating-btn');
+                if (btn) {
+                    const rating = btn.dataset.rating;
+                    this.rateQuestion(rating);
+                }
+            });
+            ratingContainer._hasEvent = true;
+        }
 
-        // 筛选器
+        // AI 按钮同样处理
+        const aiLearnBtn = document.getElementById('aiLearnBtn');
+        if (aiLearnBtn && !aiLearnBtn._hasEvent) {
+            aiLearnBtn.addEventListener('click', () => {
+                if (!this.currentQuestion) {
+                    this.showToast('请先选择一道题目', 'error');
+                    return;
+                }
+                this.navigateTo('chat');
+                setTimeout(() => this.explainWithAi(this.currentQuestion), 100);
+            });
+            aiLearnBtn._hasEvent = true;
+        }
+
+        const aiDeepBtn = document.getElementById('aiDeepAnalysisBtn');
+        if (aiDeepBtn && !aiDeepBtn._hasEvent) {
+            aiDeepBtn.addEventListener('click', () => {
+                if (!this.currentQuestion) {
+                    this.showToast('请先选择一道题目', 'error');
+                    return;
+                }
+                this.showAiDeepAnalysis(this.currentQuestion);
+            });
+            aiDeepBtn._hasEvent = true;
+        }
+
+        // 快速提问按钮
+        const quickActions = document.querySelector('.quick-actions');
+        if (quickActions && !quickActions._hasEvent) {
+            quickActions.addEventListener('click', (e) => {
+                const btn = e.target.closest('.quick-action-btn');
+                if (btn) {
+                    const prompt = btn.dataset.prompt;
+                    this.handleQuickAction(prompt);
+                }
+            });
+            quickActions._hasEvent = true;
+        }
+
+        // 天数筛选器
         document.getElementById('dayFilter')?.addEventListener('change', (e) => {
             const day = parseInt(e.target.value);
             if (!isNaN(day)) {
@@ -290,8 +476,6 @@ class AndroidInterviewApp {
 
     async showQuestion(question) {
         this.currentQuestion = question;
-        
-        // 缓存题目
         this.questionsCache.set(question.id, question);
 
         // 更新显示
@@ -302,8 +486,8 @@ class AndroidInterviewApp {
         document.getElementById('qDay').textContent = `Day ${question.day}`;
         document.getElementById('qTitle').textContent = question.question;
         
-        // 渲染答案（支持 Markdown）
-        const answerHtml = marked.parse(question.answer || '暂无答案');
+        // 渲染答案
+        const answerHtml = this.renderMarkdown(question.answer || '暂无答案');
         document.getElementById('aBody').innerHTML = answerHtml;
 
         // 重置答案显示
@@ -344,6 +528,11 @@ class AndroidInterviewApp {
         
         this.updateRatingButtons(rating);
         this.showToast(`已标记为: ${this.getRatingText(rating)}`, 'success');
+        
+        // 自动切换到下一题（延迟500ms让用户看到反馈）
+        setTimeout(() => {
+            this.nextQuestion();
+        }, 500);
     }
 
     getRatingText(rating) {
@@ -357,43 +546,122 @@ class AndroidInterviewApp {
 
     prevQuestion() {
         if (!this.currentQuestions || this.currentQuestions.length === 0) return;
-        
-        // 找到当前题目的索引
         const currentIndex = this.currentQuestions.findIndex(q => q.id === this.currentQuestion?.id);
         if (currentIndex === -1) return;
-        
-        // 计算上一题索引
         const prevIndex = currentIndex === 0 ? this.currentQuestions.length - 1 : currentIndex - 1;
-        
-        // 显示上一题
         this.showQuestion(this.currentQuestions[prevIndex]);
-        
-        // 更新计数显示
         document.getElementById('currentNum').textContent = prevIndex + 1;
     }
 
     nextQuestion() {
         if (!this.currentQuestions || this.currentQuestions.length === 0) return;
-        
-        // 找到当前题目的索引
         const currentIndex = this.currentQuestions.findIndex(q => q.id === this.currentQuestion?.id);
         if (currentIndex === -1) return;
-        
-        // 计算下一题索引
         const nextIndex = currentIndex === this.currentQuestions.length - 1 ? 0 : currentIndex + 1;
-        
-        // 显示下一题
         this.showQuestion(this.currentQuestions[nextIndex]);
-        
-        // 更新计数显示
         document.getElementById('currentNum').textContent = nextIndex + 1;
+    }
+
+    // ==================== AI Deep Analysis ====================
+    async showAiDeepAnalysis(question) {
+        const modal = document.getElementById('aiResponseModal');
+        const titleEl = document.getElementById('aiResponseTitle');
+        const subtitleEl = document.getElementById('aiResponseSubtitle');
+        const contentEl = document.getElementById('aiResponseContent');
+
+        titleEl.textContent = '🧠 AI 深度解析';
+        subtitleEl.textContent = `正在分析: ${question.question.substring(0, 30)}...`;
+        contentEl.innerHTML = `
+            <div class="ai-loading">
+                <div class="ai-loading-spinner"></div>
+                <p>AI 正在深度分析中，请稍候...</p>
+            </div>
+        `;
+
+        modal.classList.add('active');
+
+        // 关闭按钮事件
+        document.getElementById('closeAiResponse')?.addEventListener('click', () => {
+            modal.classList.remove('active');
+        });
+        document.getElementById('closeAiResponseBtn')?.addEventListener('click', () => {
+            modal.classList.remove('active');
+        });
+        document.getElementById('copyAiResponse')?.addEventListener('click', () => {
+            const text = contentEl.innerText;
+            navigator.clipboard.writeText(text).then(() => {
+                this.showToast('内容已复制到剪贴板', 'success');
+            });
+        });
+
+        // 调用 AI
+        const prompt = `请对以下 Android 面试题进行深度解析：
+
+题目：${question.question}
+
+参考答案：${question.answer}
+
+请从以下几个方面进行分析：
+1. 核心知识点讲解
+2. 易错点和面试陷阱
+3. 相关扩展知识
+4. 实际应用场景
+5. 面试回答技巧
+
+请用中文回答，结构清晰。`;
+
+        try {
+            const response = await this.callAiApi(prompt);
+            contentEl.innerHTML = this.renderMarkdown(response);
+            subtitleEl.textContent = '分析完成';
+        } catch (error) {
+            contentEl.innerHTML = `
+                <div class="chat-message error">
+                    <div class="chat-content">
+                        <div class="chat-text">
+                            <span class="chat-error-icon">⚠️</span>
+                            获取 AI 分析失败: ${error.message}
+                        </div>
+                    </div>
+                </div>
+            `;
+            subtitleEl.textContent = '分析失败';
+        }
+    }
+
+    // ==================== Quick Actions ====================
+    async handleQuickAction(prompt) {
+        if (!this.currentQuestion) {
+            this.showToast('请先选择一道题目', 'error');
+            return;
+        }
+
+        let message = '';
+        switch(prompt) {
+            case 'explain':
+                message = `请详细解释这道 Android 面试题：\n\n题目：${this.currentQuestion.question}\n\n参考答案：${this.currentQuestion.answer}\n\n请用通俗易懂的方式解释，并补充关键知识点。`;
+                break;
+            case 'knowledge':
+                message = `这道 Android 面试题涉及哪些相关知识点？\n\n题目：${this.currentQuestion.question}\n\n请列出相关的核心概念、原理和技术栈。`;
+                break;
+            case 'extend':
+                message = `请基于这道 Android 面试题，举一反三，提供几道类似的进阶题目和延伸问题：\n\n题目：${this.currentQuestion.question}\n\n请包含：1. 难度递增的变体题 2. 实际应用场景 3. 相关面试常考题。`;
+                break;
+        }
+
+        // 在聊天页面显示
+        this.navigateTo('chat');
+        setTimeout(() => {
+            document.getElementById('chatInput').value = message;
+            this.sendAiMessage();
+        }, 100);
     }
 
     // ==================== Flash Cards ====================
     initCardState() {
         this.cardState = {
-            allCards: [],      // 原始卡片数据
-            cards: [],         // 当前显示的卡片（筛选后）
+            allCards: [],
+            cards: [],
             currentIndex: 0,
             isFlipped: false,
             filter: { day: 'all', status: 'all' },
@@ -410,12 +678,11 @@ class AndroidInterviewApp {
 
     async loadCardData() {
         try {
-            // 获取所有题目作为卡片
             const allQuestions = [];
-            const days = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+            const days = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15];
             
             for (const day of days) {
-                const dayQuestions = await this.loader.loadDayQuestions(day);
+                const dayQuestions = await this.loader.loadDay(day);
                 if (dayQuestions) {
                     dayQuestions.forEach((q, idx) => {
                         allQuestions.push({
@@ -431,7 +698,6 @@ class AndroidInterviewApp {
             this.cardState.allCards = allQuestions;
             this.cardState.stats.total = allQuestions.length;
             
-            // 尝试从数据库加载卡片进度
             const savedProgress = await this.db.getCardProgress();
             if (savedProgress) {
                 savedProgress.forEach(progress => {
@@ -442,7 +708,6 @@ class AndroidInterviewApp {
                 });
             }
             
-            // 应用筛选并显示
             this.filterCards();
             this.updateCardStats();
         } catch (error) {
@@ -452,7 +717,6 @@ class AndroidInterviewApp {
     }
 
     bindCardEvents() {
-        // 卡片翻转
         const flashcard = document.getElementById('flashcard');
         flashcard?.addEventListener('click', (e) => {
             if (!e.target.closest('.card-btn')) {
@@ -460,7 +724,6 @@ class AndroidInterviewApp {
             }
         });
 
-        // 评分按钮
         document.querySelectorAll('.card-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 e.stopPropagation();
@@ -469,7 +732,6 @@ class AndroidInterviewApp {
             });
         });
 
-        // 筛选器
         document.getElementById('cardDayFilter')?.addEventListener('change', (e) => {
             this.cardState.filter.day = e.target.value;
             this.filterCards();
@@ -478,17 +740,8 @@ class AndroidInterviewApp {
         document.getElementById('cardStatusFilter')?.addEventListener('change', (e) => {
             this.cardState.filter.status = e.target.value;
             this.filterCards();
-            
-            // 提示用户筛选结果
-            const filteredCount = this.cardState.cards.length;
-            if (filteredCount === 0) {
-                this.showToast('没有符合条件的卡片', 'info');
-            } else {
-                this.showToast(`已加载 ${filteredCount} 张卡片`, 'success');
-            }
         });
 
-        // 控制按钮
         document.getElementById('shuffleCards')?.addEventListener('click', () => {
             this.shuffleCards();
         });
@@ -501,36 +754,27 @@ class AndroidInterviewApp {
     flipCard() {
         const flashcard = document.getElementById('flashcard');
         if (!flashcard || this.cardState.cards.length === 0) return;
-        
         this.cardState.isFlipped = !this.cardState.isFlipped;
         flashcard.classList.toggle('flipped', this.cardState.isFlipped);
     }
 
     rateCard(rating) {
         if (this.cardState.cards.length === 0) return;
-        
         const currentCard = this.cardState.cards[this.cardState.currentIndex];
         
-        // 更新卡片状态
         switch(rating) {
             case 'again':
-                currentCard.cardStatus = 'learning';
-                break;
             case 'hard':
                 currentCard.cardStatus = 'learning';
                 break;
             case 'good':
-                currentCard.cardStatus = 'mastered';
-                break;
             case 'easy':
                 currentCard.cardStatus = 'mastered';
                 break;
         }
         
-        // 保存进度
         this.saveCardProgress(currentCard);
         
-        // 显示反馈
         const feedback = {
             'again': '已标记为需要复习',
             'hard': '已记录为困难',
@@ -539,10 +783,7 @@ class AndroidInterviewApp {
         };
         this.showToast(feedback[rating], 'success');
         
-        // 延迟后显示下一张
-        setTimeout(() => {
-            this.nextCard();
-        }, 500);
+        setTimeout(() => this.nextCard(), 500);
     }
 
     async saveCardProgress(card) {
@@ -560,14 +801,10 @@ class AndroidInterviewApp {
 
     nextCard() {
         const flashcard = document.getElementById('flashcard');
-        
-        // 先翻回正面
         if (this.cardState.isFlipped) {
             this.cardState.isFlipped = false;
             flashcard?.classList.remove('flipped');
         }
-        
-        // 延迟后切换卡片
         setTimeout(() => {
             this.cardState.currentIndex++;
             if (this.cardState.currentIndex >= this.cardState.cards.length) {
@@ -584,7 +821,6 @@ class AndroidInterviewApp {
             document.getElementById('cardAnswer').textContent = '';
             return;
         }
-        
         const card = this.cardState.cards[this.cardState.currentIndex];
         document.getElementById('cardCategory').textContent = card.category || `Day ${card.day}`;
         document.getElementById('cardCategoryBack').textContent = card.category || `Day ${card.day}`;
@@ -595,27 +831,17 @@ class AndroidInterviewApp {
     }
 
     filterCards() {
-        // 从原始数据筛选，避免重复筛选导致数据丢失
         let filtered = [...this.cardState.allCards];
-        
-        // 按天数筛选
         if (this.cardState.filter.day !== 'all') {
             filtered = filtered.filter(c => c.day === parseInt(this.cardState.filter.day));
         }
-        
-        // 按状态筛选
         if (this.cardState.filter.status && this.cardState.filter.status !== 'all') {
-            // 选择了特定状态
             filtered = filtered.filter(c => c.cardStatus === this.cardState.filter.status);
         }
-        // 注意：如果没有选择状态或选择 "all"，则显示所有卡片（包括已掌握）
-        // 这样可以避免误过滤
-        
         this.cardState.cards = filtered;
         this.cardState.currentIndex = 0;
         this.cardState.isFlipped = false;
         document.getElementById('flashcard')?.classList.remove('flipped');
-        
         this.displayCard();
     }
 
@@ -634,9 +860,7 @@ class AndroidInterviewApp {
 
     startCardStudy() {
         if (this.cardState.cards.length === 0) {
-            this.loadCardData().then(() => {
-                this.displayCard();
-            });
+            this.loadCardData().then(() => this.displayCard());
         } else {
             this.cardState.currentIndex = 0;
             this.cardState.isFlipped = false;
@@ -649,10 +873,8 @@ class AndroidInterviewApp {
     updateCardStats() {
         const stats = this.cardState.stats;
         const cards = this.cardState.cards;
-        
         stats.learned = cards.filter(c => c.cardStatus !== 'new').length;
         stats.mastered = cards.filter(c => c.cardStatus === 'mastered').length;
-        
         document.getElementById('cardsTotal').textContent = stats.total;
         document.getElementById('cardsLearned').textContent = stats.learned;
         document.getElementById('cardsMastered').textContent = stats.mastered;
@@ -671,11 +893,7 @@ class AndroidInterviewApp {
             categories: [],
             currentCategory: null,
             questions: [],
-            filter: {
-                search: '',
-                difficulty: 'all',
-                status: 'all'
-            },
+            filter: { search: '', difficulty: 'all', status: 'all' },
             expandedCategories: new Set()
         };
     }
@@ -683,8 +901,6 @@ class AndroidInterviewApp {
     async loadCategoryData() {
         try {
             const index = await this.loader.loadIndex();
-            
-            // 构建分类树结构
             this.categoryState.categories = index.categories.map(cat => ({
                 id: cat.id,
                 name: cat.name,
@@ -694,8 +910,6 @@ class AndroidInterviewApp {
                 expanded: false,
                 selected: false
             }));
-            
-            // 默认选择第一个分类
             if (this.categoryState.categories.length > 0) {
                 this.selectCategory(this.categoryState.categories[0].id);
             }
@@ -708,34 +922,25 @@ class AndroidInterviewApp {
     renderCategoryTree() {
         const treeContainer = document.getElementById('categoryTree');
         if (!treeContainer) return;
-        
-        const buildTree = (categories) => {
-            return categories.map(cat => `
-                <div class="category-item ${cat.selected ? 'selected' : ''}" data-id="${cat.id}">
-                    <div class="category-item-header">
-                        <span class="category-icon">📁</span>
-                        <span class="category-name">${cat.name}</span>
-                        <span class="category-count">(${cat.count})</span>
-                    </div>
-                    <div class="category-day">Day ${cat.day}</div>
+        treeContainer.innerHTML = this.categoryState.categories.map(cat => `
+            <div class="category-item ${cat.selected ? 'selected' : ''}" data-id="${cat.id}">
+                <div class="category-item-header">
+                    <span class="category-icon">📁</span>
+                    <span class="category-name">${cat.name}</span>
+                    <span class="category-count">(${cat.count})</span>
                 </div>
-            `).join('');
-        };
-        
-        treeContainer.innerHTML = buildTree(this.categoryState.categories);
+                <div class="category-day">Day ${cat.day}</div>
+            </div>
+        `).join('');
     }
 
     bindCategoryEvents() {
-        // 分类点击
         document.getElementById('categoryTree')?.addEventListener('click', (e) => {
             const item = e.target.closest('.category-item');
             if (item) {
-                const categoryId = item.dataset.id;
-                this.selectCategory(categoryId);
+                this.selectCategory(item.dataset.id);
             }
         });
-        
-        // 搜索筛选
         document.getElementById('categorySearch')?.addEventListener('input', (e) => {
             this.categoryState.filter.search = e.target.value.toLowerCase();
             this.filterCategories();
@@ -743,14 +948,10 @@ class AndroidInterviewApp {
     }
 
     async selectCategory(categoryId) {
-        // 更新选中状态
         this.categoryState.categories.forEach(cat => {
             cat.selected = cat.id === categoryId;
         });
-        
         this.renderCategoryTree();
-        
-        // 加载该分类的题目
         const category = this.categoryState.categories.find(c => c.id === categoryId);
         if (category) {
             this.categoryState.currentCategory = category;
@@ -762,8 +963,6 @@ class AndroidInterviewApp {
     async loadCategoryQuestions(category) {
         try {
             const questions = [];
-            
-            // 加载该分类的所有题目文件
             for (const file of category.files) {
                 const fileQuestions = await this.loader.loadQuestions(file);
                 fileQuestions.forEach(q => {
@@ -772,7 +971,6 @@ class AndroidInterviewApp {
                 });
                 questions.push(...fileQuestions);
             }
-            
             this.categoryState.questions = questions;
             this.renderCategoryQuestions();
         } catch (error) {
@@ -784,27 +982,17 @@ class AndroidInterviewApp {
     renderCategoryQuestions() {
         const container = document.getElementById('categoryQuestionsList');
         if (!container) return;
-        
         let questions = this.categoryState.questions;
-        
-        // 应用筛选
         if (this.categoryState.filter.search) {
             questions = questions.filter(q => 
                 q.question.toLowerCase().includes(this.categoryState.filter.search) ||
                 q.answer.toLowerCase().includes(this.categoryState.filter.search)
             );
         }
-        
         if (questions.length === 0) {
-            container.innerHTML = `
-                <div class="empty-state">
-                    <span class="empty-icon">📭</span>
-                    <p>暂无题目</p>
-                </div>
-            `;
+            container.innerHTML = '<div class="empty-state"><span class="empty-icon">📭</span><p>暂无题目</p></div>';
             return;
         }
-        
         container.innerHTML = questions.map((q, idx) => `
             <div class="question-list-item" data-id="${q.id}">
                 <div class="question-header">
@@ -812,171 +1000,61 @@ class AndroidInterviewApp {
                     <span class="question-difficulty ${this.getDifficultyClass(q.difficulty)}">
                         ${this.getDifficultyText(q.difficulty)}
                     </span>
-                    <span class="question-id">${q.id}</span>
                 </div>
                 <div class="question-content">${q.question}</div>
-                <div class="question-answer-preview">
-                    ${q.answer.substring(0, 100)}${q.answer.length > 100 ? '...' : ''}
-                </div>
-                <div class="question-tags">
-                    ${(q.tags || []).map(tag => `<span class="tag">${tag}</span>`).join('')}
-                </div>
                 <div class="question-actions">
-                    <button class="btn-view-answer" data-id="${q.id}">查看答案</button>
-                    <button class="btn-study-now" data-id="${q.id}">去学习</button>
+                    <button class="btn-secondary btn-sm view-question-btn" data-id="${q.id}">查看</button>
                 </div>
             </div>
         `).join('');
-        
-        // 绑定按钮事件
-        container.querySelectorAll('.btn-view-answer').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                const id = e.target.dataset.id;
-                this.showQuestionAnswer(id);
-            });
-        });
-        
-        container.querySelectorAll('.btn-study-now').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                const id = e.target.dataset.id;
-                this.goToStudyQuestion(id);
-            });
-        });
-        
-        // 更新统计
         document.getElementById('categoryQuestionCount').textContent = `${questions.length} 题`;
-    }
-
-    showQuestionAnswer(questionId) {
-        const question = this.categoryState.questions.find(q => q.id === questionId);
-        if (!question) return;
         
-        // 创建模态框显示答案
-        const modal = document.createElement('div');
-        modal.className = 'modal active';
-        modal.innerHTML = `
-            <div class="modal-content question-modal">
-                <div class="modal-header">
-                    <h3>${question.id}</h3>
-                    <button class="modal-close">&times;</button>
-                </div>
-                <div class="modal-body">
-                    <div class="question-section">
-                        <h4>题目</h4>
-                        <div class="question-text">${question.question}</div>
-                    </div>
-                    <div class="answer-section">
-                        <h4>答案</h4>
-                        <div class="answer-text">${this.renderMarkdown(question.answer)}</div>
-                    </div>
-                    <div class="question-meta">
-                        <span>难度: ${this.getDifficultyText(question.difficulty)}</span>
-                        <span>分类: ${question.categoryName}</span>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button class="btn-primary" id="closeModal">关闭</button>
-                    <button class="btn-secondary" id="goToStudy">去学习此题</button>
-                </div>
-            </div>
-        `;
-        
-        document.body.appendChild(modal);
-        
-        // 绑定关闭事件
-        modal.querySelector('.modal-close').addEventListener('click', () => {
-            modal.remove();
-        });
-        modal.querySelector('#closeModal').addEventListener('click', () => {
-            modal.remove();
-        });
-        modal.querySelector('#goToStudy').addEventListener('click', () => {
-            modal.remove();
-            this.goToStudyQuestion(questionId);
-        });
-        
-        // 点击外部关闭
-        modal.addEventListener('click', (e) => {
-            if (e.target === modal) modal.remove();
+        // 绑定查看按钮事件
+        container.querySelectorAll('.view-question-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const questionId = e.target.dataset.id;
+                this.viewQuestionFromCategory(questionId);
+            });
         });
     }
 
-    goToStudyQuestion(questionId) {
-        // 跳转到学习页面并定位到该题目
+    async viewQuestionFromCategory(questionId) {
         const question = this.categoryState.questions.find(q => q.id === questionId);
         if (!question) return;
         
-        // 切换到学习页面
+        // 切换到学习页面并显示该题目
         this.navigateTo('study');
         
-        // 设置天数和题目
+        // 等待页面加载完成后显示题目
         setTimeout(() => {
-            document.getElementById('dayFilter').value = question.day;
-            this.currentDay = question.day;
-            this.loadQuestionsForDay(question.day);
-            
-            // 找到并高亮该题目
-            const targetQuestion = this.questionsCache.get(question.day)?.find(q => q.id === questionId);
-            if (targetQuestion) {
-                this.currentQuestion = targetQuestion;
-                this.displayQuestion();
-            }
+            this.currentQuestions = this.categoryState.questions;
+            this.showQuestion(question);
+            const currentIndex = this.currentQuestions.findIndex(q => q.id === questionId);
+            document.getElementById('currentNum').textContent = currentIndex + 1;
+            document.getElementById('totalNum').textContent = this.currentQuestions.length;
         }, 100);
-    }
-
-    filterCategories() {
-        const search = this.categoryState.filter.search.toLowerCase();
-        
-        if (!search) {
-            this.renderCategoryTree();
-            return;
-        }
-        
-        // 筛选分类
-        const filtered = this.categoryState.categories.filter(cat => 
-            cat.name.toLowerCase().includes(search)
-        );
-        
-        // 重新渲染树
-        const treeContainer = document.getElementById('categoryTree');
-        if (treeContainer) {
-            treeContainer.innerHTML = filtered.map(cat => `
-                <div class="category-item ${cat.selected ? 'selected' : ''}" data-id="${cat.id}">
-                    <div class="category-item-header">
-                        <span class="category-icon">📁</span>
-                        <span class="category-name">${cat.name}</span>
-                        <span class="category-count">(${cat.count})</span>
-                    </div>
-                    <div class="category-day">Day ${cat.day}</div>
-                </div>
-            `).join('');
-        }
     }
 
     updateCategoryHeader(category) {
         document.getElementById('currentCategoryTitle').textContent = category.name;
         document.getElementById('categoryQuestionCount').textContent = `${category.count} 题`;
-        
-        // 计算已掌握数量
-        const mastered = this.categoryState.questions.filter(q => 
-            this.progressCache.get(q.id)?.status === 'mastered'
-        ).length;
-        document.getElementById('categoryMasteredCount').textContent = `已掌握 ${mastered}`;
     }
 
+    // ==================== Weakness ====================
     async loadWeakness() {
         this.showToast('薄弱项分析功能开发中', 'info');
     }
 
+    // ==================== Mock ====================
     async loadMock() {
         this.showToast('模拟面试功能开发中', 'info');
     }
 
+    // ==================== AI Chat ====================
     async loadChat() {
         await this.initAiChat();
     }
 
-    // ==================== AI Chat ====================
     async initAiChat() {
         const chatContainer = document.getElementById('chatContainer');
         const chatInput = document.getElementById('chatInput');
@@ -984,39 +1062,44 @@ class AndroidInterviewApp {
         
         if (!chatContainer) return;
         
-        // 清空容器并添加欢迎消息
-        chatContainer.innerHTML = `
-            <div class="chat-message ai-message">
-                <div class="chat-avatar">🤖</div>
-                <div class="chat-content">
-                    <div class="chat-text">你好！我是你的 Android 面试 AI 助手。我可以帮你：</div>
-                    <ul class="chat-list">
-                        <li>📚 深入解析面试题目</li>
-                        <li>💡 提供学习建议和知识点扩展</li>
-                        <li>🎯 分析你的薄弱项并推荐针对性练习</li>
-                        <li>📝 生成模拟面试题目</li>
-                    </ul>
-                    <div class="chat-text">有什么想聊的，随时告诉我！</div>
+        // 只初始化一次欢迎消息
+        if (chatContainer.children.length === 0) {
+            chatContainer.innerHTML = `
+                <div class="chat-message ai-message">
+                    <div class="chat-avatar">🤖</div>
+                    <div class="chat-content">
+                        <div class="chat-text">你好！我是你的 Android 面试 AI 助手。我可以帮你：</div>
+                        <ul class="chat-list">
+                            <li>📚 深入解析面试题目</li>
+                            <li>💡 提供学习建议和知识点扩展</li>
+                            <li>🎯 分析你的薄弱项并推荐针对性练习</li>
+                            <li>📝 生成模拟面试题目</li>
+                        </ul>
+                        <div class="chat-text">有什么想聊的，随时告诉我！</div>
+                    </div>
                 </div>
-            </div>
-        `;
+            `;
+        }
         
-        // 绑定发送事件
         sendBtn?.addEventListener('click', () => this.sendAiMessage());
         chatInput?.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') this.sendAiMessage();
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                this.sendAiMessage();
+            }
         });
         
-        // 添加快捷提示按钮
         this.addQuickPrompts();
     }
     
     addQuickPrompts() {
         const prompts = [
             { icon: '📖', text: '解释当前题目', action: 'explain_current' },
+            { icon: '🔗', text: '相关知识点', action: 'related_knowledge' },
+            { icon: '💡', text: '举一反三', action: 'similar_questions' },
             { icon: '🎯', text: '分析薄弱知识点', action: 'analyze_weakness' },
             { icon: '📝', text: '生成模拟面试', action: 'generate_mock' },
-            { icon: '💡', text: '学习建议', action: 'study_advice' }
+            { icon: '🎓', text: '学习建议', action: 'study_advice' }
         ];
         
         const container = document.getElementById('chatQuickPrompts');
@@ -1042,9 +1125,23 @@ class AndroidInterviewApp {
         switch(action) {
             case 'explain_current':
                 if (this.currentQuestion) {
-                    message = `请详细解释这道面试题：\n\n题目：${this.currentQuestion.question}\n\n当前答案：${this.currentQuestion.answer}`;
+                    message = `请详细解释这道面试题：\n\n题目：${this.currentQuestion.question}\n\n参考答案：${this.currentQuestion.answer}`;
                 } else {
                     message = '请帮我解释 Android 中 Binder 机制的原理和作用';
+                }
+                break;
+            case 'related_knowledge':
+                if (this.currentQuestion) {
+                    message = `这道 Android 面试题涉及哪些相关知识点？\n\n题目：${this.currentQuestion.question}`;
+                } else {
+                    message = 'Android 中有哪些重要的性能优化知识点？';
+                }
+                break;
+            case 'similar_questions':
+                if (this.currentQuestion) {
+                    message = `请基于这道 Android 面试题，举一反三，提供几道类似的进阶题目：\n\n题目：${this.currentQuestion.question}`;
+                } else {
+                    message = '请给我出几道关于 Handler 的面试题，难度递增';
                 }
                 break;
             case 'analyze_weakness':
@@ -1066,6 +1163,7 @@ class AndroidInterviewApp {
 
     async sendAiMessage() {
         const input = document.getElementById('chatInput');
+        const sendBtn = document.getElementById('sendMessage');
         const message = input.value.trim();
         if (!message) return;
         
@@ -1073,16 +1171,21 @@ class AndroidInterviewApp {
         this.addChatMessage('user', message);
         input.value = '';
         
+        // 禁用发送按钮
+        sendBtn.disabled = true;
+        
         // 显示 AI 思考中
-        const thinkingId = this.showAiThinking();
+        const loadingId = this.showAiLoading();
         
         try {
             const response = await this.callAiApi(message);
-            this.removeAiThinking(thinkingId);
+            this.removeAiLoading(loadingId);
             this.addChatMessage('ai', response);
         } catch (error) {
-            this.removeAiThinking(thinkingId);
-            this.addChatMessage('ai', '抱歉，AI 服务暂时不可用，请稍后重试。错误：' + error.message);
+            this.removeAiLoading(loadingId);
+            this.addChatMessage('error', `抱歉，AI 服务暂时不可用: ${error.message}`);
+        } finally {
+            sendBtn.disabled = false;
         }
     }
 
@@ -1091,81 +1194,119 @@ class AndroidInterviewApp {
         const messageDiv = document.createElement('div');
         messageDiv.className = `chat-message ${role}-message`;
         
-        const avatar = role === 'ai' ? '🤖' : '👤';
+        const avatar = role === 'ai' ? '🤖' : role === 'error' ? '⚠️' : '👤';
         const isMarkdown = role === 'ai';
         
-        messageDiv.innerHTML = `
-            <div class="chat-avatar">${avatar}</div>
-            <div class="chat-content">
-                <div class="chat-text">${isMarkdown ? this.renderMarkdown(content) : this.escapeHtml(content)}</div>
-            </div>
-        `;
+        if (role === 'error') {
+            messageDiv.innerHTML = `
+                <div class="chat-avatar">${avatar}</div>
+                <div class="chat-content">
+                    <div class="chat-text" style="color: var(--accent)">${content}</div>
+                </div>
+            `;
+        } else {
+            messageDiv.innerHTML = `
+                <div class="chat-avatar">${avatar}</div>
+                <div class="chat-content">
+                    <div class="chat-text">${isMarkdown ? this.renderMarkdown(content) : this.escapeHtml(content)}</div>
+                </div>
+            `;
+        }
         
         container.appendChild(messageDiv);
         container.scrollTop = container.scrollHeight;
     }
 
-    showAiThinking() {
+    showAiLoading() {
         const container = document.getElementById('chatContainer');
-        const id = 'thinking-' + Date.now();
-        const thinkingDiv = document.createElement('div');
-        thinkingDiv.id = id;
-        thinkingDiv.className = 'chat-message ai-message thinking';
-        thinkingDiv.innerHTML = `
+        const id = 'loading-' + Date.now();
+        const loadingDiv = document.createElement('div');
+        loadingDiv.id = id;
+        loadingDiv.className = 'chat-message ai-message loading';
+        loadingDiv.innerHTML = `
             <div class="chat-avatar">🤖</div>
             <div class="chat-content">
-                <div class="chat-text">
-                    <span class="thinking-dots">思考中<span>.</span><span>.</span><span>.</span></span>
+                <div class="loading-indicator">
+                    <div class="loading-dots">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
+                    <span>思考中...</span>
                 </div>
             </div>
         `;
-        container.appendChild(thinkingDiv);
+        container.appendChild(loadingDiv);
         container.scrollTop = container.scrollHeight;
         return id;
     }
 
-    removeAiThinking(id) {
+    removeAiLoading(id) {
         const el = document.getElementById(id);
         if (el) el.remove();
     }
 
-    async callAiApi(message) {
-        // 获取 API Key（从配置或本地存储）
-        const apiKey = window.appConfig?.ai?.apiKey || localStorage.getItem('ai_api_key');
+    async callAiApi(message, isTest = false) {
+        const apiKey = this.aiConfig.apiKey;
         
-        // 如果没有 API Key，使用演示模式
         if (!apiKey) {
-            console.log('AI API Key not found, using mock mode');
+            if (isTest) throw new Error('请先配置 API Key');
             return this.getMockAiResponse(message);
         }
         
-        try {
-            const response = await fetch('https://dashscope.aliyuncs.com/api/v1/services/aigc/text-generation/generation', {
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${apiKey}`,
-                    'Content-Type': 'application/json'
+        const provider = this.aiConfig.provider;
+        let url, body, headers;
+        
+        if (provider === 'dashscope') {
+            url = 'https://dashscope.aliyuncs.com/api/v1/services/aigc/text-generation/generation';
+            headers = {
+                'Authorization': `Bearer ${apiKey}`,
+                'Content-Type': 'application/json'
+            };
+            body = {
+                model: this.aiConfig.model,
+                input: {
+                    messages: [
+                        {
+                            role: 'system',
+                            content: '你是 Android 面试专家助手。请用中文回答，提供详细的面试知识点解析、代码示例和学习建议。回答要结构清晰，重点突出。'
+                        },
+                        { role: 'user', content: message }
+                    ]
                 },
-                body: JSON.stringify({
-                    model: window.appConfig?.ai?.model || 'qwen-turbo',
-                    input: {
-                        messages: [
-                            {
-                                role: 'system',
-                                content: '你是 Android 面试专家助手。请用中文回答，提供详细的面试知识点解析、代码示例和学习建议。回答要结构清晰，重点突出。'
-                            },
-                            {
-                                role: 'user',
-                                content: message
-                            }
-                        ]
+                parameters: {
+                    result_format: 'message',
+                    max_tokens: 2000,
+                    temperature: this.aiConfig.temperature
+                }
+            };
+        } else if (provider === 'openai') {
+            url = 'https://api.openai.com/v1/chat/completions';
+            headers = {
+                'Authorization': `Bearer ${apiKey}`,
+                'Content-Type': 'application/json'
+            };
+            body = {
+                model: this.aiConfig.model,
+                messages: [
+                    {
+                        role: 'system',
+                        content: '你是 Android 面试专家助手。请用中文回答，提供详细的面试知识点解析、代码示例和学习建议。回答要结构清晰，重点突出。'
                     },
-                    parameters: {
-                        result_format: 'message',
-                        max_tokens: 2000,
-                        temperature: 0.7
-                    }
-                })
+                    { role: 'user', content: message }
+                ],
+                max_tokens: 2000,
+                temperature: this.aiConfig.temperature
+            };
+        } else {
+            throw new Error('不支持的 AI 提供商');
+        }
+        
+        try {
+            const response = await fetch(url, {
+                method: 'POST',
+                headers,
+                body: JSON.stringify(body)
             });
 
             if (!response.ok) {
@@ -1173,93 +1314,121 @@ class AndroidInterviewApp {
             }
 
             const data = await response.json();
-            return data.output?.choices?.[0]?.message?.content || 'AI 没有返回有效回答';
+            
+            if (provider === 'dashscope') {
+                return data.output?.choices?.[0]?.message?.content || 'AI 没有返回有效回答';
+            } else {
+                return data.choices?.[0]?.message?.content || 'AI 没有返回有效回答';
+            }
         } catch (error) {
             console.error('AI API call failed:', error);
+            if (isTest) throw error;
             return this.getMockAiResponse(message);
         }
     }
     
+    explainWithAi(question) {
+        const message = `请详细解释这道面试题：\n\n题目：${question.question}\n\n参考答案：${question.answer}\n\n请提供深度解析、易错点和相关扩展知识。`;
+        document.getElementById('chatInput').value = message;
+        this.sendAiMessage();
+    }
+    
     getMockAiResponse(message) {
-        // 模拟 AI 回答，用于演示
-        const responses = {
-            'handler': `## Handler 机制的重要性
-
-Handler 是 Android 中最重要的机制之一，在面试中几乎必问：
+        const lowerMsg = message.toLowerCase();
+        
+        if (lowerMsg.includes('handler')) {
+            return `## Handler 机制详解
 
 ### 核心作用
-1. **线程间通信** - 子线程通过 Handler 向主线程发送消息，更新 UI
-2. **异步处理** - 避免在主线程执行耗时操作，防止 ANR
-3. **消息调度** - 通过 MessageQueue 实现延迟执行和定时任务
+1. **线程间通信** - 子线程通过 Handler 向主线程发送消息
+2. **异步处理** - 避免在主线程执行耗时操作
+3. **消息调度** - 通过 MessageQueue 实现延迟执行
 
 ### 核心组件
 - **Handler** - 发送和处理消息
-- **Looper** - 消息循环，不断从 MessageQueue 取消息
-- **MessageQueue** - 消息队列，存储待处理的消息
+- **Looper** - 消息循环
+- **MessageQueue** - 消息队列
 - **Message** - 消息载体
 
-### 典型使用场景
+### 代码示例
 \`\`\`kotlin
 // 子线程处理耗时任务后更新 UI
 thread {
     val result = loadData()
     handler.post {
-        textView.text = result  // 在主线程更新 UI
+        textView.text = result
     }
 }
 \`\`\`
 
-### 面试常见问题
-1. **为什么 Handler 不会阻塞主线程？**
-   - Looper.loop() 是阻塞的，但它阻塞的是消息队列，不是主线程的 UI 渲染
-   
-2. **Handler 内存泄漏原因？**
-   - 非静态内部类持有外部 Activity 引用，Activity 销毁时消息未处理完
-
-3. **IdleHandler 是什么？**
-   - 在 MessageQueue 空闲时执行的回调，用于延迟初始化
-
-需要深入了解哪个方面？`,
-            'default': `## 回答您的问题
-
-您的问题很有价值！让我为您详细分析：
-
-### 核心概念
-这是一个重要的 Android 面试知识点，在实际开发中经常使用。
-
-### 关键点
-1. **原理** - 理解其工作机制和内部实现
-2. **使用场景** - 知道在什么情况下使用
-3. **注意事项** - 避免常见错误和性能问题
-4. **源码分析** - 能简单描述关键源码流程
-
-### 学习建议
-- 结合源码学习，理解底层实现
-- 多动手实践，写 Demo 验证
-- 总结常见面试题和回答套路
-
-如果您有具体的题目或代码需要分析，欢迎继续提问！我可以帮您：
-- 深入解析具体题目
-- 分析代码问题
-- 提供学习路线建议
-
-您还想了解什么？`
-        };
-        
-        // 根据消息内容匹配回答
-        const lowerMsg = message.toLowerCase();
-        if (lowerMsg.includes('handler')) {
-            return responses['handler'];
+### 面试要点
+- Handler 不会阻塞主线程的原因
+- 内存泄漏问题及解决方案
+- IdleHandler 的使用场景`;
         }
         
-        return responses['default'];
+        if (lowerMsg.includes('binder')) {
+            return `## Binder 机制解析
+
+### 什么是 Binder
+Binder 是 Android 特有的跨进程通信（IPC）机制，基于 OpenBinder 实现。
+
+### 核心优势
+1. **性能高效** - 只进行一次内存拷贝
+2. **安全可靠** - 基于 C/S 架构，支持身份校验
+3. **面向对象** - 使用代理模式封装底层细节
+
+### 工作流程
+1. Client 获取 Service 的 Binder 引用
+2. Client 通过 transact() 发送请求
+3. Binder 驱动将数据拷贝到 Server 进程
+4. Server 的 onTransact() 处理请求
+5. 结果通过 Binder 驱动返回 Client
+
+### 面试常问
+- Binder 与 AIDL 的关系
+- Binder 驱动的作用
+- 如何实现自定义 Binder 服务`;
+        }
+        
+        return `## Android 面试知识点解析
+
+您提出了一个很好的问题！让我为您详细分析：
+
+### 核心概念
+这是一个重要的 Android 面试知识点，涉及以下关键内容：
+
+### 学习建议
+1. **理解原理** - 深入理解底层机制
+2. **动手实践** - 编写 Demo 验证知识点
+3. **总结套路** - 形成自己的回答模板
+
+### 相关扩展
+- Android 系统架构
+- Framework 层源码
+- 性能优化技巧
+
+如果您有具体的代码或题目需要分析，欢迎继续提问！`;
     }
 
     renderMarkdown(text) {
-        // 简单的 Markdown 渲染
-        return text
-            .replace(/```(\w+)?\n([\s\S]*?)```/g, '<pre><code>$2</code></pre>')
-            .replace(/`([^`]+)`/g, '<code>$1</code>')
+        if (!text) return '';
+        
+        // Step 1: 先处理 Mermaid 图表，提取并替换为占位符
+        let mermaidId = 0;
+        const mermaidBlocks = [];
+        
+        text = text.replace(/```mermaid\s*\n([\s\S]*?)```/g, (match, content) => {
+            const id = `mermaid-${mermaidId++}`;
+            mermaidBlocks.push({ id, content: content.trim() });
+            return `__MERMAID_PLACEHOLDER_${id}__`;
+        });
+        
+        // Step 2: 处理普通代码块（非 Mermaid）
+        text = text.replace(/```(\w+)?\n([\s\S]*?)```/g, '<pre><code>$2</code></pre>');
+        
+        // Step 3: 其他 Markdown 处理
+        text = text.replace(/\`([^`]+)\`/g, '<code>$1</code>')
             .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
             .replace(/\*(.+?)\*/g, '<em>$1</em>')
             .replace(/^### (.+)$/gm, '<h4>$1</h4>')
@@ -1268,29 +1437,46 @@ thread {
             .replace(/^- (.+)$/gm, '<li>$1</li>')
             .replace(/(<li>.+<\/li>\n?)+/g, '<ul>$&</ul>')
             .replace(/\n/g, '<br>');
+        
+        // Step 4: 恢复 Mermaid 占位符为实际的 Mermaid div
+        mermaidBlocks.forEach(({ id, content }) => {
+            text = text.replace(
+                `__MERMAID_PLACEHOLDER_${id}__`,
+                `<div class="mermaid">${content}</div>`
+            );
+        });
+        
+        // Step 5: 渲染 Mermaid 图表
+        if (mermaidBlocks.length > 0 && typeof mermaid !== 'undefined') {
+            setTimeout(() => {
+                try {
+                    mermaid.run({
+                        querySelector: '.mermaid'
+                    });
+                } catch (e) {
+                    console.error('Mermaid run error:', e);
+                }
+            }, 100);
+        }
+        
+        return text;
     }
 
     escapeHtml(text) {
+        if (!text) return '';
         const div = document.createElement('div');
         div.textContent = text;
         return div.innerHTML;
     }
 
-
-
     // ==================== Utilities ====================
     handleSearch(keyword) {
         if (keyword.length < 2) return;
-        // 搜索逻辑
         console.log('Search:', keyword);
     }
 
     openSettings() {
-        document.getElementById('settingsModal').classList.add('active');
-    }
-
-    openAiModal() {
-        document.getElementById('aiModal').classList.add('active');
+        this.openAiConfigModal();
     }
 
     async exportData() {
@@ -1301,7 +1487,6 @@ thread {
                 exportDate: new Date().toISOString(),
                 progress
             };
-            
             const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
@@ -1309,7 +1494,6 @@ thread {
             a.download = `android_interview_backup_${Date.now()}.json`;
             a.click();
             URL.revokeObjectURL(url);
-            
             this.showToast('数据导出成功', 'success');
         } catch (error) {
             console.error('Export failed:', error);
@@ -1322,12 +1506,8 @@ thread {
         const toast = document.createElement('div');
         toast.className = `toast toast-${type}`;
         toast.textContent = message;
-        
         container.appendChild(toast);
-        
-        setTimeout(() => {
-            toast.remove();
-        }, 3000);
+        setTimeout(() => toast.remove(), 3000);
     }
 }
 

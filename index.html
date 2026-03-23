@@ -350,13 +350,7 @@
                     </div>
                 </div>
 
-                <div class="page weakness-page" id="weaknessPage">
-                    <div class="placeholder">
-                        <span class="placeholder-icon">🎯</span>
-                        <h2>薄弱项分析</h2>
-                        <p>功能开发中...</p>
-                    </div>
-                </div>
+                <div class="page weakness-page" id="weaknessPage"></div>
 
                 <div class="page mock-page" id="mockPage">
                     <div class="placeholder">
@@ -404,5 +398,20 @@
     <script src="src/db.js"></script>
     <script src="src/loader.js"></script>
     <script src="src/app.js"></script>
+    <script>
+        // 初始化 Mermaid
+        if (typeof mermaid !== 'undefined') {
+            mermaid.initialize({
+                startOnLoad: false,
+                theme: 'dark',
+                securityLevel: 'loose',
+                flowchart: {
+                    useMaxWidth: true,
+                    htmlLabels: true,
+                    curve: 'basis'
+                }
+            });
+        }
+    </script>
 </body>
 </html>

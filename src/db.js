@@ -84,7 +84,6 @@ class DatabaseManager {
         return counts;
     }
 
-    // ==================== Card Progress ====================
     async saveCardProgress(progress) {
         if (!this.db) return;
         
@@ -116,86 +115,5 @@ class DatabaseManager {
             request.onsuccess = () => resolve(request.result);
             request.onerror = () => reject(request.error);
         });
-    }
-}
-
-// Data Loader
-class DataLoader {
-    constructor() {
-        this.cache = new Map();
-        this.indexData = null;
-    }
-
-    async loadIndex() {
-        if (this.indexData) return this.indexData;
-        try {
-            const response = await fetch('data/index.json');
-            this.indexData = await response.json();
-            return this.indexData;
-        } catch (error) {
-            console.error('Failed to load index:', error);
-            // Return minimal fallback data
-            return {
-                metadata: { total_questions: 1200, categories: 15 },
-                categories: [
-                    { id: 'android_basic', name: 'Android 基础', day: 1, files: ['day1/activity.json'] }
-                ],
-                questions_index: []
-            };
-        }
-    }
-
-    async loadQuestions(filePath) {
-        if (this.cache.has(filePath)) return this.cache.get(filePath);
-        try {
-            const response = await fetch(`data/questions/${filePath}`);
-            const data = await response.json();
-            const questions = data.questions || [];
-            this.cache.set(filePath, questions);
-            return questions;
-        } catch (error) {
-            console.error('Failed to load questions:', filePath, error);
-            return [];
-        }
-    }
-
-    async loadDay(day) {
-        const index = await this.loadIndex();
-        const dayCategories = index.categories.filter(c => c.day === day);
-        const allQuestions = [];
-        for (const category of dayCategories) {
-            for (const file of category.files || []) {
-                const questions = await this.loadQuestions(file);
-                questions.forEach(q => { q.day = day; q.category = category.name; });
-                allQuestions.push(...questions);
-            }
-        }
-        return allQuestions;
-    }
-
-    async loadDayQuestions(day) {
-        // 从 index.json 获取该天的文件列表
-        const index = await this.loadIndex();
-        const dayCategories = index.categories.filter(c => c.day === day);
-        
-        const allQuestions = [];
-        for (const category of dayCategories) {
-            for (const file of category.files || []) {
-                try {
-                    const questions = await this.loadQuestions(file);
-                    if (questions && questions.length > 0) {
-                        questions.forEach(q => {
-                            q.day = day;
-                            q.category = category.name;
-                            allQuestions.push(q);
-                        });
-                    }
-                } catch (e) {
-                    // 文件可能不存在，跳过
-                    console.warn(`Failed to load ${file}:`, e.message);
-                }
-            }
-        }
-        return allQuestions;
     }
 }

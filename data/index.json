@@ -1,38 +1,44 @@
 {
   "metadata": {
-    "version": "2.2",
-    "total_questions": 15,
-    "categories_count": 2,
-    "days_count": 2,
-    "generated_date": "2026-03-22",
-    "note": "高质量答案版本"
+    "version": "3.0",
+    "total_questions": 600,
+    "categories_count": 15,
+    "days_count": 15,
+    "generated_date": "2026-03-23",
+    "note": "Android 面试题大全 - 15天学习计划"
   },
   "categories": [
-    {
-      "id": "android_basic",
-      "name": "Android 基础",
-      "day": 1,
-      "question_count": 5,
-      "files": ["day1/service_broadcast.json"]
-    },
-    {
-      "id": "kotlin",
-      "name": "Kotlin 核心",
-      "day": 2,
-      "question_count": 4,
-      "files": ["day2/kotlin_core.json"]
-    }
+    {"id": "android_basic", "name": "Android 基础", "day": 1, "question_count": 60, "files": ["day1/android_basics.json"]},
+    {"id": "kotlin", "name": "Kotlin 基础与协程", "day": 2, "question_count": 60, "files": ["day2/kotlin_interview.json"]},
+    {"id": "java_concurrent", "name": "Java 并发编程", "day": 3, "question_count": 50, "files": ["day3/java_concurrency.json"]},
+    {"id": "jvm", "name": "JVM 原理", "day": 4, "question_count": 50, "files": ["day4/jvm_principles.json"]},
+    {"id": "android_architecture", "name": "Android 系统架构", "day": 5, "question_count": 40, "files": ["day5/android_architecture.json"]},
+    {"id": "framework", "name": "Framework 源码", "day": 6, "question_count": 40, "files": ["day6/framework_source.json"]},
+    {"id": "performance", "name": "性能优化", "day": 7, "question_count": 40, "files": ["day7/performance.json"]},
+    {"id": "jetpack_compose", "name": "Jetpack & Compose", "day": 8, "question_count": 40, "files": ["day8/jetpack_compose.json"]},
+    {"id": "design_patterns", "name": "设计模式", "day": 9, "question_count": 40, "files": ["day9/design_patterns.json"]},
+    {"id": "open_source", "name": "开源框架", "day": 10, "question_count": 40, "files": ["day10/open_source.json"]},
+    {"id": "network", "name": "网络编程", "day": 11, "question_count": 30, "files": ["day11/network.json"]},
+    {"id": "algorithm", "name": "数据结构与算法", "day": 12, "question_count": 30, "files": ["day12/algorithm.json"]},
+    {"id": "ndk_jni", "name": "NDK/JNI", "day": 13, "question_count": 30, "files": ["day13/ndk_jni.json"]},
+    {"id": "flutter", "name": "Flutter", "day": 14, "question_count": 30, "files": ["day14/flutter.json"]},
+    {"id": "system_design", "name": "系统设计", "day": 15, "question_count": 20, "files": ["day15/system_design.json"]}
   ],
   "days": {
-    "1": {
-      "name": "Android 基础",
-      "categories": ["Service", "Broadcast"],
-      "target": 5
-    },
-    "2": {
-      "name": "Kotlin 核心",
-      "categories": ["Kotlin 基础", "协程"],
-      "target": 4
-    }
+    "1": {"name": "Android 基础", "categories": ["Activity", "Fragment", "Service", "Broadcast", "ContentProvider"], "target": 60},
+    "2": {"name": "Kotlin 基础与协程", "categories": ["Kotlin基础", "协程", "Flow"], "target": 60},
+    "3": {"name": "Java 并发编程", "categories": ["线程", "锁", "并发工具"], "target": 50},
+    "4": {"name": "JVM 原理", "categories": ["内存模型", "GC", "类加载"], "target": 50},
+    "5": {"name": "Android 系统架构", "categories": ["Binder", "Handler", "AMS"], "target": 40},
+    "6": {"name": "Framework 源码", "categories": ["AMS", "WMS", "View系统"], "target": 40},
+    "7": {"name": "性能优化", "categories": ["内存优化", "启动优化", "布局优化"], "target": 40},
+    "8": {"name": "Jetpack & Compose", "categories": ["ViewModel", "LiveData", "Compose"], "target": 40},
+    "9": {"name": "设计模式", "categories": ["创建型", "结构型", "行为型"], "target": 40},
+    "10": {"name": "开源框架", "categories": ["OkHttp", "Retrofit", "Glide"], "target": 40},
+    "11": {"name": "网络编程", "categories": ["HTTP", "TCP/UDP", "WebSocket"], "target": 30},
+    "12": {"name": "数据结构与算法", "categories": ["数组", "树", "排序"], "target": 30},
+    "13": {"name": "NDK/JNI", "categories": ["JNI", "C++", "Native"], "target": 30},
+    "14": {"name": "Flutter", "categories": ["Widget", "状态管理", "平台通道"], "target": 30},
+    "15": {"name": "系统设计", "categories": ["图片加载", "IM", "Feed流"], "target": 20}
   }
 }

@@ -8,6 +8,15 @@ class DataLoader {
         this.cache = new Map();
         this.loading = new Map();
         this.indexData = null;
+        this.cacheVersion = Date.now(); // 缓存版本号
+    }
+    
+    // 清除缓存
+    clearCache() {
+        this.cache.clear();
+        this.loading.clear();
+        this.indexData = null;
+        this.cacheVersion = Date.now();
     }
 
     // 加载题目索引
@@ -54,12 +63,26 @@ class DataLoader {
     }
 
     async _fetchQuestions(filePath) {
-        const response = await fetch(`data/questions/${filePath}`);
+        const response = await fetch(`data/questions/${filePath}?v=${Date.now()}`);
         if (!response.ok) {
             throw new Error(`Failed to load ${filePath}: ${response.status}`);
         }
         const data = await response.json();
-        return data.questions || [];
+        
+        // 支持两种格式：直接 questions 数组 或 categories 嵌套
+        if (data.questions) {
+            return data.questions;
+        } else if (data.categories) {
+            // 从 categories 中提取所有 questions
+            let allQuestions = [];
+            for (const category of data.categories) {
+                if (category.questions) {
+                    allQuestions.push(...category.questions);
+                }
+            }
+            return allQuestions;
+        }
+        return [];
     }
 
     // 根据 Day 加载所有题目
