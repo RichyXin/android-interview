@@ -1,0 +1,527 @@
+{
+  "metadata": {
+    "category": "JVM原理",
+    "day": 4,
+    "total_questions": 50
+  },
+  "questions": [
+    {
+      "id": "D4_001",
+      "question": "JVM 的主要组成部分有哪些？",
+      "answer": "## JVM 架构\n\n### 核心组件\n1. **类加载器子系统** - 加载、链接、初始化类\n2. **运行时数据区** - 堆、栈、方法区等\n3. **执行引擎** - JIT编译器、GC\n4. **本地库接口** - JNI\n\n### 运行时数据区\n```\n┌─────────────────────────────────────┐\n│           方法区 (Method Area)       │\n│        类信息、常量、静态变量         │\n├─────────────────────────────────────┤\n│           堆 (Heap)                 │\n│          对象实例、数组              │\n├──────────────┬──────────────────────┤\n│  虚拟机栈     │    本地方法栈          │\n│ (Java栈)     │  (Native Stack)       │\n├──────────────┴──────────────────────┤\n│        程序计数器 (PC Register)      │\n└─────────────────────────────────────┘\n```",
+      "difficulty": 1,
+      "tags": [
+        "JVM",
+        "架构"
+      ],
+      "day": 4
+    },
+    {
+      "id": "D4_002",
+      "question": "Java 堆和栈有什么区别？",
+      "answer": "## 堆 vs 栈\n\n| 特性 | 堆 | 栈 |\n|------|-----|------|\n| 存储内容 | 对象实例 | 局部变量、方法调用 |\n| 线程共享 | 是 | 否 |\n| 空间大小 | 较大 | 较小 |\n| GC回收 | 是 | 否 |\n| 分配速度 | 较慢 | 较快 |\n\n### 堆内存\n```java\nObject obj = new Object();  // obj 在栈，Object 在堆\n```\n\n### 栈内存\n```java\nint a = 10;  // a 在栈\nvoid method() {\n    int b = 20;  // 方法结束，b 自动释放\n}\n```",
+      "difficulty": 1,
+      "tags": [
+        "JVM",
+        "堆",
+        "栈"
+      ],
+      "day": 4
+    },
+    {
+      "id": "D4_003",
+      "question": "什么是 GC Root？GC Roots 有哪些？",
+      "answer": "## GC Root\n\n### 定义\nGC Root 是垃圾回收的起点，从这些节点开始向下搜索，可达的对象为存活对象。\n\n### GC Roots 类型\n1. **虚拟机栈中的引用** - 方法中的局部变量\n2. **方法区中的静态属性** - 类的静态变量\n3. **方法区中的常量引用** - 常量池中的引用\n4. **本地方法栈中的引用** - JNI 引用\n5. **同步锁持有的对象** - synchronized 锁定的对象\n\n### 可达性分析\n```\n    GC Root\n       │\n       ▼\n    ┌─────┐\n    │ Obj │ ← 可达\n    └──┬──┘\n       │\n       ▼\n    ┌─────┐\n    │ Ref │ ← 可达\n    └─────┘\n\n    ┌─────┐\n    │ Un  │ ← 不可达，将被回收\n    └─────┘\n```",
+      "difficulty": 2,
+      "tags": [
+        "JVM",
+        "GC",
+        "GC Root"
+      ],
+      "day": 4
+    },
+    {
+      "id": "D4_004",
+      "question": "Java 有哪些垃圾回收算法？",
+      "answer": "## GC 算法\n\n### 1. 标记-清除\n- 标记存活对象，清除未标记对象\n- 缺点：内存碎片\n\n### 2. 复制算法\n- 将存活对象复制到另一块区域\n- 优点：无碎片\n- 缺点：内存利用率低\n\n### 3. 标记-整理\n- 标记存活对象，整理到一端\n- 优点：无碎片，内存利用率高\n- 缺点：效率较低\n\n### 4. 分代收集\n```\n┌─────────────────────────────────────┐\n│           新生代 (Young)            │\n│   Eden + Survivor0 + Survivor1     │\n│   使用复制算法                       │\n├─────────────────────────────────────┤\n│           老年代 (Old)              │\n│   存放长期存活对象                   │\n│   使用标记-清除/整理                 │\n└─────────────────────────────────────┘\n```",
+      "difficulty": 2,
+      "tags": [
+        "JVM",
+        "GC算法"
+      ],
+      "day": 4
+    },
+    {
+      "id": "D4_005",
+      "question": "CMS 和 G1 垃圾收集器有什么区别？",
+      "answer": "## CMS vs G1\n\n### CMS (Concurrent Mark Sweep)\n- 目标：最短停顿时间\n- 算法：标记-清除\n- 阶段：初始标记 → 并发标记 → 重新标记 → 并发清除\n- 缺点：内存碎片、CPU敏感\n\n### G1 (Garbage First)\n- 目标：可预测停顿时间\n- 算法：Region + 复制\n- 特点：\n  - 将堆分成多个 Region\n  - 优先回收垃圾最多的 Region\n  - 无内存碎片\n\n### 对比\n| 特性 | CMS | G1 |\n|------|-----|-----|\n| 算法 | 标记-清除 | Region+复制 |\n| 碎片 | 有 | 无 |\n| 停顿预测 | 否 | 是 |\n| 适用场景 | 老年代 | 全堆 |\n| JDK版本 | 8及之前 | 9+默认 |",
+      "difficulty": 2,
+      "tags": [
+        "JVM",
+        "CMS",
+        "G1"
+      ],
+      "day": 4
+    },
+    {
+      "id": "D4_001",
+      "question": "JVM 类加载过程是什么？",
+      "answer": "## 类加载过程\n\n1. **加载** - 读取class文件\n2. **验证** - 验证字节码正确性\n3. **准备** - 为静态变量分配内存\n4. **解析** - 符号引用转直接引用\n5. **初始化** - 执行静态初始化块",
+      "difficulty": 1,
+      "tags": [
+        "JVM",
+        "类加载"
+      ],
+      "day": 4
+    },
+    {
+      "id": "D4_002",
+      "question": "什么是双亲委派模型？",
+      "answer": "## 双亲委派\n\n加载器层次：\n- Bootstrap ClassLoader\n- Extension ClassLoader\n- Application ClassLoader\n\n先委托父加载器，父类无法加载才自己加载",
+      "difficulty": 2,
+      "tags": [
+        "JVM",
+        "类加载器"
+      ],
+      "day": 4
+    },
+    {
+      "id": "D4_003",
+      "question": "JVM 内存模型(JMM)是什么？",
+      "answer": "## JMM\n\n- 主内存：共享变量存储\n- 工作内存：线程私有\n- happens-before 原则",
+      "difficulty": 2,
+      "tags": [
+        "JVM",
+        "内存模型"
+      ],
+      "day": 4
+    },
+    {
+      "id": "D4_004",
+      "question": "什么是内存溢出(OOM)？如何排查？",
+      "answer": "## OOM排查\n\n1. 使用 jmap dump 内存\n2. MAT 分析 hprof 文件\n3. 查找大对象和泄漏点",
+      "difficulty": 2,
+      "tags": [
+        "JVM",
+        "OOM"
+      ],
+      "day": 4
+    },
+    {
+      "id": "D4_005",
+      "question": "JIT 编译器是什么？",
+      "answer": "## JIT\n\n- 即时编译器\n- 热点代码编译成本地代码\n- C1(客户端)、C2(服务端)编译器",
+      "difficulty": 2,
+      "tags": [
+        "JVM",
+        "JIT"
+      ],
+      "day": 4
+    },
+    {
+      "id": "D4_100",
+      "question": "JVM堆内存划分？",
+      "answer": "## 堆划分\n\n- 新生代: Eden + S0 + S1\n- 老年代: 长期存活对象\n- 新生代:老年代 = 1:2\n- Eden:S0:S1 = 8:1:1",
+      "difficulty": 2,
+      "tags": [
+        "JVM",
+        "堆"
+      ],
+      "day": 4
+    },
+    {
+      "id": "D4_101",
+      "question": "对象什么时候进入老年代？",
+      "answer": "## 进入老年代\n\n1. 年龄>=15(默认)\n2. 大对象直接进入\n3. Survivor空间不足\n4. 动态年龄判断",
+      "difficulty": 2,
+      "tags": [
+        "JVM",
+        "GC"
+      ],
+      "day": 4
+    },
+    {
+      "id": "D4_102",
+      "question": "Full GC触发条件？",
+      "answer": "## Full GC触发\n\n1. System.gc()\n2. 老年代空间不足\n3. 方法区空间不足\n4. CMS GC失败",
+      "difficulty": 2,
+      "tags": [
+        "JVM",
+        "GC"
+      ],
+      "day": 4
+    },
+    {
+      "id": "D4_103",
+      "question": "类什么时候被初始化？",
+      "answer": "## 类初始化时机\n\n1. new实例\n2. 访问静态变量\n3. 反射调用\n4. 子类初始化\n5. main方法所在类",
+      "difficulty": 2,
+      "tags": [
+        "JVM",
+        "类加载"
+      ],
+      "day": 4
+    },
+    {
+      "id": "D4_104",
+      "question": "Java对象头包含什么？",
+      "answer": "## 对象头\n\n- Mark Word: 锁状态、GC年龄\n- 类型指针\n- 数组长度(数组对象)",
+      "difficulty": 2,
+      "tags": [
+        "JVM",
+        "对象"
+      ],
+      "day": 4
+    },
+    {
+      "id": "D4_016",
+      "question": "堆内存的核心原理是什么？",
+      "answer": "## 堆内存\n\n### 核心要点\n\n堆内存是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 1,
+      "tags": [
+        "堆内存"
+      ],
+      "day": 4
+    },
+    {
+      "id": "D4_017",
+      "question": "栈内存的核心原理是什么？",
+      "answer": "## 栈内存\n\n### 核心要点\n\n栈内存是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 2,
+      "tags": [
+        "栈内存"
+      ],
+      "day": 4
+    },
+    {
+      "id": "D4_018",
+      "question": "方法区的核心原理是什么？",
+      "answer": "## 方法区\n\n### 核心要点\n\n方法区是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 3,
+      "tags": [
+        "方法区"
+      ],
+      "day": 4
+    },
+    {
+      "id": "D4_019",
+      "question": "GC算法的核心原理是什么？",
+      "answer": "## GC算法\n\n### 核心要点\n\nGC算法是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 1,
+      "tags": [
+        "GC算法"
+      ],
+      "day": 4
+    },
+    {
+      "id": "D4_020",
+      "question": "垃圾收集器的核心原理是什么？",
+      "answer": "## 垃圾收集器\n\n### 核心要点\n\n垃圾收集器是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 2,
+      "tags": [
+        "垃圾收集器"
+      ],
+      "day": 4
+    },
+    {
+      "id": "D4_021",
+      "question": "类加载器的核心原理是什么？",
+      "answer": "## 类加载器\n\n### 核心要点\n\n类加载器是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 3,
+      "tags": [
+        "类加载器"
+      ],
+      "day": 4
+    },
+    {
+      "id": "D4_022",
+      "question": "双亲委派的核心原理是什么？",
+      "answer": "## 双亲委派\n\n### 核心要点\n\n双亲委派是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 1,
+      "tags": [
+        "双亲委派"
+      ],
+      "day": 4
+    },
+    {
+      "id": "D4_023",
+      "question": "JIT编译的核心原理是什么？",
+      "answer": "## JIT编译\n\n### 核心要点\n\nJIT编译是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 2,
+      "tags": [
+        "JIT编译"
+      ],
+      "day": 4
+    },
+    {
+      "id": "D4_024",
+      "question": "内存模型的核心原理是什么？",
+      "answer": "## 内存模型\n\n### 核心要点\n\n内存模型是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 3,
+      "tags": [
+        "内存模型"
+      ],
+      "day": 4
+    },
+    {
+      "id": "D4_025",
+      "question": "对象头的核心原理是什么？",
+      "answer": "## 对象头\n\n### 核心要点\n\n对象头是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 1,
+      "tags": [
+        "对象头"
+      ],
+      "day": 4
+    },
+    {
+      "id": "D4_026",
+      "question": "栈帧的核心原理是什么？",
+      "answer": "## 栈帧\n\n### 核心要点\n\n栈帧是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 2,
+      "tags": [
+        "栈帧"
+      ],
+      "day": 4
+    },
+    {
+      "id": "D4_027",
+      "question": "程序计数器的核心原理是什么？",
+      "answer": "## 程序计数器\n\n### 核心要点\n\n程序计数器是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 3,
+      "tags": [
+        "程序计数器"
+      ],
+      "day": 4
+    },
+    {
+      "id": "D4_028",
+      "question": "本地方法栈的核心原理是什么？",
+      "answer": "## 本地方法栈\n\n### 核心要点\n\n本地方法栈是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 1,
+      "tags": [
+        "本地方法栈"
+      ],
+      "day": 4
+    },
+    {
+      "id": "D4_029",
+      "question": "元空间的核心原理是什么？",
+      "answer": "## 元空间\n\n### 核心要点\n\n元空间是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 2,
+      "tags": [
+        "元空间"
+      ],
+      "day": 4
+    },
+    {
+      "id": "D4_030",
+      "question": "永久代的核心原理是什么？",
+      "answer": "## 永久代\n\n### 核心要点\n\n永久代是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 3,
+      "tags": [
+        "永久代"
+      ],
+      "day": 4
+    },
+    {
+      "id": "D4_031",
+      "question": "Eden区的核心原理是什么？",
+      "answer": "## Eden区\n\n### 核心要点\n\nEden区是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 1,
+      "tags": [
+        "Eden区"
+      ],
+      "day": 4
+    },
+    {
+      "id": "D4_032",
+      "question": "Survivor区的核心原理是什么？",
+      "answer": "## Survivor区\n\n### 核心要点\n\nSurvivor区是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 2,
+      "tags": [
+        "Survivor区"
+      ],
+      "day": 4
+    },
+    {
+      "id": "D4_033",
+      "question": "老年代的核心原理是什么？",
+      "answer": "## 老年代\n\n### 核心要点\n\n老年代是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 3,
+      "tags": [
+        "老年代"
+      ],
+      "day": 4
+    },
+    {
+      "id": "D4_034",
+      "question": "Minor GC的核心原理是什么？",
+      "answer": "## Minor GC\n\n### 核心要点\n\nMinor GC是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 1,
+      "tags": [
+        "Minor GC"
+      ],
+      "day": 4
+    },
+    {
+      "id": "D4_035",
+      "question": "Major GC的核心原理是什么？",
+      "answer": "## Major GC\n\n### 核心要点\n\nMajor GC是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 2,
+      "tags": [
+        "Major GC"
+      ],
+      "day": 4
+    },
+    {
+      "id": "D4_036",
+      "question": "Full GC的核心原理是什么？",
+      "answer": "## Full GC\n\n### 核心要点\n\nFull GC是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 3,
+      "tags": [
+        "Full GC"
+      ],
+      "day": 4
+    },
+    {
+      "id": "D4_037",
+      "question": "STW的核心原理是什么？",
+      "answer": "## STW\n\n### 核心要点\n\nSTW是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 1,
+      "tags": [
+        "STW"
+      ],
+      "day": 4
+    },
+    {
+      "id": "D4_038",
+      "question": "CMS的核心原理是什么？",
+      "answer": "## CMS\n\n### 核心要点\n\nCMS是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 2,
+      "tags": [
+        "CMS"
+      ],
+      "day": 4
+    },
+    {
+      "id": "D4_039",
+      "question": "G1的核心原理是什么？",
+      "answer": "## G1\n\n### 核心要点\n\nG1是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 3,
+      "tags": [
+        "G1"
+      ],
+      "day": 4
+    },
+    {
+      "id": "D4_040",
+      "question": "ZGC的核心原理是什么？",
+      "answer": "## ZGC\n\n### 核心要点\n\nZGC是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 1,
+      "tags": [
+        "ZGC"
+      ],
+      "day": 4
+    },
+    {
+      "id": "D4_041",
+      "question": "内存泄漏的核心原理是什么？",
+      "answer": "## 内存泄漏\n\n### 核心要点\n\n内存泄漏是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 2,
+      "tags": [
+        "内存泄漏"
+      ],
+      "day": 4
+    },
+    {
+      "id": "D4_042",
+      "question": "OOM的核心原理是什么？",
+      "answer": "## OOM\n\n### 核心要点\n\nOOM是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 3,
+      "tags": [
+        "OOM"
+      ],
+      "day": 4
+    },
+    {
+      "id": "D4_043",
+      "question": "hprof分析的核心原理是什么？",
+      "answer": "## hprof分析\n\n### 核心要点\n\nhprof分析是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 1,
+      "tags": [
+        "hprof分析"
+      ],
+      "day": 4
+    },
+    {
+      "id": "D4_044",
+      "question": "MAT工具的核心原理是什么？",
+      "answer": "## MAT工具\n\n### 核心要点\n\nMAT工具是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 2,
+      "tags": [
+        "MAT工具"
+      ],
+      "day": 4
+    },
+    {
+      "id": "D4_045",
+      "question": "JConsole的核心原理是什么？",
+      "answer": "## JConsole\n\n### 核心要点\n\nJConsole是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 3,
+      "tags": [
+        "JConsole"
+      ],
+      "day": 4
+    },
+    {
+      "id": "D4_046",
+      "question": "JVisualVM的核心原理是什么？",
+      "answer": "## JVisualVM\n\n### 核心要点\n\nJVisualVM是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 1,
+      "tags": [
+        "JVisualVM"
+      ],
+      "day": 4
+    },
+    {
+      "id": "D4_047",
+      "question": "堆内存的核心原理是什么？",
+      "answer": "## 堆内存\n\n### 核心要点\n\n堆内存是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 2,
+      "tags": [
+        "堆内存"
+      ],
+      "day": 4
+    },
+    {
+      "id": "D4_048",
+      "question": "栈内存的核心原理是什么？",
+      "answer": "## 栈内存\n\n### 核心要点\n\n栈内存是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 3,
+      "tags": [
+        "栈内存"
+      ],
+      "day": 4
+    },
+    {
+      "id": "D4_049",
+      "question": "方法区的核心原理是什么？",
+      "answer": "## 方法区\n\n### 核心要点\n\n方法区是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 1,
+      "tags": [
+        "方法区"
+      ],
+      "day": 4
+    },
+    {
+      "id": "D4_050",
+      "question": "GC算法的核心原理是什么？",
+      "answer": "## GC算法\n\n### 核心要点\n\nGC算法是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 2,
+      "tags": [
+        "GC算法"
+      ],
+      "day": 4
+    }
+  ]
+}

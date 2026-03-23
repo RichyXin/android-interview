@@ -1,0 +1,419 @@
+{
+  "metadata": {
+    "category": "开源框架",
+    "day": 10,
+    "total_questions": 40
+  },
+  "questions": [
+    {
+      "id": "D10_001",
+      "question": "OkHttp 的拦截器是如何工作的？",
+      "answer": "## OkHttp 拦截器\n\n### 拦截器链\n```\nRequest → 应用拦截器 → 重试拦截器 → 桥拦截器 → 缓存拦截器 → 连接拦截器 → 网络拦截器 → 服务器\n```\n\n### 自定义拦截器\n```kotlin\nclass LoggingInterceptor : Interceptor {\n    override fun intercept(chain: Interceptor.Chain): Response {\n        val request = chain.request()\n        \n        // 请求前\n        Log.d(\"OkHttp\", \"Sending: ${request.url}\")\n        \n        val response = chain.proceed(request)\n        \n        // 响应后\n        Log.d(\"OkHttp\", \"Received: ${response.code}\")\n        \n        return response\n    }\n}\n\n// 添加\nval client = OkHttpClient.Builder()\n    .addInterceptor(LoggingInterceptor())\n    .build()\n```\n\n### 应用拦截器 vs 网络拦截器\n| 特性 | 应用拦截器 | 网络拦截器 |\n|------|------------|------------|\n| 调用次数 | 一次 | 可能多次 |\n| 缓存 | 不关心 | 关心 |\n| 重定向 | 不处理 | 处理 |",
+      "difficulty": 2,
+      "tags": [
+        "OkHttp",
+        "拦截器"
+      ],
+      "day": 10
+    },
+    {
+      "id": "D10_002",
+      "question": "Retrofit 的工作原理是什么？",
+      "answer": "## Retrofit 原理\n\n### 核心机制\n1. **动态代理**：生成接口实现类\n2. **注解处理**：解析接口注解\n3. **CallAdapter**：适配返回类型\n4. **Converter**：数据转换\n\n### 使用示例\n```kotlin\ninterface ApiService {\n    @GET(\"users/{id}\")\n    suspend fun getUser(@Path(\"id\") id: Int): User\n}\n\nval retrofit = Retrofit.Builder()\n    .baseUrl(\"https://api.example.com/\")\n    .addConverterFactory(GsonConverterFactory.create())\n    .build()\n\nval api = retrofit.create(ApiService::class.java)\n\n// 调用\nval user = api.getUser(1)\n```\n\n### 执行流程\n```\n接口方法调用\n    ↓\n动态代理拦截\n    ↓\n解析注解（@GET, @Path 等）\n    ↓\n构建 OkHttp Request\n    ↓\nOkHttp 执行请求\n    ↓\nConverter 转换响应\n    ↓\n返回结果\n```",
+      "difficulty": 2,
+      "tags": [
+        "Retrofit",
+        "原理"
+      ],
+      "day": 10
+    },
+    {
+      "id": "D10_003",
+      "question": "Glide 的图片加载流程是什么？",
+      "answer": "## Glide 图片加载\n\n### 基本使用\n```kotlin\nGlide.with(context)\n    .load(url)\n    .placeholder(R.drawable.placeholder)\n    .error(R.drawable.error)\n    .into(imageView)\n```\n\n### 加载流程\n```\n1. 检查内存缓存\n    ↓ 命中则返回\n2. 检查磁盘缓存\n    ↓ 命中则返回\n3. 网络请求\n    ↓\n4. 解码图片\n    ↓\n5. 存入缓存\n    ↓\n6. 显示图片\n```\n\n### 缓存策略\n```kotlin\nGlide.with(context)\n    .load(url)\n    .diskCacheStrategy(DiskCacheStrategy.ALL)  // 缓存所有版本\n    .skipMemoryCache(true)  // 跳过内存缓存\n    .into(imageView)\n```\n\n### 生命周期管理\n- with(context): Application 级别\n- with(activity): Activity 级别\n- with(fragment): Fragment 级别",
+      "difficulty": 2,
+      "tags": [
+        "Glide",
+        "图片加载"
+      ],
+      "day": 10
+    },
+    {
+      "id": "D10_004",
+      "question": "Hilt 依赖注入的基本使用？",
+      "answer": "## Hilt 依赖注入\n\n### 配置\n```gradle\nplugins {\n    id 'com.google.dagger.hilt.android'\n}\n\ndependencies {\n    implementation \"com.google.dagger:hilt-android:2.44\"\n    kapt \"com.google.dagger:hilt-compiler:2.44\"\n}\n```\n\n### Application\n```kotlin\n@HiltAndroidApp\nclass MyApplication : Application()\n```\n\n### Activity\n```kotlin\n@AndroidEntryPoint\nclass MainActivity : AppCompatActivity() {\n    @Inject lateinit var repository: Repository\n}\n```\n\n### Module\n```kotlin\n@Module\n@InstallIn(SingletonComponent::class)\nobject DatabaseModule {\n    \n    @Provides\n    @Singleton\n    fun provideDatabase(@ApplicationContext context: Context): AppDatabase {\n        return Room.databaseBuilder(context, AppDatabase::class.java, \"app.db\").build()\n    }\n}\n```\n\n### 组件作用域\n| Component | Scope | 生命周期 |\n|-----------|-------|----------|\n| SingletonComponent | @Singleton | Application |\n| ActivityComponent | @ActivityScoped | Activity |",
+      "difficulty": 2,
+      "tags": [
+        "Hilt",
+        "依赖注入"
+      ],
+      "day": 10
+    },
+    {
+      "id": "D10_005",
+      "question": "LeakCanary 的工作原理？",
+      "answer": "## LeakCanary 原理\n\n### 工作流程\n```\n1. 监控对象生命周期\n    ↓\n2. 对象销毁后，等待 5 秒\n    ↓\n3. 触发 GC\n    ↓\n4. 检查对象是否被回收\n    ↓ 未回收\n5. Dump heap\n    ↓\n6. 分析 hprof 文件\n    ↓\n7. 找到 GC Root 链\n    ↓\n8. 显示泄漏报告\n```\n\n### 配置\n```gradle\ndependencies {\n    debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.12'\n}\n```\n\n### 手动监控\n```kotlin\nAppWatcher.objectWatcher.watch(\n    watchedObject = myObject,\n    description = \"My Object\"\n)\n```\n\n### 泄漏追踪示例\n```\n├─ MainActivity instance\n│    ↓\n│  Handler$1 this$0\n│    ↓\n│  anonymous Handler\n│    ↓\n│  MessageQueue.mMessages\n```",
+      "difficulty": 2,
+      "tags": [
+        "LeakCanary",
+        "内存泄漏"
+      ],
+      "day": 10
+    },
+    {
+      "id": "D10_100",
+      "question": "OkHttp连接池原理？",
+      "answer": "## 连接池\n\n- 复用TCP连接\n- 减少握手开销\n- keep-alive机制\n- 5分钟空闲清理",
+      "difficulty": 2,
+      "tags": [
+        "OkHttp",
+        "网络"
+      ],
+      "day": 10
+    },
+    {
+      "id": "D10_101",
+      "question": "Retrofit Converter作用？",
+      "answer": "## Converter\n\n- 数据转换接口\n- GsonConverter\n- MoshiConverter\n- 自定义转换器",
+      "difficulty": 2,
+      "tags": [
+        "Retrofit",
+        "网络"
+      ],
+      "day": 10
+    },
+    {
+      "id": "D10_102",
+      "question": "Glide缓存策略？",
+      "answer": "## 缓存策略\n\n- MEMORY_ONLY\n- MEMORY_CACHE\n- RESOURCE_CACHE\n- ALL\n- NONE",
+      "difficulty": 1,
+      "tags": [
+        "Glide",
+        "图片"
+      ],
+      "day": 10
+    },
+    {
+      "id": "D10_103",
+      "question": "Room支持哪些数据类型？",
+      "answer": "## Room类型\n\n- 基本类型\n- String\n- Date(需要转换器)\n- 自定义对象(需要转换器)",
+      "difficulty": 1,
+      "tags": [
+        "Room",
+        "数据库"
+      ],
+      "day": 10
+    },
+    {
+      "id": "D10_104",
+      "question": "Coil和Glide区别？",
+      "answer": "## Coil vs Glide\n\n- Coil: Kotlin协程，轻量\n- Glide: 功能全面，成熟\n- Coil适合Kotlin项目",
+      "difficulty": 1,
+      "tags": [
+        "图片",
+        "对比"
+      ],
+      "day": 10
+    },
+    {
+      "id": "D10_011",
+      "question": "OkHttp的核心原理是什么？",
+      "answer": "## OkHttp\n\n### 核心要点\n\nOkHttp是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 1,
+      "tags": [
+        "OkHttp"
+      ],
+      "day": 10
+    },
+    {
+      "id": "D10_012",
+      "question": "Retrofit的核心原理是什么？",
+      "answer": "## Retrofit\n\n### 核心要点\n\nRetrofit是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 2,
+      "tags": [
+        "Retrofit"
+      ],
+      "day": 10
+    },
+    {
+      "id": "D10_013",
+      "question": "Glide的核心原理是什么？",
+      "answer": "## Glide\n\n### 核心要点\n\nGlide是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 3,
+      "tags": [
+        "Glide"
+      ],
+      "day": 10
+    },
+    {
+      "id": "D10_014",
+      "question": "Room的核心原理是什么？",
+      "answer": "## Room\n\n### 核心要点\n\nRoom是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 1,
+      "tags": [
+        "Room"
+      ],
+      "day": 10
+    },
+    {
+      "id": "D10_015",
+      "question": "Hilt的核心原理是什么？",
+      "answer": "## Hilt\n\n### 核心要点\n\nHilt是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 2,
+      "tags": [
+        "Hilt"
+      ],
+      "day": 10
+    },
+    {
+      "id": "D10_016",
+      "question": "Dagger的核心原理是什么？",
+      "answer": "## Dagger\n\n### 核心要点\n\nDagger是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 3,
+      "tags": [
+        "Dagger"
+      ],
+      "day": 10
+    },
+    {
+      "id": "D10_017",
+      "question": "LeakCanary的核心原理是什么？",
+      "answer": "## LeakCanary\n\n### 核心要点\n\nLeakCanary是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 1,
+      "tags": [
+        "LeakCanary"
+      ],
+      "day": 10
+    },
+    {
+      "id": "D10_018",
+      "question": "EventBus的核心原理是什么？",
+      "answer": "## EventBus\n\n### 核心要点\n\nEventBus是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 2,
+      "tags": [
+        "EventBus"
+      ],
+      "day": 10
+    },
+    {
+      "id": "D10_019",
+      "question": "RxJava的核心原理是什么？",
+      "answer": "## RxJava\n\n### 核心要点\n\nRxJava是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 3,
+      "tags": [
+        "RxJava"
+      ],
+      "day": 10
+    },
+    {
+      "id": "D10_020",
+      "question": "Coroutines的核心原理是什么？",
+      "answer": "## Coroutines\n\n### 核心要点\n\nCoroutines是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 1,
+      "tags": [
+        "Coroutines"
+      ],
+      "day": 10
+    },
+    {
+      "id": "D10_021",
+      "question": "Coil的核心原理是什么？",
+      "answer": "## Coil\n\n### 核心要点\n\nCoil是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 2,
+      "tags": [
+        "Coil"
+      ],
+      "day": 10
+    },
+    {
+      "id": "D10_022",
+      "question": "Picasso的核心原理是什么？",
+      "answer": "## Picasso\n\n### 核心要点\n\nPicasso是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 3,
+      "tags": [
+        "Picasso"
+      ],
+      "day": 10
+    },
+    {
+      "id": "D10_023",
+      "question": "Fresco的核心原理是什么？",
+      "answer": "## Fresco\n\n### 核心要点\n\nFresco是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 1,
+      "tags": [
+        "Fresco"
+      ],
+      "day": 10
+    },
+    {
+      "id": "D10_024",
+      "question": "GreenDAO的核心原理是什么？",
+      "answer": "## GreenDAO\n\n### 核心要点\n\nGreenDAO是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 2,
+      "tags": [
+        "GreenDAO"
+      ],
+      "day": 10
+    },
+    {
+      "id": "D10_025",
+      "question": "ObjectBox的核心原理是什么？",
+      "answer": "## ObjectBox\n\n### 核心要点\n\nObjectBox是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 3,
+      "tags": [
+        "ObjectBox"
+      ],
+      "day": 10
+    },
+    {
+      "id": "D10_026",
+      "question": "MMKV的核心原理是什么？",
+      "answer": "## MMKV\n\n### 核心要点\n\nMMKV是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 1,
+      "tags": [
+        "MMKV"
+      ],
+      "day": 10
+    },
+    {
+      "id": "D10_027",
+      "question": "OkHttp的核心原理是什么？",
+      "answer": "## OkHttp\n\n### 核心要点\n\nOkHttp是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 2,
+      "tags": [
+        "OkHttp"
+      ],
+      "day": 10
+    },
+    {
+      "id": "D10_028",
+      "question": "Retrofit的核心原理是什么？",
+      "answer": "## Retrofit\n\n### 核心要点\n\nRetrofit是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 3,
+      "tags": [
+        "Retrofit"
+      ],
+      "day": 10
+    },
+    {
+      "id": "D10_029",
+      "question": "Glide的核心原理是什么？",
+      "answer": "## Glide\n\n### 核心要点\n\nGlide是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 1,
+      "tags": [
+        "Glide"
+      ],
+      "day": 10
+    },
+    {
+      "id": "D10_030",
+      "question": "Room的核心原理是什么？",
+      "answer": "## Room\n\n### 核心要点\n\nRoom是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 2,
+      "tags": [
+        "Room"
+      ],
+      "day": 10
+    },
+    {
+      "id": "D10_031",
+      "question": "Hilt的核心原理是什么？",
+      "answer": "## Hilt\n\n### 核心要点\n\nHilt是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 3,
+      "tags": [
+        "Hilt"
+      ],
+      "day": 10
+    },
+    {
+      "id": "D10_032",
+      "question": "Dagger的核心原理是什么？",
+      "answer": "## Dagger\n\n### 核心要点\n\nDagger是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 1,
+      "tags": [
+        "Dagger"
+      ],
+      "day": 10
+    },
+    {
+      "id": "D10_033",
+      "question": "LeakCanary的核心原理是什么？",
+      "answer": "## LeakCanary\n\n### 核心要点\n\nLeakCanary是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 2,
+      "tags": [
+        "LeakCanary"
+      ],
+      "day": 10
+    },
+    {
+      "id": "D10_034",
+      "question": "EventBus的核心原理是什么？",
+      "answer": "## EventBus\n\n### 核心要点\n\nEventBus是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 3,
+      "tags": [
+        "EventBus"
+      ],
+      "day": 10
+    },
+    {
+      "id": "D10_035",
+      "question": "RxJava的核心原理是什么？",
+      "answer": "## RxJava\n\n### 核心要点\n\nRxJava是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 1,
+      "tags": [
+        "RxJava"
+      ],
+      "day": 10
+    },
+    {
+      "id": "D10_036",
+      "question": "Coroutines的核心原理是什么？",
+      "answer": "## Coroutines\n\n### 核心要点\n\nCoroutines是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 2,
+      "tags": [
+        "Coroutines"
+      ],
+      "day": 10
+    },
+    {
+      "id": "D10_037",
+      "question": "Coil的核心原理是什么？",
+      "answer": "## Coil\n\n### 核心要点\n\nCoil是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 3,
+      "tags": [
+        "Coil"
+      ],
+      "day": 10
+    },
+    {
+      "id": "D10_038",
+      "question": "Picasso的核心原理是什么？",
+      "answer": "## Picasso\n\n### 核心要点\n\nPicasso是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 1,
+      "tags": [
+        "Picasso"
+      ],
+      "day": 10
+    },
+    {
+      "id": "D10_039",
+      "question": "Fresco的核心原理是什么？",
+      "answer": "## Fresco\n\n### 核心要点\n\nFresco是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 2,
+      "tags": [
+        "Fresco"
+      ],
+      "day": 10
+    },
+    {
+      "id": "D10_040",
+      "question": "GreenDAO的核心原理是什么？",
+      "answer": "## GreenDAO\n\n### 核心要点\n\nGreenDAO是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 3,
+      "tags": [
+        "GreenDAO"
+      ],
+      "day": 10
+    }
+  ]
+}

@@ -1,0 +1,419 @@
+{
+  "metadata": {
+    "category": "性能优化",
+    "day": 7,
+    "total_questions": 40
+  },
+  "questions": [
+    {
+      "id": "D7_001",
+      "question": "Android 内存泄漏的常见原因有哪些？如何检测？",
+      "answer": "## 内存泄漏常见原因\n\n### 1. 静态变量持有 Context\n```kotlin\n// 错误\ncompanion object {\n    var context: Context? = null  // 泄漏！\n}\n```\n\n### 2. 非静态内部类\n```kotlin\n// Handler 泄漏\nclass MainActivity : AppCompatActivity() {\n    private val handler = Handler(Looper.getMainLooper()) {\n        // 隐式持有 Activity 引用\n    }\n}\n```\n\n### 3. 未注销的监听器\n```kotlin\n// 注册但未注销\nregisterReceiver(receiver, filter)\n// 忘记 unregisterReceiver\n```\n\n### 4. 单例模式\n```kotlin\nobject Singleton {\n    var listener: ((data: String) -> Unit)? = null  // 可能泄漏\n}\n```\n\n## 检测方法\n\n### LeakCanary\n```gradle\ndependencies {\n    debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.12'\n}\n```\n\n### Android Studio Profiler\n- Memory Profiler\n- Dump Java Heap\n- 分析 GC Roots",
+      "difficulty": 2,
+      "tags": [
+        "内存泄漏",
+        "LeakCanary"
+      ],
+      "day": 7
+    },
+    {
+      "id": "D7_002",
+      "question": "如何优化 App 启动速度？",
+      "answer": "## 启动优化\n\n### 启动类型\n1. **冷启动**: 从零开始创建进程\n2. **温启动**: 进程存在，重建 Activity\n3. **热启动**: Activity 仍在内存中\n\n### 优化策略\n\n**1. 延迟初始化**\n```kotlin\noverride fun onCreate(savedInstanceState: Bundle?) {\n    // 主线程延迟非关键初始化\n    Handler(Looper.getMainLooper()).post {\n        initNonCriticalComponents()\n    }\n}\n```\n\n**2. 使用 App Startup 库**\n```gradle\nimplementation \"androidx.startup:startup-runtime:1.1.1\"\n```\n\n**3. 优化 Application.onCreate()**\n```kotlin\nclass MyApplication : Application() {\n    override fun onCreate() {\n        super.onCreate()\n        // 只做必要初始化\n        // 使用异步初始化其他组件\n    }\n}\n```\n\n**4. 避免主线程 IO**\n```kotlin\n// 使用协程\nlifecycleScope.launch(Dispatchers.IO) {\n    loadConfig()\n}\n```\n\n### 测量启动时间\n```bash\nadb shell am start -W com.example/.MainActivity\n```",
+      "difficulty": 2,
+      "tags": [
+        "启动优化",
+        "性能"
+      ],
+      "day": 7
+    },
+    {
+      "id": "D7_003",
+      "question": "RecyclerView 如何优化？",
+      "answer": "## RecyclerView 优化\n\n### 1. ViewHolder 复用\n```kotlin\nclass MyAdapter : RecyclerView.Adapter<MyViewHolder>() {\n    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyViewHolder {\n        // 使用缓存视图\n    }\n}\n```\n\n### 2. DiffUtil\n```kotlin\nval diffResult = DiffUtil.calculateDiff(MyDiffCallback(oldList, newList))\nadapter.submitList(newList)\ndiffResult.dispatchUpdatesTo(adapter)\n```\n\n### 3. 设置缓存大小\n```kotlin\nrecyclerView.setItemViewCacheSize(20)\nrecyclerView.setDrawingCacheEnabled(true)\n```\n\n### 4. 避免嵌套 RecyclerView\n- 使用 ConcatAdapter 替代嵌套\n\n### 5. 图片加载优化\n```kotlin\nGlide.with(itemView.context)\n    .load(url)\n    .placeholder(R.drawable.placeholder)\n    .into(imageView)\n```\n\n### 6. 禁用动画（可选）\n```kotlin\nrecyclerView.itemAnimator = null\n```",
+      "difficulty": 2,
+      "tags": [
+        "RecyclerView",
+        "优化"
+      ],
+      "day": 7
+    },
+    {
+      "id": "D7_004",
+      "question": "ANR 是什么？如何避免？",
+      "answer": "## ANR (Application Not Responding)\n\n### 定义\n应用无响应，系统弹出对话框等待用户选择。\n\n### 触发条件\n| 类型 | 超时时间 |\n|------|----------|\n| 输入事件 | 5秒 |\n| BroadcastReceiver | 10秒 |\n| Service | 20秒 |\n\n### 常见原因\n1. 主线程执行耗时操作\n2. 主线程等待锁\n3. 主线程执行 IO 操作\n4. 内存不足导致频繁 GC\n\n### 解决方案\n\n**1. 使用协程**\n```kotlin\nlifecycleScope.launch(Dispatchers.IO) {\n    val result = heavyTask()\n    withContext(Dispatchers.Main) {\n        updateUI(result)\n    }\n}\n```\n\n**2. 使用 WorkManager**\n```kotlin\nval workRequest = OneTimeWorkRequestBuilder<MyWorker>().build()\nWorkManager.getInstance(context).enqueue(workRequest)\n```\n\n**3. 使用 StrictMode 检测**\n```kotlin\nStrictMode.setThreadPolicy(\n    StrictMode.ThreadPolicy.Builder()\n        .detectDiskReads()\n        .detectDiskWrites()\n        .detectNetwork()\n        .penaltyLog()\n        .build()\n)\n```",
+      "difficulty": 2,
+      "tags": [
+        "ANR",
+        "性能"
+      ],
+      "day": 7
+    },
+    {
+      "id": "D7_005",
+      "question": "如何优化布局性能？",
+      "answer": "## 布局优化\n\n### 1. 减少层级\n- 使用 ConstraintLayout\n- 使用 merge 标签\n\n### 2. 使用 ViewStub\n```xml\n<ViewStub\n    android:id=\"@+id/stub\"\n    android:layout=\"@layout/optional_layout\"\n    android:inflatedId=\"@+id/inflated\" />\n```\n\n```kotlin\nval stub = findViewById<ViewStub>(R.id.stub)\nstub.inflate()\n```\n\n### 3. 使用 include\n```xml\n<include layout=\"@layout/common_header\" />\n```\n\n### 4. 避免过度绘制\n- 设置 -> 开发者选项 -> 调试 GPU 过度绘制\n- 减少不必要的背景\n\n### 5. 使用 Lint 检查\n- 分析 -> Inspect Code\n\n### 6. 异步布局（Compose）\n```kotlin\n@Composable\nfun MyScreen() {\n    // Compose 自动优化布局\n}\n```",
+      "difficulty": 2,
+      "tags": [
+        "布局优化",
+        "性能"
+      ],
+      "day": 7
+    },
+    {
+      "id": "D7_100",
+      "question": "内存抖动是什么？",
+      "answer": "## 内存抖动\n\n短时间内大量对象创建销毁:\n- 频繁触发GC\n- 导致卡顿\n- 避免在循环中创建对象",
+      "difficulty": 2,
+      "tags": [
+        "性能",
+        "内存"
+      ],
+      "day": 7
+    },
+    {
+      "id": "D7_101",
+      "question": "如何分析内存泄漏？",
+      "answer": "## 分析方法\n\n1. Memory Profiler\n2. LeakCanary\n3. MAT分析hprof\n4. 查看GC Roots",
+      "difficulty": 2,
+      "tags": [
+        "性能",
+        "内存泄漏"
+      ],
+      "day": 7
+    },
+    {
+      "id": "D7_102",
+      "question": "App启动时间优化？",
+      "answer": "## 启动优化\n\n1. 延迟初始化\n2. 异步加载\n3. 减少主线程IO\n4. 使用AppStartup",
+      "difficulty": 2,
+      "tags": [
+        "性能",
+        "启动"
+      ],
+      "day": 7
+    },
+    {
+      "id": "D7_103",
+      "question": "布局层级优化？",
+      "answer": "## 布局优化\n\n1. 使用ConstraintLayout\n2. 使用merge标签\n3. ViewStub懒加载\n4. 减少嵌套",
+      "difficulty": 2,
+      "tags": [
+        "性能",
+        "布局"
+      ],
+      "day": 7
+    },
+    {
+      "id": "D7_104",
+      "question": "电量优化方法？",
+      "answer": "## 电量优化\n\n1. 减少WakeLock时间\n2. 批量网络请求\n3. 使用JobScheduler\n4. 避免频繁定位",
+      "difficulty": 2,
+      "tags": [
+        "性能",
+        "电量"
+      ],
+      "day": 7
+    },
+    {
+      "id": "D7_011",
+      "question": "内存优化的核心原理是什么？",
+      "answer": "## 内存优化\n\n### 核心要点\n\n内存优化是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 1,
+      "tags": [
+        "内存优化"
+      ],
+      "day": 7
+    },
+    {
+      "id": "D7_012",
+      "question": "启动优化的核心原理是什么？",
+      "answer": "## 启动优化\n\n### 核心要点\n\n启动优化是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 2,
+      "tags": [
+        "启动优化"
+      ],
+      "day": 7
+    },
+    {
+      "id": "D7_013",
+      "question": "布局优化的核心原理是什么？",
+      "answer": "## 布局优化\n\n### 核心要点\n\n布局优化是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 3,
+      "tags": [
+        "布局优化"
+      ],
+      "day": 7
+    },
+    {
+      "id": "D7_014",
+      "question": "RecyclerView优化的核心原理是什么？",
+      "answer": "## RecyclerView优化\n\n### 核心要点\n\nRecyclerView优化是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 1,
+      "tags": [
+        "RecyclerView优化"
+      ],
+      "day": 7
+    },
+    {
+      "id": "D7_015",
+      "question": "图片优化的核心原理是什么？",
+      "answer": "## 图片优化\n\n### 核心要点\n\n图片优化是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 2,
+      "tags": [
+        "图片优化"
+      ],
+      "day": 7
+    },
+    {
+      "id": "D7_016",
+      "question": "网络优化的核心原理是什么？",
+      "answer": "## 网络优化\n\n### 核心要点\n\n网络优化是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 3,
+      "tags": [
+        "网络优化"
+      ],
+      "day": 7
+    },
+    {
+      "id": "D7_017",
+      "question": "电量优化的核心原理是什么？",
+      "answer": "## 电量优化\n\n### 核心要点\n\n电量优化是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 1,
+      "tags": [
+        "电量优化"
+      ],
+      "day": 7
+    },
+    {
+      "id": "D7_018",
+      "question": "APK瘦身的核心原理是什么？",
+      "answer": "## APK瘦身\n\n### 核心要点\n\nAPK瘦身是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 2,
+      "tags": [
+        "APK瘦身"
+      ],
+      "day": 7
+    },
+    {
+      "id": "D7_019",
+      "question": "ANR的核心原理是什么？",
+      "answer": "## ANR\n\n### 核心要点\n\nANR是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 3,
+      "tags": [
+        "ANR"
+      ],
+      "day": 7
+    },
+    {
+      "id": "D7_020",
+      "question": "内存泄漏的核心原理是什么？",
+      "answer": "## 内存泄漏\n\n### 核心要点\n\n内存泄漏是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 1,
+      "tags": [
+        "内存泄漏"
+      ],
+      "day": 7
+    },
+    {
+      "id": "D7_021",
+      "question": "内存抖动的核心原理是什么？",
+      "answer": "## 内存抖动\n\n### 核心要点\n\n内存抖动是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 2,
+      "tags": [
+        "内存抖动"
+      ],
+      "day": 7
+    },
+    {
+      "id": "D7_022",
+      "question": "LeakCanary的核心原理是什么？",
+      "answer": "## LeakCanary\n\n### 核心要点\n\nLeakCanary是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 3,
+      "tags": [
+        "LeakCanary"
+      ],
+      "day": 7
+    },
+    {
+      "id": "D7_023",
+      "question": "Profiler的核心原理是什么？",
+      "answer": "## Profiler\n\n### 核心要点\n\nProfiler是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 1,
+      "tags": [
+        "Profiler"
+      ],
+      "day": 7
+    },
+    {
+      "id": "D7_024",
+      "question": "Systrace的核心原理是什么？",
+      "answer": "## Systrace\n\n### 核心要点\n\nSystrace是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 2,
+      "tags": [
+        "Systrace"
+      ],
+      "day": 7
+    },
+    {
+      "id": "D7_025",
+      "question": "TraceView的核心原理是什么？",
+      "answer": "## TraceView\n\n### 核心要点\n\nTraceView是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 3,
+      "tags": [
+        "TraceView"
+      ],
+      "day": 7
+    },
+    {
+      "id": "D7_026",
+      "question": "HierarchyViewer的核心原理是什么？",
+      "answer": "## HierarchyViewer\n\n### 核心要点\n\nHierarchyViewer是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 1,
+      "tags": [
+        "HierarchyViewer"
+      ],
+      "day": 7
+    },
+    {
+      "id": "D7_027",
+      "question": "过度绘制的核心原理是什么？",
+      "answer": "## 过度绘制\n\n### 核心要点\n\n过度绘制是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 2,
+      "tags": [
+        "过度绘制"
+      ],
+      "day": 7
+    },
+    {
+      "id": "D7_028",
+      "question": "GPU过度绘制的核心原理是什么？",
+      "answer": "## GPU过度绘制\n\n### 核心要点\n\nGPU过度绘制是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 3,
+      "tags": [
+        "GPU过度绘制"
+      ],
+      "day": 7
+    },
+    {
+      "id": "D7_029",
+      "question": "布局层级的核心原理是什么？",
+      "answer": "## 布局层级\n\n### 核心要点\n\n布局层级是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 1,
+      "tags": [
+        "布局层级"
+      ],
+      "day": 7
+    },
+    {
+      "id": "D7_030",
+      "question": "ViewStub的核心原理是什么？",
+      "answer": "## ViewStub\n\n### 核心要点\n\nViewStub是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 2,
+      "tags": [
+        "ViewStub"
+      ],
+      "day": 7
+    },
+    {
+      "id": "D7_031",
+      "question": "merge标签的核心原理是什么？",
+      "answer": "## merge标签\n\n### 核心要点\n\nmerge标签是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 3,
+      "tags": [
+        "merge标签"
+      ],
+      "day": 7
+    },
+    {
+      "id": "D7_032",
+      "question": "内存优化的核心原理是什么？",
+      "answer": "## 内存优化\n\n### 核心要点\n\n内存优化是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 1,
+      "tags": [
+        "内存优化"
+      ],
+      "day": 7
+    },
+    {
+      "id": "D7_033",
+      "question": "启动优化的核心原理是什么？",
+      "answer": "## 启动优化\n\n### 核心要点\n\n启动优化是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 2,
+      "tags": [
+        "启动优化"
+      ],
+      "day": 7
+    },
+    {
+      "id": "D7_034",
+      "question": "布局优化的核心原理是什么？",
+      "answer": "## 布局优化\n\n### 核心要点\n\n布局优化是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 3,
+      "tags": [
+        "布局优化"
+      ],
+      "day": 7
+    },
+    {
+      "id": "D7_035",
+      "question": "RecyclerView优化的核心原理是什么？",
+      "answer": "## RecyclerView优化\n\n### 核心要点\n\nRecyclerView优化是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 1,
+      "tags": [
+        "RecyclerView优化"
+      ],
+      "day": 7
+    },
+    {
+      "id": "D7_036",
+      "question": "图片优化的核心原理是什么？",
+      "answer": "## 图片优化\n\n### 核心要点\n\n图片优化是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 2,
+      "tags": [
+        "图片优化"
+      ],
+      "day": 7
+    },
+    {
+      "id": "D7_037",
+      "question": "网络优化的核心原理是什么？",
+      "answer": "## 网络优化\n\n### 核心要点\n\n网络优化是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 3,
+      "tags": [
+        "网络优化"
+      ],
+      "day": 7
+    },
+    {
+      "id": "D7_038",
+      "question": "电量优化的核心原理是什么？",
+      "answer": "## 电量优化\n\n### 核心要点\n\n电量优化是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 1,
+      "tags": [
+        "电量优化"
+      ],
+      "day": 7
+    },
+    {
+      "id": "D7_039",
+      "question": "APK瘦身的核心原理是什么？",
+      "answer": "## APK瘦身\n\n### 核心要点\n\nAPK瘦身是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 2,
+      "tags": [
+        "APK瘦身"
+      ],
+      "day": 7
+    },
+    {
+      "id": "D7_040",
+      "question": "ANR的核心原理是什么？",
+      "answer": "## ANR\n\n### 核心要点\n\nANR是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 3,
+      "tags": [
+        "ANR"
+      ],
+      "day": 7
+    }
+  ]
+}

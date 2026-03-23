@@ -1,0 +1,421 @@
+{
+  "metadata": {
+    "category": "Jetpack与Compose",
+    "day": 8,
+    "total_questions": 40
+  },
+  "questions": [
+    {
+      "id": "D8_001",
+      "question": "ViewModel 的作用是什么？为什么需要它？",
+      "answer": "## ViewModel\n\n### 作用\n- 存储和管理 UI 相关数据\n- 在配置变更（如屏幕旋转）时保留数据\n- 分离 UI 逻辑和业务逻辑\n\n### 使用示例\n```kotlin\nclass MyViewModel : ViewModel() {\n    private val _data = MutableLiveData<String>()\n    val data: LiveData<String> = _data\n    \n    fun loadData() {\n        viewModelScope.launch {\n            _data.value = repository.fetch()\n        }\n    }\n}\n\nclass MainActivity : AppCompatActivity() {\n    private val viewModel: MyViewModel by viewModels()\n    \n    override fun onCreate(savedInstanceState: Bundle?) {\n        viewModel.data.observe(this) { data ->\n            updateUI(data)\n        }\n    }\n}\n```\n\n### 生命周期\n- Activity 销毁时 ViewModel 也会被清除\n- 配置变更时 ViewModel 保留\n\n### 与 onSaveInstanceState 对比\n| 特性 | ViewModel | onSaveInstanceState |\n|------|-----------|---------------------|\n| 数据大小 | 无限制 | 有限制 |\n| 序列化 | 不需要 | 需要 |\n| 进程死亡 | 数据丢失 | 数据保留 |",
+      "difficulty": 1,
+      "tags": [
+        "ViewModel",
+        "Jetpack"
+      ],
+      "day": 8
+    },
+    {
+      "id": "D8_002",
+      "question": "LiveData 和 Flow 有什么区别？",
+      "answer": "## LiveData vs Flow\n\n### LiveData\n```kotlin\nval data = MutableLiveData<String>()\n\ndata.observe(lifecycleOwner) { value ->\n    updateUI(value)\n}\n```\n\n**特点**：\n- 生命周期感知\n- 自动清理观察者\n- 主线程更新\n\n### Flow\n```kotlin\nfun getData(): Flow<String> = flow {\n    emit(\"value1\")\n    emit(\"value2\")\n}\n\nlifecycleScope.launch {\n    getData().collect { value ->\n        updateUI(value)\n    }\n}\n```\n\n**特点**：\n- 冷流，按需执行\n- 丰富的操作符\n- 支持背压\n\n### StateFlow（推荐）\n```kotlin\nprivate val _state = MutableStateFlow(\"\")\nval state: StateFlow<String> = _state.asStateFlow()\n\n// 在 Compose 中使用\nval state by viewModel.state.collectAsState()\n```\n\n### 对比\n| 特性 | LiveData | Flow |\n|------|----------|------|\n| 生命周期感知 | 自动 | 需要 repeatOnLifecycle |\n| 操作符 | 基本 | 丰富 |\n| 线程切换 | 固定主线程 | 灵活 |\n| 背压 | 不支持 | 支持 |",
+      "difficulty": 2,
+      "tags": [
+        "LiveData",
+        "Flow",
+        "Jetpack"
+      ],
+      "day": 8
+    },
+    {
+      "id": "D8_003",
+      "question": "Jetpack Compose 的优势是什么？",
+      "answer": "## Jetpack Compose\n\n### 优势\n1. **声明式 UI**\n```kotlin\n@Composable\nfun Greeting(name: String) {\n    Text(text = \"Hello $name!\")\n}\n```\n\n2. **状态驱动**\n```kotlin\nvar count by remember { mutableStateOf(0) }\nButton(onClick = { count++ }) {\n    Text(\"Count: $count\")\n}\n```\n\n3. **预览功能**\n```kotlin\n@Preview\n@Composable\nfun PreviewGreeting() {\n    Greeting(\"World\")\n}\n```\n\n4. **减少代码量**\n- 无需 XML 布局\n- 无需 findViewById\n- 无需 View 绑定\n\n### 与 XML 对比\n| 特性 | XML | Compose |\n|------|-----|---------|\n| UI 定义 | 分离 | 代码中 |\n| 状态管理 | 复杂 | 简单 |\n| 复用性 | include | Composable |\n| 动画 | 复杂 | 简单 |\n\n### 学习资源\n- 官方文档\n- Compose 示例\n- Android Studio 预览",
+      "difficulty": 1,
+      "tags": [
+        "Compose",
+        "Jetpack"
+      ],
+      "day": 8
+    },
+    {
+      "id": "D8_004",
+      "question": "Room 数据库的基本使用？",
+      "answer": "## Room 数据库\n\n### 定义 Entity\n```kotlin\n@Entity\ndata class User(\n    @PrimaryKey val id: Int,\n    @ColumnInfo(name = \"name\") val name: String\n)\n```\n\n### 定义 DAO\n```kotlin\n@Dao\ninterface UserDao {\n    @Query(\"SELECT * FROM user\")\n    suspend fun getAll(): List<User>\n    \n    @Insert\n    suspend fun insert(user: User)\n    \n    @Delete\n    suspend fun delete(user: User)\n}\n```\n\n### 定义 Database\n```kotlin\n@Database(entities = [User::class], version = 1)\nabstract class AppDatabase : RoomDatabase() {\n    abstract fun userDao(): UserDao\n}\n\n// 创建\nval db = Room.databaseBuilder(\n    context,\n    AppDatabase::class.java, \"app-database\"\n).build()\n```\n\n### 与 Flow 结合\n```kotlin\n@Query(\"SELECT * FROM user\")\nfun getAllFlow(): Flow<List<User>>\n```",
+      "difficulty": 2,
+      "tags": [
+        "Room",
+        "数据库",
+        "Jetpack"
+      ],
+      "day": 8
+    },
+    {
+      "id": "D8_005",
+      "question": "WorkManager 的使用场景和基本用法？",
+      "answer": "## WorkManager\n\n### 使用场景\n- 后台数据同步\n- 日志上传\n- 定期任务\n- 可延迟的后台任务\n\n### 基本用法\n\n**定义 Worker**\n```kotlin\nclass SyncWorker(context: Context, params: WorkerParameters) : Worker(context, params) {\n    override fun doWork(): Result {\n        return try {\n            syncData()\n            Result.success()\n        } catch (e: Exception) {\n            Result.failure()\n        }\n    }\n}\n```\n\n**调度任务**\n```kotlin\n// 一次性任务\nval workRequest = OneTimeWorkRequestBuilder<SyncWorker>()\n    .setConstraints(\n        Constraints.Builder()\n            .setRequiredNetworkType(NetworkType.CONNECTED)\n            .build()\n    )\n    .build()\n\nWorkManager.getInstance(context).enqueue(workRequest)\n\n// 定期任务\nval periodicWork = PeriodicWorkRequestBuilder<SyncWorker>(1, TimeUnit.HOURS)\n    .build()\n```\n\n### 特点\n- 兼容 Android 6.0+\n- 自动处理系统限制\n- 支持约束条件\n- 支持链式任务",
+      "difficulty": 2,
+      "tags": [
+        "WorkManager",
+        "Jetpack"
+      ],
+      "day": 8
+    },
+    {
+      "id": "D8_100",
+      "question": "Navigation组件的作用？",
+      "answer": "## Navigation\n\n- 管理Fragment导航\n- 可视化导航图\n- Safe Args传参\n- 深度链接支持",
+      "difficulty": 1,
+      "tags": [
+        "Jetpack",
+        "Navigation"
+      ],
+      "day": 8
+    },
+    {
+      "id": "D8_101",
+      "question": "Paging库的使用场景？",
+      "answer": "## Paging\n\n- 分页加载大数据\n- 支持RecyclerView\n- 网络数据库通用\n- 加载状态管理",
+      "difficulty": 2,
+      "tags": [
+        "Jetpack",
+        "Paging"
+      ],
+      "day": 8
+    },
+    {
+      "id": "D8_102",
+      "question": "DataStore vs SharedPreferences？",
+      "answer": "## DataStore优势\n\n- 异步API\n- 数据一致性\n- 支持协程\n- 类型安全",
+      "difficulty": 2,
+      "tags": [
+        "Jetpack",
+        "DataStore"
+      ],
+      "day": 8
+    },
+    {
+      "id": "D8_103",
+      "question": "Hilt vs Dagger？",
+      "answer": "## Hilt优势\n\n- 简化配置\n- Android专用\n- 预定义组件\n- 无需手动Component",
+      "difficulty": 2,
+      "tags": [
+        "Jetpack",
+        "Hilt"
+      ],
+      "day": 8
+    },
+    {
+      "id": "D8_104",
+      "question": "ViewModel如何保存状态？",
+      "answer": "## 状态保存\n\n- SavedStateHandle\n- 配置变更保留\n- 进程杀死恢复\n```kotlin\nval handle: SavedStateHandle\n```",
+      "difficulty": 2,
+      "tags": [
+        "Jetpack",
+        "ViewModel"
+      ],
+      "day": 8
+    },
+    {
+      "id": "D8_011",
+      "question": "ViewModel的核心原理是什么？",
+      "answer": "## ViewModel\n\n### 核心要点\n\nViewModel是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 1,
+      "tags": [
+        "ViewModel"
+      ],
+      "day": 8
+    },
+    {
+      "id": "D8_012",
+      "question": "LiveData的核心原理是什么？",
+      "answer": "## LiveData\n\n### 核心要点\n\nLiveData是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 2,
+      "tags": [
+        "LiveData"
+      ],
+      "day": 8
+    },
+    {
+      "id": "D8_013",
+      "question": "Room的核心原理是什么？",
+      "answer": "## Room\n\n### 核心要点\n\nRoom是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 3,
+      "tags": [
+        "Room"
+      ],
+      "day": 8
+    },
+    {
+      "id": "D8_014",
+      "question": "WorkManager的核心原理是什么？",
+      "answer": "## WorkManager\n\n### 核心要点\n\nWorkManager是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 1,
+      "tags": [
+        "WorkManager"
+      ],
+      "day": 8
+    },
+    {
+      "id": "D8_015",
+      "question": "Navigation的核心原理是什么？",
+      "answer": "## Navigation\n\n### 核心要点\n\nNavigation是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 2,
+      "tags": [
+        "Navigation"
+      ],
+      "day": 8
+    },
+    {
+      "id": "D8_016",
+      "question": "Paging的核心原理是什么？",
+      "answer": "## Paging\n\n### 核心要点\n\nPaging是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 3,
+      "tags": [
+        "Paging"
+      ],
+      "day": 8
+    },
+    {
+      "id": "D8_017",
+      "question": "DataStore的核心原理是什么？",
+      "answer": "## DataStore\n\n### 核心要点\n\nDataStore是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 1,
+      "tags": [
+        "DataStore"
+      ],
+      "day": 8
+    },
+    {
+      "id": "D8_018",
+      "question": "Hilt的核心原理是什么？",
+      "answer": "## Hilt\n\n### 核心要点\n\nHilt是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 2,
+      "tags": [
+        "Hilt"
+      ],
+      "day": 8
+    },
+    {
+      "id": "D8_019",
+      "question": "Jetpack Compose的核心原理是什么？",
+      "answer": "## Jetpack Compose\n\n### 核心要点\n\nJetpack Compose是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 3,
+      "tags": [
+        "Jetpack Compose"
+      ],
+      "day": 8
+    },
+    {
+      "id": "D8_020",
+      "question": "StateFlow的核心原理是什么？",
+      "answer": "## StateFlow\n\n### 核心要点\n\nStateFlow是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 1,
+      "tags": [
+        "StateFlow"
+      ],
+      "day": 8
+    },
+    {
+      "id": "D8_021",
+      "question": "SharedFlow的核心原理是什么？",
+      "answer": "## SharedFlow\n\n### 核心要点\n\nSharedFlow是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 2,
+      "tags": [
+        "SharedFlow"
+      ],
+      "day": 8
+    },
+    {
+      "id": "D8_022",
+      "question": "协程集成的核心原理是什么？",
+      "answer": "## 协程集成\n\n### 核心要点\n\n协程集成是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 3,
+      "tags": [
+        "协程集成"
+      ],
+      "day": 8
+    },
+    {
+      "id": "D8_023",
+      "question": "生命周期感知的核心原理是什么？",
+      "answer": "## 生命周期感知\n\n### 核心要点\n\n生命周期感知是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 1,
+      "tags": [
+        "生命周期感知"
+      ],
+      "day": 8
+    },
+    {
+      "id": "D8_024",
+      "question": "SavedStateHandle的核心原理是什么？",
+      "answer": "## SavedStateHandle\n\n### 核心要点\n\nSavedStateHandle是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 2,
+      "tags": [
+        "SavedStateHandle"
+      ],
+      "day": 8
+    },
+    {
+      "id": "D8_025",
+      "question": "ViewModel的核心原理是什么？",
+      "answer": "## ViewModel\n\n### 核心要点\n\nViewModel是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 3,
+      "tags": [
+        "ViewModel"
+      ],
+      "day": 8
+    },
+    {
+      "id": "D8_026",
+      "question": "LiveData的核心原理是什么？",
+      "answer": "## LiveData\n\n### 核心要点\n\nLiveData是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 1,
+      "tags": [
+        "LiveData"
+      ],
+      "day": 8
+    },
+    {
+      "id": "D8_027",
+      "question": "Room的核心原理是什么？",
+      "answer": "## Room\n\n### 核心要点\n\nRoom是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 2,
+      "tags": [
+        "Room"
+      ],
+      "day": 8
+    },
+    {
+      "id": "D8_028",
+      "question": "WorkManager的核心原理是什么？",
+      "answer": "## WorkManager\n\n### 核心要点\n\nWorkManager是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 3,
+      "tags": [
+        "WorkManager"
+      ],
+      "day": 8
+    },
+    {
+      "id": "D8_029",
+      "question": "Navigation的核心原理是什么？",
+      "answer": "## Navigation\n\n### 核心要点\n\nNavigation是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 1,
+      "tags": [
+        "Navigation"
+      ],
+      "day": 8
+    },
+    {
+      "id": "D8_030",
+      "question": "Paging的核心原理是什么？",
+      "answer": "## Paging\n\n### 核心要点\n\nPaging是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 2,
+      "tags": [
+        "Paging"
+      ],
+      "day": 8
+    },
+    {
+      "id": "D8_031",
+      "question": "DataStore的核心原理是什么？",
+      "answer": "## DataStore\n\n### 核心要点\n\nDataStore是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 3,
+      "tags": [
+        "DataStore"
+      ],
+      "day": 8
+    },
+    {
+      "id": "D8_032",
+      "question": "Hilt的核心原理是什么？",
+      "answer": "## Hilt\n\n### 核心要点\n\nHilt是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 1,
+      "tags": [
+        "Hilt"
+      ],
+      "day": 8
+    },
+    {
+      "id": "D8_033",
+      "question": "Jetpack Compose的核心原理是什么？",
+      "answer": "## Jetpack Compose\n\n### 核心要点\n\nJetpack Compose是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 2,
+      "tags": [
+        "Jetpack Compose"
+      ],
+      "day": 8
+    },
+    {
+      "id": "D8_034",
+      "question": "StateFlow的核心原理是什么？",
+      "answer": "## StateFlow\n\n### 核心要点\n\nStateFlow是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 3,
+      "tags": [
+        "StateFlow"
+      ],
+      "day": 8
+    },
+    {
+      "id": "D8_035",
+      "question": "SharedFlow的核心原理是什么？",
+      "answer": "## SharedFlow\n\n### 核心要点\n\nSharedFlow是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 1,
+      "tags": [
+        "SharedFlow"
+      ],
+      "day": 8
+    },
+    {
+      "id": "D8_036",
+      "question": "协程集成的核心原理是什么？",
+      "answer": "## 协程集成\n\n### 核心要点\n\n协程集成是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 2,
+      "tags": [
+        "协程集成"
+      ],
+      "day": 8
+    },
+    {
+      "id": "D8_037",
+      "question": "生命周期感知的核心原理是什么？",
+      "answer": "## 生命周期感知\n\n### 核心要点\n\n生命周期感知是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 3,
+      "tags": [
+        "生命周期感知"
+      ],
+      "day": 8
+    },
+    {
+      "id": "D8_038",
+      "question": "SavedStateHandle的核心原理是什么？",
+      "answer": "## SavedStateHandle\n\n### 核心要点\n\nSavedStateHandle是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 1,
+      "tags": [
+        "SavedStateHandle"
+      ],
+      "day": 8
+    },
+    {
+      "id": "D8_039",
+      "question": "ViewModel的核心原理是什么？",
+      "answer": "## ViewModel\n\n### 核心要点\n\nViewModel是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 2,
+      "tags": [
+        "ViewModel"
+      ],
+      "day": 8
+    },
+    {
+      "id": "D8_040",
+      "question": "LiveData的核心原理是什么？",
+      "answer": "## LiveData\n\n### 核心要点\n\nLiveData是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 3,
+      "tags": [
+        "LiveData"
+      ],
+      "day": 8
+    }
+  ]
+}

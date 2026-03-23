@@ -1,0 +1,449 @@
+{
+  "day": 3,
+  "topic": "Java Concurrency",
+  "total_questions": 50,
+  "categories": [
+    {
+      "name": "Thread Basics and States",
+      "question_count": 5,
+      "questions": [
+        {
+          "id": "D3_001",
+          "question": "What are the different states of a Thread in Java? Draw the thread state diagram.",
+          "answer": "Java threads have 6 states: NEW, RUNNABLE, BLOCKED, WAITING, TIMED_WAITING, TERMINATED. NEW: created but not started. RUNNABLE: executing or ready to execute. BLOCKED: waiting for monitor lock. WAITING: waiting indefinitely for another thread. TIMED_WAITING: waiting for specified time. TERMINATED: completed execution.",
+          "code_example": "Thread.State[] states = Thread.State.values();\nfor (Thread.State state : states) {\n    System.out.println(state);\n}\n// Output: NEW, RUNNABLE, BLOCKED, WAITING, TIMED_WAITING, TERMINATED",
+          "difficulty": "easy",
+          "tags": ["thread", "states", "lifecycle"]
+        },
+        {
+          "id": "D3_002",
+          "question": "Explain the difference between start() and run() methods in Thread class.",
+          "answer": "start() creates a new thread and calls run() in that new thread. run() just executes the code in the current thread like a normal method call. Calling run() directly doesn't achieve concurrency.",
+          "code_example": "Thread t = new Thread(() -> System.out.println(\"Hello\"));\nt.start();  // Creates new thread, runs concurrently\nt.run();    // Executes in current thread, no concurrency",
+          "difficulty": "easy",
+          "tags": ["thread", "start", "run"]
+        },
+        {
+          "id": "D3_003",
+          "question": "How do you create a thread in Java? Compare extending Thread vs implementing Runnable vs implementing Callable.",
+          "answer": "Three ways: 1) Extend Thread class - simple but limits inheritance. 2) Implement Runnable - flexible, can extend other classes. 3) Implement Callable - can return result and throw exceptions. Preferred: Runnable/Callable with ExecutorService.",
+          "code_example": "// Extending Thread\nclass MyThread extends Thread {\n    public void run() { System.out.println(\"Thread\"); }\n}\n\n// Implementing Runnable\nclass MyTask implements Runnable {\n    public void run() { System.out.println(\"Runnable\"); }\n}\n\n// Implementing Callable\nclass MyCallable implements Callable<Integer> {\n    public Integer call() { return 42; }\n}",
+          "difficulty": "medium",
+          "tags": ["thread", "runnable", "callable"]
+        },
+        {
+          "id": "D3_004",
+          "question": "What is the purpose of join() method? Write code to wait for multiple threads.",
+          "answer": "join() makes current thread wait until the thread on which it's called completes. Useful when you need to wait for threads to finish before proceeding.",
+          "code_example": "Thread t1 = new Thread(() -> doTask1());\nThread t2 = new Thread(() -> doTask2());\nt1.start();\nt2.start();\ntry {\n    t1.join();  // Wait for t1\n    t2.join();  // Wait for t2\n    System.out.println(\"Both threads completed\");\n} catch (InterruptedException e) {\n    Thread.currentThread().interrupt();\n}",
+          "difficulty": "medium",
+          "tags": ["thread", "join", "synchronization"]
+        },
+        {
+          "id": "D3_005",
+          "question": "What happens when you call interrupt() on a thread? How should a thread handle interruption?",
+          "answer": "interrupt() sets the interrupted flag. If thread is blocked (sleep, wait, join), it throws InterruptedException. Thread should check isInterrupted() or handle InterruptedException properly by restoring interrupt status.",
+          "code_example": "Thread t = new Thread(() -> {\n    while (!Thread.currentThread().isInterrupted()) {\n        try {\n            doWork();\n        } catch (InterruptedException e) {\n            Thread.currentThread().interrupt();\n            break;\n        }\n    }\n});\nt.start();\nt.interrupt();",
+          "difficulty": "medium",
+          "tags": ["thread", "interrupt", "InterruptedException"]
+        }
+      ]
+    },
+    {
+      "name": "Synchronized, Volatile, Atomic",
+      "question_count": 8,
+      "questions": [
+        {
+          "id": "D3_006",
+          "question": "Explain the synchronized keyword. What's the difference between synchronized method and synchronized block?",
+          "answer": "synchronized ensures mutual exclusion. Synchronized method locks on 'this' (instance) or class (static). Synchronized block allows specifying lock object and narrower scope, improving performance.",
+          "code_example": "// Synchronized method\npublic synchronized void increment() { count++; }\n\n// Synchronized block (better - finer granularity)\npublic void increment() {\n    synchronized(this) {\n        count++;\n    }\n}\n\n// Static synchronized - locks on class\npublic static synchronized void staticIncrement() { }",
+          "difficulty": "medium",
+          "tags": ["synchronized", "lock", "mutual-exclusion"]
+        },
+        {
+          "id": "D3_007",
+          "question": "What is the volatile keyword? When should you use it?",
+          "answer": "volatile ensures visibility across threads - writes are immediately visible to other threads. It prevents caching in CPU registers. Use for flags, status variables. Does NOT provide atomicity for compound operations.",
+          "code_example": "private volatile boolean running = true;\n\npublic void stop() { running = false; }\npublic void run() {\n    while (running) {\n        doWork();\n    }\n}\n// Note: volatile doesn't make count++ atomic!\nprivate volatile int count = 0;\ncount++; // NOT thread-safe!",
+          "difficulty": "medium",
+          "tags": ["volatile", "visibility", "memory"]
+        },
+        {
+          "id": "D3_008",
+          "question": "What are Atomic classes? Give examples and explain CAS operation.",
+          "answer": "Atomic classes (AtomicInteger, AtomicLong, AtomicReference) use CAS (Compare-And-Swap) for lock-free thread-safe operations. CAS compares expected value with current, if matches, swaps atomically.",
+          "code_example": "AtomicInteger counter = new AtomicInteger(0);\n\n// Thread-safe increment\nint newValue = counter.incrementAndGet();\n\n// CAS operation\nboolean success = counter.compareAndSet(0, 1);\nif (success) {\n    System.out.println(\"Updated from 0 to 1\");\n}\n\n// Accumulate with custom function\ncounter.accumulateAndGet(5, (x, y) -> x + y);",
+          "difficulty": "medium",
+          "tags": ["atomic", "CAS", "lock-free"]
+        },
+        {
+          "id": "D3_009",
+          "question": "Demonstrate the double-checked locking pattern with volatile.",
+          "answer": "Double-checked locking optimizes singleton creation. First check without lock, then synchronized block, then second check. volatile prevents instruction reordering that could expose partially constructed object.",
+          "code_example": "public class Singleton {\n    private static volatile Singleton instance;\n    \n    private Singleton() {}\n    \n    public static Singleton getInstance() {\n        if (instance == null) {\n            synchronized (Singleton.class) {\n                if (instance == null) {\n                    instance = new Singleton();\n                }\n            }\n        }\n        return instance;\n    }\n}",
+          "difficulty": "hard",
+          "tags": ["singleton", "volatile", "double-check"]
+        },
+        {
+          "id": "D3_010",
+          "question": "What is the 'happens-before' relationship in Java?",
+          "answer": "Happens-before defines memory visibility: if action A happens-before B, then A's results are visible to B. Established by: program order, monitor lock (unlock happens-before lock), volatile write (happens-before read), thread start/join.",
+          "code_example": "// Volatile establishes happens-before\nvolatile int x = 0;\n\n// Thread 1\nx = 5;\nx = 10;\n\n// Thread 2  \nint val = x; // This read sees latest write\n\n// Lock establishes happens-before\nsynchronized(lock) { x = 5; }\n// Unlock happens-before next lock on same monitor",
+          "difficulty": "hard",
+          "tags": ["happens-before", "memory-model", "visibility"]
+        },
+        {
+          "id": "D3_011",
+          "question": "Compare synchronized vs ReentrantLock. When would you choose each?",
+          "answer": "synchronized: simpler, automatic release, JVM optimized. ReentrantLock: more flexible (tryLock, timed lock, interruptible, multiple conditions), manual release required. Use synchronized for simple cases, ReentrantLock for advanced features.",
+          "code_example": "// ReentrantLock advantages\nReentrantLock lock = new ReentrantLock();\n\nif (lock.tryLock(100, TimeUnit.MILLISECONDS)) {\n    try {\n        // critical section\n    } finally {\n        lock.unlock();\n    }\n}\n\n// vs synchronized (auto release)\nsynchronized(lock) {\n    // critical section\n}",
+          "difficulty": "medium",
+          "tags": ["synchronized", "ReentrantLock", "comparison"]
+        },
+        {
+          "id": "D3_012",
+          "question": "What is false sharing? How does @Contended annotation help?",
+          "answer": "False sharing occurs when threads modify variables on same cache line, causing cache invalidation. @Contended adds padding to put variable in separate cache line, improving performance in high-contention scenarios.",
+          "code_example": "@sun.misc.Contended\npublic class Counter {\n    @Contended\n    private long value = 0;\n    \n    public void increment() {\n        value++;\n    }\n}",
+          "difficulty": "hard",
+          "tags": ["false-sharing", "Contended", "performance"]
+        },
+        {
+          "id": "D3_013",
+          "question": "Write a thread-safe counter using AtomicInteger vs synchronized. Compare performance characteristics.",
+          "answer": "AtomicInteger uses CAS (lock-free), better for low-medium contention. synchronized uses monitors, better for high contention. AtomicInteger avoids context switching overhead.",
+          "code_example": "// Using AtomicInteger (lock-free)\npublic class AtomicCounter {\n    private AtomicInteger count = new AtomicInteger(0);\n    public void increment() { count.incrementAndGet(); }\n    public int get() { return count.get(); }\n}\n\n// Using synchronized (monitor lock)\npublic class SyncCounter {\n    private int count = 0;\n    public synchronized void increment() { count++; }\n    public synchronized int get() { return count; }\n}",
+          "difficulty": "medium",
+          "tags": ["AtomicInteger", "synchronized", "performance"]
+        }
+      ]
+    },
+    {
+      "name": "Thread Pools and Executor",
+      "question_count": 8,
+      "questions": [
+        {
+          "id": "D3_014",
+          "question": "What is the Executor framework? Why prefer it over creating threads manually?",
+          "answer": "Executor framework separates task submission from execution. Benefits: thread reuse (reduces creation overhead), configurable pool size, task scheduling, lifecycle management, better resource control.",
+          "code_example": "// Bad: creating threads manually\nfor (int i = 0; i < 1000; i++) {\n    new Thread(() -> doWork()).start();\n}\n\n// Good: Executor framework\nExecutorService executor = Executors.newFixedThreadPool(10);\nfor (int i = 0; i < 1000; i++) {\n    executor.submit(() -> doWork());\n}\nexecutor.shutdown();",
+          "difficulty": "easy",
+          "tags": ["executor", "thread-pool", "best-practice"]
+        },
+        {
+          "id": "D3_015",
+          "question": "Explain ThreadPoolExecutor constructor parameters.",
+          "answer": "7 parameters: corePoolSize (min threads), maximumPoolSize (max threads), keepAliveTime (idle timeout), unit (time unit), workQueue (task queue), threadFactory (thread creator), handler (rejection policy).",
+          "code_example": "ThreadPoolExecutor executor = new ThreadPoolExecutor(\n    5,                          // corePoolSize\n    10,                         // maximumPoolSize  \n    60L,                        // keepAliveTime\n    TimeUnit.SECONDS,           // unit\n    new LinkedBlockingQueue<>(100),\n    Executors.defaultThreadFactory(),\n    new ThreadPoolExecutor.AbortPolicy()\n);",
+          "difficulty": "medium",
+          "tags": ["ThreadPoolExecutor", "parameters", "configuration"]
+        },
+        {
+          "id": "D3_016",
+          "question": "Compare different ExecutorService types: newFixedThreadPool, newCachedThreadPool, newSingleThreadExecutor, newScheduledThreadPool.",
+          "answer": "newFixedThreadPool: fixed size, bounded queue. newCachedThreadPool: unlimited, creates new threads as needed (risk of OOM). newSingleThreadExecutor: single thread, sequential execution. newScheduledThreadPool: supports scheduling/delayed tasks.",
+          "code_example": "ExecutorService fixed = Executors.newFixedThreadPool(10);\nExecutorService cached = Executors.newCachedThreadPool();\nExecutorService single = Executors.newSingleThreadExecutor();\nScheduledExecutorService scheduled = Executors.newScheduledThreadPool(5);\nscheduled.scheduleAtFixedRate(() -> task(), 0, 1, TimeUnit.SECONDS);",
+          "difficulty": "medium",
+          "tags": ["ExecutorService", "types", "comparison"]
+        },
+        {
+          "id": "D3_017",
+          "question": "What are the rejection policies in ThreadPoolExecutor? When does rejection occur?",
+          "answer": "Rejection occurs when queue is full and maxPoolSize threads are busy. Policies: AbortPolicy (throws exception), CallerRunsPolicy (runs in caller thread), DiscardPolicy (silently drops), DiscardOldestPolicy (drops oldest task).",
+          "code_example": "RejectedExecutionHandler handler = (r, executor) -> {\n    System.out.println(\"Task rejected, logging...\");\n};\n\nThreadPoolExecutor executor = new ThreadPoolExecutor(\n    2, 2, 60L, TimeUnit.SECONDS,\n    new ArrayBlockingQueue<>(10),\n    new ThreadPoolExecutor.CallerRunsPolicy()\n);",
+          "difficulty": "medium",
+          "tags": ["rejection-policy", "ThreadPoolExecutor", "overflow"]
+        },
+        {
+          "id": "D3_018",
+          "question": "How do you properly shutdown an ExecutorService?",
+          "answer": "Use shutdown() for graceful shutdown (finishes existing tasks, no new tasks). Use shutdownNow() for immediate (tries to stop, returns pending tasks). Always call shutdown() to prevent resource leaks.",
+          "code_example": "ExecutorService executor = Executors.newFixedThreadPool(10);\n\ntry {\n    executor.submit(task);\n} finally {\n    executor.shutdown();\n    try {\n        if (!executor.awaitTermination(60, TimeUnit.SECONDS)) {\n            executor.shutdownNow();\n        }\n    } catch (InterruptedException e) {\n        executor.shutdownNow();\n        Thread.currentThread().interrupt();\n    }\n}",
+          "difficulty": "medium",
+          "tags": ["shutdown", "ExecutorService", "lifecycle"]
+        },
+        {
+          "id": "D3_019",
+          "question": "What is ForkJoinPool? When would you use it?",
+          "answer": "ForkJoinPool implements work-stealing algorithm for parallel recursive tasks. Best for divide-and-conquer algorithms (sorting, matrix operations). Common pool used by parallel streams.",
+          "code_example": "class Fibonacci extends RecursiveTask<Integer> {\n    final int n;\n    Fibonacci(int n) { this.n = n; }\n    \n    protected Integer compute() {\n        if (n <= 1) return n;\n        Fibonacci f1 = new Fibonacci(n - 1);\n        f1.fork();\n        Fibonacci f2 = new Fibonacci(n - 2);\n        return f2.compute() + f1.join();\n    }\n}\n\nForkJoinPool pool = new ForkJoinPool();\nint result = pool.invoke(new Fibonacci(10));",
+          "difficulty": "hard",
+          "tags": ["ForkJoinPool", "work-stealing", "parallel"]
+        },
+        {
+          "id": "D3_020",
+          "question": "How do you handle exceptions in ExecutorService tasks?",
+          "answer": "For Runnable: exceptions are swallowed, use UncaughtExceptionHandler. For Callable/submit(): exceptions wrapped in ExecutionException, get() rethrows. Use Future to retrieve exceptions.",
+          "code_example": "Future<?> future = executor.submit(() -> {\n    throw new RuntimeException(\"Error!\");\n});\n\ntry {\n    future.get();\n} catch (ExecutionException e) {\n    Throwable cause = e.getCause();\n    System.out.println(\"Task failed: \" + cause.getMessage());\n} catch (InterruptedException e) {\n    Thread.currentThread().interrupt();\n}",
+          "difficulty": "medium",
+          "tags": ["exception", "Future", "error-handling"]
+        },
+        {
+          "id": "D3_021",
+          "question": "Write code to execute multiple tasks and get results in completion order using invokeAll vs invokeAny.",
+          "answer": "invokeAll: submits all tasks, returns List of Futures in submission order. invokeAny: submits all, returns result of first completed task (cancels others).",
+          "code_example": "List<Callable<String>> callables = Arrays.asList(task1, task2, task3);\n\n// invokeAll - get all results\nList<Future<String>> futures = executor.invokeAll(callables);\nfor (Future<String> f : futures) {\n    System.out.println(f.get());\n}\n\n// invokeAny - get first completed result\nString result = executor.invokeAny(callables);\nSystem.out.println(\"First completed: \" + result);",
+          "difficulty": "medium",
+          "tags": ["invokeAll", "invokeAny", "batch-tasks"]
+        }
+      ]
+    },
+    {
+      "name": "Lock and ReentrantLock",
+      "question_count": 7,
+      "questions": [
+        {
+          "id": "D3_022",
+          "question": "What is ReentrantLock? What does 'reentrant' mean?",
+          "answer": "ReentrantLock is a mutual exclusion lock with same semantics as synchronized but more flexible. 'Reentrant' means same thread can acquire lock multiple times (count increments), must unlock same number of times.",
+          "code_example": "ReentrantLock lock = new ReentrantLock();\n\npublic void outer() {\n    lock.lock();\n    try {\n        inner();\n    } finally {\n        lock.unlock();\n    }\n}\n\npublic void inner() {\n    lock.lock();\n    try {\n        // do work\n    } finally {\n        lock.unlock();\n    }\n}",
+          "difficulty": "easy",
+          "tags": ["ReentrantLock", "reentrant", "lock"]
+        },
+        {
+          "id": "D3_023",
+          "question": "Compare fair vs non-fair locks. What are the trade-offs?",
+          "answer": "Fair lock: threads acquire in FIFO order (prevents starvation). Non-fair: allows barging (better throughput, risk of starvation). Default is non-fair for performance.",
+          "code_example": "// Non-fair (default, better throughput)\nReentrantLock nonFair = new ReentrantLock();\n\n// Fair (prevents starvation, lower throughput)\nReentrantLock fair = new ReentrantLock(true);",
+          "difficulty": "medium",
+          "tags": ["fair-lock", "ReentrantLock", "starvation"]
+        },
+        {
+          "id": "D3_024",
+          "question": "What is Condition? How is it different from Object.wait/notify?",
+          "answer": "Condition provides await/signal like wait/notify but with multiple wait sets per lock. More flexible: multiple conditions, interruptible wait, timed wait. Requires explicit lock.",
+          "code_example": "ReentrantLock lock = new ReentrantLock();\nCondition notEmpty = lock.newCondition();\nCondition notFull = lock.newCondition();\n\nlock.lock();\ntry {\n    while (queue.isEmpty()) {\n        notEmpty.await();\n    }\n    queue.add(item);\n    notFull.signal();\n} finally {\n    lock.unlock();\n}",
+          "difficulty": "medium",
+          "tags": ["Condition", "await", "signal"]
+        },
+        {
+          "id": "D3_025",
+          "question": "What is ReadWriteLock? When would you use it?",
+          "answer": "ReadWriteLock allows multiple readers OR one writer. Improves concurrency for read-heavy workloads. ReadLock: shared, multiple holders. WriteLock: exclusive.",
+          "code_example": "ReadWriteLock rwLock = new ReentrantReadWriteLock();\n\npublic Object get(Key key) {\n    rwLock.readLock().lock();\n    try {\n        return map.get(key);\n    } finally {\n        rwLock.readLock().unlock();\n    }\n}\n\npublic void put(Key key, Object value) {\n    rwLock.writeLock().lock();\n    try {\n        map.put(key, value);\n    } finally {\n        rwLock.writeLock().unlock();\n    }\n}",
+          "difficulty": "medium",
+          "tags": ["ReadWriteLock", "read-write", "concurrency"]
+        },
+        {
+          "id": "D3_026",
+          "question": "What is StampedLock? How does it differ from ReadWriteLock?",
+          "answer": "StampedLock is more performant than ReadWriteLock with optimistic reads. Returns stamp for validation. Three modes: write, read, optimistic-read. No reentrancy, risk of starvation.",
+          "code_example": "StampedLock lock = new StampedLock();\n\nlong stamp = lock.tryOptimisticRead();\nint x = this.x;\nif (!lock.validate(stamp)) {\n    stamp = lock.readLock();\n    try {\n        x = this.x;\n    } finally {\n        lock.unlockRead(stamp);\n    }\n}",
+          "difficulty": "hard",
+          "tags": ["StampedLock", "optimistic-read", "performance"]
+        },
+        {
+          "id": "D3_027",
+          "question": "How do you prevent deadlock when using multiple locks?",
+          "answer": "Prevention strategies: 1) Acquire locks in consistent order. 2) Use tryLock with timeout. 3) Use single lock when possible. 4) Use higher-level concurrency utilities.",
+          "code_example": "void transfer(Account from, Account to) {\n    Account first = from.id < to.id ? from : to;\n    Account second = from.id < to.id ? to : from;\n    \n    first.lock.lock();\n    try {\n        second.lock.lock();\n        try {\n            // transfer\n        } finally { second.lock.unlock(); }\n    } finally { first.lock.unlock(); }\n}",
+          "difficulty": "hard",
+          "tags": ["deadlock", "lock-ordering", "prevention"]
+        },
+        {
+          "id": "D3_028",
+          "question": "Write code using tryLock with timeout. What are the benefits?",
+          "answer": "tryLock attempts to acquire lock, returns immediately or after timeout. Benefits: avoids indefinite blocking, enables timeout handling, prevents deadlocks.",
+          "code_example": "Lock lock = new ReentrantLock();\n\nif (lock.tryLock()) {\n    try {\n        // Critical section\n    } finally {\n        lock.unlock();\n    }\n} else {\n    System.out.println(\"Lock unavailable\");\n}\n\n// With timeout\ntry {\n    if (lock.tryLock(100, TimeUnit.MILLISECONDS)) {\n        try {\n            // Critical section\n        } finally {\n            lock.unlock();\n        }\n    }\n} catch (InterruptedException e) {\n    Thread.currentThread().interrupt();\n}",
+          "difficulty": "medium",
+          "tags": ["tryLock", "timeout", "non-blocking"]
+        }
+      ]
+    },
+    {
+      "name": "ConcurrentHashMap and BlockingQueue",
+      "question_count": 8,
+      "questions": [
+        {
+          "id": "D3_029",
+          "question": "How does ConcurrentHashMap achieve thread-safety? Compare with Hashtable.",
+          "answer": "CHM uses CAS + synchronized on nodes/bins (Java 8+), segment locking (Java 7). Allows concurrent reads/writes. Hashtable uses single lock, blocks entire map. CHM doesn't allow null keys/values.",
+          "code_example": "ConcurrentHashMap<String, Integer> map = new ConcurrentHashMap<>();\n\nmap.put(\"key\", 1);\nmap.computeIfAbsent(\"key\", k -> computeValue(k));\nmap.merge(\"key\", 1, Integer::sum);\n\n// Vs Hashtable (legacy, synchronized)\nHashtable<String, Integer> table = new Hashtable<>();",
+          "difficulty": "medium",
+          "tags": ["ConcurrentHashMap", "Hashtable", "thread-safe"]
+        },
+        {
+          "id": "D3_030",
+          "question": "Explain compute, computeIfAbsent, and computeIfPresent methods in ConcurrentHashMap.",
+          "answer": "These are atomic operations. compute: calculate new value. computeIfAbsent: compute only if key missing. computeIfPresent: compute only if key exists. All operations are atomic per-key.",
+          "code_example": "ConcurrentHashMap<String, Integer> map = new ConcurrentHashMap<>();\n\nInteger count = map.computeIfAbsent(\"key\", k -> 0);\nmap.compute(\"key\", (k, v) -> v == null ? 1 : v + 1);\nmap.computeIfPresent(\"key\", (k, v) -> v + 1);\nmap.merge(\"key\", 1, Integer::sum);",
+          "difficulty": "medium",
+          "tags": ["ConcurrentHashMap", "compute", "atomic"]
+        },
+        {
+          "id": "D3_031",
+          "question": "What is the difference between ConcurrentHashMap and Collections.synchronizedMap?",
+          "answer": "CHM: fine-grained locking, concurrent access, iterators don't throw ConcurrentModificationException. synchronizedMap: wraps map with single lock, entire map locked per operation, iterators can fail-fast.",
+          "code_example": "ConcurrentHashMap<String, String> chm = new ConcurrentHashMap<>();\n\nMap<String, String> sync = Collections.synchronizedMap(new HashMap<>());\n\n// CHM iterators are weakly consistent\nfor (String key : chm.keySet()) { }\n\n// synchronizedMap requires external synchronization for iteration\nsynchronized (sync) {\n    for (String key : sync.keySet()) { }\n}",
+          "difficulty": "medium",
+          "tags": ["ConcurrentHashMap", "synchronizedMap", "comparison"]
+        },
+        {
+          "id": "D3_032",
+          "question": "What is BlockingQueue? Name common implementations and their use cases.",
+          "answer": "BlockingQueue is thread-safe queue with blocking operations. Implementations: ArrayBlockingQueue (bounded, array), LinkedBlockingQueue (optionally bounded), PriorityBlockingQueue (unbounded, priority), DelayQueue (delayed elements), SynchronousQueue (handoff).",
+          "code_example": "BlockingQueue<String> queue = new ArrayBlockingQueue<>(10);\n\nqueue.put(\"item\");  // Blocks if full\nString item = queue.take();  // Blocks if empty\n\nboolean added = queue.offer(\"item\");\nString polled = queue.poll(100, TimeUnit.MILLISECONDS);",
+          "difficulty": "medium",
+          "tags": ["BlockingQueue", "producer-consumer", "blocking"]
+        },
+        {
+          "id": "D3_033",
+          "question": "Explain SynchronousQueue. When would you use it?",
+          "answer": "SynchronousQueue has zero capacity - each insert waits for remove and vice versa. Direct handoff between threads. Use for thread pools with direct handoff (CachedThreadPool uses it).",
+          "code_example": "BlockingQueue<String> queue = new SynchronousQueue<>();\n\nqueue.put(\"item\");  // Blocks until receiver\nString item = queue.take();  // Blocks until item available\n\nif (!queue.offer(\"item\", 1, TimeUnit.SECONDS)) {\n    System.out.println(\"No receiver\");\n}",
+          "difficulty": "medium",
+          "tags": ["SynchronousQueue", "handoff", "zero-capacity"]
+        },
+        {
+          "id": "D3_034",
+          "question": "How does DelayQueue work? Provide a use case.",
+          "answer": "DelayQueue holds elements implementing Delayed interface, only allows taking elements whose delay has expired. Use case: scheduled tasks, cache expiration, timeout management.",
+          "code_example": "class DelayedTask implements Delayed {\n    private long expireTime;\n    \n    public long getDelay(TimeUnit unit) {\n        return unit.convert(expireTime - System.currentTimeMillis(), MILLISECONDS);\n    }\n    \n    public int compareTo(Delayed other) {\n        return Long.compare(this.getDelay(MILLISECONDS), other.getDelay(MILLISECONDS));\n    }\n}\n\nDelayQueue<DelayedTask> queue = new DelayQueue<>();\nqueue.put(new DelayedTask());",
+          "difficulty": "hard",
+          "tags": ["DelayQueue", "Delayed", "scheduling"]
+        },
+        {
+          "id": "D3_035",
+          "question": "Write a producer-consumer implementation using BlockingQueue.",
+          "answer": "BlockingQueue provides built-in blocking for producer-consumer pattern. put() blocks when full, take() blocks when empty. Thread-safe, no explicit synchronization needed.",
+          "code_example": "BlockingQueue<Integer> queue = new ArrayBlockingQueue<>(100);\n\n// Producer\nnew Thread(() -> {\n    for (int i = 0; i < 1000; i++) {\n        try {\n            queue.put(i);\n        } catch (InterruptedException e) {\n            Thread.currentThread().interrupt();\n        }\n    }\n}).start();\n\n// Consumer\nnew Thread(() -> {\n    while (true) {\n        try {\n            Integer item = queue.take();\n            process(item);\n        } catch (InterruptedException e) {\n            Thread.currentThread().interrupt();\n            break;\n        }\n    }\n}).start();",
+          "difficulty": "medium",
+          "tags": ["producer-consumer", "BlockingQueue", "pattern"]
+        },
+        {
+          "id": "D3_036",
+          "question": "What is transfer() in TransferQueue? How is it different from put()?",
+          "answer": "TransferQueue extends BlockingQueue with transfer() method. transfer() waits until element is consumed (not just queued). put() returns when element is added to queue. SynchronousQueue is a TransferQueue.",
+          "code_example": "TransferQueue<String> queue = new LinkedTransferQueue<>();\n\nqueue.transfer(\"item\");  // Blocks until consumer takes\nString item = queue.take();\n\nboolean transferred = queue.tryTransfer(\"item\", 1, TimeUnit.SECONDS);",
+          "difficulty": "hard",
+          "tags": ["TransferQueue", "transfer", "handoff"]
+        }
+      ]
+    },
+    {
+      "name": "CompletableFuture",
+      "question_count": 6,
+      "questions": [
+        {
+          "id": "D3_037",
+          "question": "What is CompletableFuture? How is it better than Future?",
+          "answer": "CompletableFuture implements Future + CompletionStage. Benefits: can be manually completed, supports callbacks (thenApply, thenAccept), chaining, combining multiple futures, exception handling. More composable than plain Future.",
+          "code_example": "Future<String> future = executor.submit(task);\nString result = future.get();  // Blocks\n\nCompletableFuture<String> cf = CompletableFuture.supplyAsync(() -> doWork());\ncf.thenAccept(result -> System.out.println(result))\n  .exceptionally(ex -> \"default\");",
+          "difficulty": "medium",
+          "tags": ["CompletableFuture", "Future", "async"]
+        },
+        {
+          "id": "D3_038",
+          "question": "Explain thenApply, thenAccept, and thenRun methods.",
+          "answer": "thenApply: transforms result, returns new value. thenAccept: consumes result, returns void. thenRun: runs after completion, no result access. All are non-blocking callbacks.",
+          "code_example": "CompletableFuture<Integer> future = CompletableFuture.supplyAsync(() -> 10)\n    .thenApply(x -> x * 2)\n    .thenApply(x -> x + 5)\n    .thenAccept(x -> System.out.println(x))\n    .thenRun(() -> System.out.println(\"Done\"));\n\nfuture.join();",
+          "difficulty": "medium",
+          "tags": ["thenApply", "thenAccept", "thenRun"]
+        },
+        {
+          "id": "D3_039",
+          "question": "How do you combine multiple CompletableFutures? Explain allOf, anyOf, thenCombine.",
+          "answer": "allOf: waits for all futures, returns CompletableFuture<Void>. anyOf: returns first completed result. thenCombine: combines two futures when both complete.",
+          "code_example": "CompletableFuture<String> f1 = CompletableFuture.supplyAsync(() -> \"A\");\nCompletableFuture<String> f2 = CompletableFuture.supplyAsync(() -> \"B\");\n\nCompletableFuture<String> combined = f1.thenCombine(f2, (a, b) -> a + b);\nCompletableFuture<Void> all = CompletableFuture.allOf(f1, f2);\nCompletableFuture<Object> any = CompletableFuture.anyOf(f1, f2);",
+          "difficulty": "medium",
+          "tags": ["allOf", "anyOf", "thenCombine"]
+        },
+        {
+          "id": "D3_040",
+          "question": "How do you handle exceptions in CompletableFuture?",
+          "answer": "Methods: exceptionally: provide default value. handle: transform result or exception. whenComplete: observe result/exception. errorAt: throw exception.",
+          "code_example": "CompletableFuture<String> future = CompletableFuture.supplyAsync(() -> {\n    if (error) throw new RuntimeException(\"Failed\");\n    return \"success\";\n})\n.exceptionally(ex -> \"default value\")\n.handle((result, ex) -> ex != null ? \"recovered\" : result)\n.whenComplete((result, ex) -> {\n    if (ex != null) System.err.println(ex.getMessage());\n});",
+          "difficulty": "medium",
+          "tags": ["exception", "exceptionally", "handle"]
+        },
+        {
+          "id": "D3_041",
+          "question": "What is the difference between supplyAsync and runAsync?",
+          "answer": "supplyAsync: supplies result (Supplier<T>), returns CompletableFuture<T>. runAsync: runs action (Runnable), returns CompletableFuture<Void>. Use supplyAsync when you need result, runAsync for side effects.",
+          "code_example": "CompletableFuture<String> cf1 = CompletableFuture.supplyAsync(() -> {\n    return fetchResult();\n});\ncf1.thenApply(result -> process(result));\n\nCompletableFuture<Void> cf2 = CompletableFuture.runAsync(() -> {\n    doSideEffect();\n});",
+          "difficulty": "easy",
+          "tags": ["supplyAsync", "runAsync", "comparison"]
+        },
+        {
+          "id": "D3_042",
+          "question": "Write code to fetch data from multiple sources in parallel and combine results.",
+          "answer": "Use supplyAsync for parallel fetching, thenCombine/allOf to combine. Significantly faster than sequential fetching when sources are independent.",
+          "code_example": "CompletableFuture<String> userFuture = CompletableFuture.supplyAsync(() -> fetchUser(id));\nCompletableFuture<String> orderFuture = CompletableFuture.supplyAsync(() -> fetchOrders(id));\nCompletableFuture<String> paymentFuture = CompletableFuture.supplyAsync(() -> fetchPayment(id));\n\nCompletableFuture<String> combined = userFuture\n    .thenCombine(orderFuture, (user, orders) -> user + orders)\n    .thenCombine(paymentFuture, (userOrders, payment) -> userOrders + payment);\n\nCompletableFuture.allOf(userFuture, orderFuture, paymentFuture)\n    .thenApply(v -> \n        userFuture.join() + orderFuture.join() + paymentFuture.join()\n    );",
+          "difficulty": "hard",
+          "tags": ["parallel", "combine", "async-fetch"]
+        }
+      ]
+    },
+    {
+      "name": "Java Memory Model",
+      "question_count": 8,
+      "questions": [
+        {
+          "id": "D3_043",
+          "question": "What is the Java Memory Model (JMM)? Why is it important?",
+          "answer": "JMM defines how threads interact through memory, specifies visibility guarantees, ordering constraints. Important because: hardware/compiler optimizations can reorder instructions, threads may see stale values without proper synchronization.",
+          "code_example": "int x = 0;  // Thread 1: x = 1; Thread 2: may still see x = 0\n\nvolatile int x = 0;  // Thread 2 will see x = 1\n\nsynchronized(lock) { x = 1; }  // Unlock makes write visible",
+          "difficulty": "medium",
+          "tags": ["JMM", "memory-model", "visibility"]
+        },
+        {
+          "id": "D3_044",
+          "question": "What are the three properties of concurrency: atomicity, visibility, ordering?",
+          "answer": "Atomicity: operation completes fully or not at all (no partial results). Visibility: changes made by one thread visible to others. Ordering: operations appear in expected order (no reordering visible).",
+          "code_example": "int count = 0;\ncount++;  // NOT atomic\n\nAtomicInteger count = new AtomicInteger(0);\ncount.incrementAndGet();  // Atomic\n\nvolatile boolean flag = false;  // Always visible",
+          "difficulty": "medium",
+          "tags": ["atomicity", "visibility", "ordering"]
+        },
+        {
+          "id": "D3_045",
+          "question": "Explain instruction reordering. How does it affect multithreaded code?",
+          "answer": "Compiler/CPU may reorder instructions for optimization if single-threaded semantics preserved. In multithreading, this can cause unexpected behavior. Prevent with volatile, synchronized, or explicit memory barriers.",
+          "code_example": "class Reorder {\n    int a = 0;\n    boolean ready = false;\n    \n    void writer() {\n        a = 1;\n        ready = true;\n    }\n    \n    void reader() {\n        if (ready) {\n            System.out.println(a);  // Might print 0!\n        }\n    }\n}\n\nvolatile boolean ready = false;  // Fix",
+          "difficulty": "hard",
+          "tags": ["reordering", "instruction", "optimization"]
+        },
+        {
+          "id": "D3_046",
+          "question": "What is the difference between heap and stack in multithreaded context?",
+          "answer": "Heap: shared memory, all threads can access. Objects live here. Stack: thread-local, each thread has own stack. Local variables, method calls. No synchronization needed for stack-local data.",
+          "code_example": "class Shared {\n    int counter = 0;  // Heap, visible to all threads\n    synchronized void increment() { counter++; }\n}\n\nvoid process() {\n    int local = 0;  // Stack, thread-private\n    for (int i = 0; i < 100; i++) {\n        local++;  // No synchronization needed\n    }\n}",
+          "difficulty": "easy",
+          "tags": ["heap", "stack", "memory"]
+        },
+        {
+          "id": "D3_047",
+          "question": "What is thread-local storage? How does ThreadLocal work?",
+          "answer": "ThreadLocal provides per-thread variables. Each thread has independent copy. Useful for thread-specific state (user context, transaction). Implemented as Map<Thread, Object> internally.",
+          "code_example": "private static ThreadLocal<SimpleDateFormat> formatter = \n    ThreadLocal.withInitial(() -> new SimpleDateFormat(\"yyyy-MM-dd\"));\n\nString date = formatter.get().format(new Date());\n\ntry {\n    // use formatter\n} finally {\n    formatter.remove();\n}",
+          "difficulty": "medium",
+          "tags": ["ThreadLocal", "thread-local", "per-thread"]
+        },
+        {
+          "id": "D3_048",
+          "question": "What memory leak issues can occur with ThreadLocal in thread pools?",
+          "answer": "ThreadLocal entries hold strong references to values. In thread pools, threads live long, so values persist even after use. Must call remove() to prevent memory leaks, especially with ClassLoader references.",
+          "code_example": "ThreadLocal<UserContext> context = new ThreadLocal<>();\n\nexecutor.submit(() -> {\n    try {\n        context.set(new UserContext());\n        doWork();\n    } finally {\n        context.remove();  // Prevent memory leak\n    }\n});",
+          "difficulty": "hard",
+          "tags": ["ThreadLocal", "memory-leak", "thread-pool"]
+        },
+        {
+          "id": "D3_049",
+          "question": "Explain the safe publication pattern. How do you safely publish objects?",
+          "answer": "Safe publication ensures object is fully constructed before other threads see it. Patterns: static initializer, volatile field, AtomicReference, final field, lock-protected field, concurrent collection.",
+          "code_example": "volatile MyObject obj;\nobj = new MyObject();\n\nAtomicReference<MyObject> ref = new AtomicReference<>();\nref.set(new MyObject());\n\nfinal MyObject obj = new MyObject();\n\nsynchronized(lock) { obj = new MyObject(); }",
+          "difficulty": "hard",
+          "tags": ["safe-publication", "publication", "initialization"]
+        },
+        {
+          "id": "D3_050",
+          "question": "What are the differences between synchronized, volatile, and atomic variables in terms of JMM guarantees?",
+          "answer": "synchronized: provides atomicity + visibility + ordering (full lock semantics). volatile: provides visibility + ordering, NOT atomicity. Atomic: provides atomicity + visibility (uses volatile internally + CAS).",
+          "code_example": "private int count = 0;\npublic synchronized void increment() { count++; }\n\nprivate volatile int count = 0;\ncount++;  // NOT atomic!\n\nprivate AtomicInteger count = new AtomicInteger(0);\ncount.incrementAndGet();  // Atomic, visible",
+          "difficulty": "hard",
+          "tags": ["synchronized", "volatile", "atomic", "JMM"]
+        }
+      ]
+    }
+  ]
+}

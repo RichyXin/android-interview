@@ -1,0 +1,420 @@
+{
+  "metadata": {
+    "category": "Framework源码",
+    "day": 6,
+    "total_questions": 40
+  },
+  "questions": [
+    {
+      "id": "D6_001",
+      "question": "Activity 的启动流程源码分析？",
+      "answer": "## Activity 启动源码流程\n\n### 调用链\n```\nActivity.startActivity()\n    ↓\nInstrumentation.execStartActivity()\n    ↓\nActivityTaskManagerService.startActivity()\n    ↓\nActivityStarter.execute()\n    ↓\nActivityStack.startActivityLocked()\n    ↓\nClientTransaction.schedule()\n    ↓\nApplicationThread.scheduleTransaction()\n    ↓\nActivityThread.handleLaunchActivity()\n    ↓\nActivity.onCreate()\n```\n\n### 关键类\n| 类 | 作用 |\n|---|------|\n| Instrumentation | 监控Activity生命周期 |\n| ATMS | 管理Activity任务 |\n| ActivityStarter | 启动逻辑 |\n| ActivityStack | 任务栈管理 |\n| ClientTransaction | 客户端事务 |",
+      "difficulty": 3,
+      "tags": [
+        "Framework",
+        "Activity",
+        "源码"
+      ],
+      "day": 6
+    },
+    {
+      "id": "D6_002",
+      "question": "View 的测量、布局、绘制流程？",
+      "answer": "## View 绘制流程\n\n### 三大流程\n```\nmeasure() → layout() → draw()\n```\n\n### measure\n```java\n// 测量View大小\nprotected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {\n    setMeasuredDimension(width, height);\n}\n```\n\nMeasureSpec = Size + Mode\n- EXACTLY: 精确值\n- AT_MOST: 最大值\n- UNSPECIFIED: 无限制\n\n### layout\n```java\n// 确定View位置\nprotected void onLayout(boolean changed, int l, int t, int r, int b) {\n    // 子View布局\n}\n```\n\n### draw\n```java\n// 绘制View\npublic void draw(Canvas canvas) {\n    drawBackground();    // 背景\n    onDraw();           // 内容\n    dispatchDraw();     // 子View\n    onDrawForeground(); // 前景\n}\n```",
+      "difficulty": 2,
+      "tags": [
+        "View",
+        "绘制"
+      ],
+      "day": 6
+    },
+    {
+      "id": "D6_003",
+      "question": "事件分发机制的源码分析？",
+      "answer": "## 事件分发源码\n\n### 核心方法\n```java\n// Activity\ndispatchTouchEvent()\n    ↓\n// PhoneWindow\nsuperDispatchTouchEvent()\n    ↓\n// DecorView\ndispatchTouchEvent()\n    ↓\n// ViewGroup\ndispatchTouchEvent()\n    ├── onInterceptTouchEvent() // 拦截\n    └── child.dispatchTouchEvent() // 分发\n    ↓\n// View\ndispatchTouchEvent()\n    └── onTouchEvent() // 处理\n```\n\n### ViewGroup.dispatchTouchEvent()\n```java\npublic boolean dispatchTouchEvent(MotionEvent ev) {\n    // 检查拦截\n    if (onInterceptTouchEvent(ev)) {\n        return onTouchEvent(ev);\n    }\n    // 分发给子View\n    for (child : children) {\n        if (child.dispatchTouchEvent(ev)) {\n            return true;\n        }\n    }\n    return onTouchEvent(ev);\n}\n```",
+      "difficulty": 3,
+      "tags": [
+        "事件分发",
+        "源码"
+      ],
+      "day": 6
+    },
+    {
+      "id": "D6_004",
+      "question": "Choreographer 的工作原理？",
+      "answer": "## Choreographer\n\n### 作用\n协调 UI 绘制、输入、动画的时机\n\n### VSync 信号\n```\nVSync 信号 (16.6ms)\n      ↓\nChoreographer.doFrame()\n      ├── doCallbacks(INPUT)\n      ├── doCallbacks(ANIMATION)\n      ├── doCallbacks(TRAVERSAL)\n      └── doCallbacks(COMMIT)\n```\n\n### 使用\n```java\nChoreographer.getInstance().postFrameCallback(new FrameCallback() {\n    @Override\n    public void doFrame(long frameTimeNanos) {\n        // 在下一帧执行\n    }\n});\n```\n\n### 关键变量\n- frameTimeNanos: 帧时间戳\n- vsyncTimestamp: VSync 时间\n- doFrame: 执行帧回调",
+      "difficulty": 3,
+      "tags": [
+        "Choreographer",
+        "VSync"
+      ],
+      "day": 6
+    },
+    {
+      "id": "D6_005",
+      "question": "Window 和 WindowManager 的关系？",
+      "answer": "## Window 体系\n\n### Window 类型\n- PhoneWindow: Activity 使用\n- Dialog 的 Window\n- Toast 的 Window\n\n### WindowManager\n```java\nWindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);\nwm.addView(view, params);\nwm.removeView(view);\nwm.updateViewLayout(view, params);\n```\n\n### 关系图\n```\nActivity\n    └── PhoneWindow\n            └── DecorView\n                    └── WindowManagerImpl\n                            └── WindowManagerGlobal\n                                    └── ViewRootImpl\n                                            └── WindowSession\n                                                    └── WMS\n```\n\n### ViewRootImpl\n- 连接 WindowManager 和 DecorView\n- 负责 measure, layout, draw\n- 处理输入事件",
+      "difficulty": 2,
+      "tags": [
+        "Window",
+        "WMS"
+      ],
+      "day": 6
+    },
+    {
+      "id": "D6_100",
+      "question": "MeasureSpec三种模式？",
+      "answer": "## MeasureSpec\n\n- EXACTLY: match_parent或精确值\n- AT_MOST: wrap_content\n- UNSPECIFIED: 无限制",
+      "difficulty": 2,
+      "tags": [
+        "View",
+        "测量"
+      ],
+      "day": 6
+    },
+    {
+      "id": "D6_101",
+      "question": "自定义View的步骤？",
+      "answer": "## 自定义View\n\n1. 继承View/ViewGroup\n2. 重写onMeasure\n3. 重写onLayout(ViewGroup)\n4. 重写onDraw\n5. 自定义属性",
+      "difficulty": 2,
+      "tags": [
+        "View",
+        "自定义"
+      ],
+      "day": 6
+    },
+    {
+      "id": "D6_102",
+      "question": "View.post和Handler.post区别？",
+      "answer": "## 区别\n\n- View.post: 在attached后执行\n- Handler.post: 立即加入队列\n- View.post保证View已测量",
+      "difficulty": 2,
+      "tags": [
+        "View",
+        "Handler"
+      ],
+      "day": 6
+    },
+    {
+      "id": "D6_103",
+      "question": "RecyclerView缓存机制？",
+      "answer": "## RecyclerView缓存\n\n- mAttachedScrap: 屏幕内\n- mCachedViews: 刚移出屏幕\n- mViewCacheExtension: 自定义\n- RecycledViewPool: 缓存池",
+      "difficulty": 2,
+      "tags": [
+        "RecyclerView",
+        "缓存"
+      ],
+      "day": 6
+    },
+    {
+      "id": "D6_104",
+      "question": "Surface和SurfaceView区别？",
+      "answer": "## Surface\n\n- Surface: 绘图表面\n- SurfaceView: 带Surface的View\n- 独立线程绘制\n- 适合视频/游戏",
+      "difficulty": 2,
+      "tags": [
+        "View",
+        "Surface"
+      ],
+      "day": 6
+    },
+    {
+      "id": "D6_011",
+      "question": "AMS的核心原理是什么？",
+      "answer": "## AMS\n\n### 核心要点\n\nAMS是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 1,
+      "tags": [
+        "AMS"
+      ],
+      "day": 6
+    },
+    {
+      "id": "D6_012",
+      "question": "WMS的核心原理是什么？",
+      "answer": "## WMS\n\n### 核心要点\n\nWMS是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 2,
+      "tags": [
+        "WMS"
+      ],
+      "day": 6
+    },
+    {
+      "id": "D6_013",
+      "question": "PMS的核心原理是什么？",
+      "answer": "## PMS\n\n### 核心要点\n\nPMS是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 3,
+      "tags": [
+        "PMS"
+      ],
+      "day": 6
+    },
+    {
+      "id": "D6_014",
+      "question": "View绘制的核心原理是什么？",
+      "answer": "## View绘制\n\n### 核心要点\n\nView绘制是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 1,
+      "tags": [
+        "View绘制"
+      ],
+      "day": 6
+    },
+    {
+      "id": "D6_015",
+      "question": "measure的核心原理是什么？",
+      "answer": "## measure\n\n### 核心要点\n\nmeasure是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 2,
+      "tags": [
+        "measure"
+      ],
+      "day": 6
+    },
+    {
+      "id": "D6_016",
+      "question": "layout的核心原理是什么？",
+      "answer": "## layout\n\n### 核心要点\n\nlayout是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 3,
+      "tags": [
+        "layout"
+      ],
+      "day": 6
+    },
+    {
+      "id": "D6_017",
+      "question": "draw的核心原理是什么？",
+      "answer": "## draw\n\n### 核心要点\n\ndraw是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 1,
+      "tags": [
+        "draw"
+      ],
+      "day": 6
+    },
+    {
+      "id": "D6_018",
+      "question": "事件分发的核心原理是什么？",
+      "answer": "## 事件分发\n\n### 核心要点\n\n事件分发是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 2,
+      "tags": [
+        "事件分发"
+      ],
+      "day": 6
+    },
+    {
+      "id": "D6_019",
+      "question": "dispatchTouchEvent的核心原理是什么？",
+      "answer": "## dispatchTouchEvent\n\n### 核心要点\n\ndispatchTouchEvent是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 3,
+      "tags": [
+        "dispatchTouchEvent"
+      ],
+      "day": 6
+    },
+    {
+      "id": "D6_020",
+      "question": "onInterceptTouchEvent的核心原理是什么？",
+      "answer": "## onInterceptTouchEvent\n\n### 核心要点\n\nonInterceptTouchEvent是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 1,
+      "tags": [
+        "onInterceptTouchEvent"
+      ],
+      "day": 6
+    },
+    {
+      "id": "D6_021",
+      "question": "onTouchEvent的核心原理是什么？",
+      "answer": "## onTouchEvent\n\n### 核心要点\n\nonTouchEvent是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 2,
+      "tags": [
+        "onTouchEvent"
+      ],
+      "day": 6
+    },
+    {
+      "id": "D6_022",
+      "question": "ViewGroup的核心原理是什么？",
+      "answer": "## ViewGroup\n\n### 核心要点\n\nViewGroup是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 3,
+      "tags": [
+        "ViewGroup"
+      ],
+      "day": 6
+    },
+    {
+      "id": "D6_023",
+      "question": "DecorView的核心原理是什么？",
+      "answer": "## DecorView\n\n### 核心要点\n\nDecorView是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 1,
+      "tags": [
+        "DecorView"
+      ],
+      "day": 6
+    },
+    {
+      "id": "D6_024",
+      "question": "PhoneWindow的核心原理是什么？",
+      "answer": "## PhoneWindow\n\n### 核心要点\n\nPhoneWindow是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 2,
+      "tags": [
+        "PhoneWindow"
+      ],
+      "day": 6
+    },
+    {
+      "id": "D6_025",
+      "question": "WindowManager的核心原理是什么？",
+      "answer": "## WindowManager\n\n### 核心要点\n\nWindowManager是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 3,
+      "tags": [
+        "WindowManager"
+      ],
+      "day": 6
+    },
+    {
+      "id": "D6_026",
+      "question": "LayoutInflater的核心原理是什么？",
+      "answer": "## LayoutInflater\n\n### 核心要点\n\nLayoutInflater是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 1,
+      "tags": [
+        "LayoutInflater"
+      ],
+      "day": 6
+    },
+    {
+      "id": "D6_027",
+      "question": "ViewRootImpl的核心原理是什么？",
+      "answer": "## ViewRootImpl\n\n### 核心要点\n\nViewRootImpl是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 2,
+      "tags": [
+        "ViewRootImpl"
+      ],
+      "day": 6
+    },
+    {
+      "id": "D6_028",
+      "question": "Surface的核心原理是什么？",
+      "answer": "## Surface\n\n### 核心要点\n\nSurface是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 3,
+      "tags": [
+        "Surface"
+      ],
+      "day": 6
+    },
+    {
+      "id": "D6_029",
+      "question": "Canvas的核心原理是什么？",
+      "answer": "## Canvas\n\n### 核心要点\n\nCanvas是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 1,
+      "tags": [
+        "Canvas"
+      ],
+      "day": 6
+    },
+    {
+      "id": "D6_030",
+      "question": "Paint的核心原理是什么？",
+      "answer": "## Paint\n\n### 核心要点\n\nPaint是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 2,
+      "tags": [
+        "Paint"
+      ],
+      "day": 6
+    },
+    {
+      "id": "D6_031",
+      "question": "MeasureSpec的核心原理是什么？",
+      "answer": "## MeasureSpec\n\n### 核心要点\n\nMeasureSpec是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 3,
+      "tags": [
+        "MeasureSpec"
+      ],
+      "day": 6
+    },
+    {
+      "id": "D6_032",
+      "question": "RecyclerView缓存的核心原理是什么？",
+      "answer": "## RecyclerView缓存\n\n### 核心要点\n\nRecyclerView缓存是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 1,
+      "tags": [
+        "RecyclerView缓存"
+      ],
+      "day": 6
+    },
+    {
+      "id": "D6_033",
+      "question": "ViewHolder的核心原理是什么？",
+      "answer": "## ViewHolder\n\n### 核心要点\n\nViewHolder是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 2,
+      "tags": [
+        "ViewHolder"
+      ],
+      "day": 6
+    },
+    {
+      "id": "D6_034",
+      "question": "Adapter的核心原理是什么？",
+      "answer": "## Adapter\n\n### 核心要点\n\nAdapter是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 3,
+      "tags": [
+        "Adapter"
+      ],
+      "day": 6
+    },
+    {
+      "id": "D6_035",
+      "question": "AMS的核心原理是什么？",
+      "answer": "## AMS\n\n### 核心要点\n\nAMS是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 1,
+      "tags": [
+        "AMS"
+      ],
+      "day": 6
+    },
+    {
+      "id": "D6_036",
+      "question": "WMS的核心原理是什么？",
+      "answer": "## WMS\n\n### 核心要点\n\nWMS是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 2,
+      "tags": [
+        "WMS"
+      ],
+      "day": 6
+    },
+    {
+      "id": "D6_037",
+      "question": "PMS的核心原理是什么？",
+      "answer": "## PMS\n\n### 核心要点\n\nPMS是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 3,
+      "tags": [
+        "PMS"
+      ],
+      "day": 6
+    },
+    {
+      "id": "D6_038",
+      "question": "View绘制的核心原理是什么？",
+      "answer": "## View绘制\n\n### 核心要点\n\nView绘制是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 1,
+      "tags": [
+        "View绘制"
+      ],
+      "day": 6
+    },
+    {
+      "id": "D6_039",
+      "question": "measure的核心原理是什么？",
+      "answer": "## measure\n\n### 核心要点\n\nmeasure是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 2,
+      "tags": [
+        "measure"
+      ],
+      "day": 6
+    },
+    {
+      "id": "D6_040",
+      "question": "layout的核心原理是什么？",
+      "answer": "## layout\n\n### 核心要点\n\nlayout是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 3,
+      "tags": [
+        "layout"
+      ],
+      "day": 6
+    }
+  ]
+}

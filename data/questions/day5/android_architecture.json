@@ -1,0 +1,418 @@
+{
+  "metadata": {
+    "category": "Android系统架构",
+    "day": 5,
+    "total_questions": 40
+  },
+  "questions": [
+    {
+      "id": "D5_001",
+      "question": "Binder 机制的核心原理是什么？",
+      "answer": "## Binder 原理\n\n### 架构\n```\n┌─────────────┐     ┌─────────────┐\n│   Client    │     │   Server    │\n└──────┬──────┘     └──────┬──────┘\n       │                   │\n       ▼                   ▼\n┌──────────────────────────────┐\n│       Binder Driver          │\n│       (内核层)                │\n└──────────────────────────────┘\n```\n\n### 核心特点\n1. **一次拷贝** - 数据只需从用户空间拷贝到内核\n2. **内存映射** - mmap 实现共享内存\n3. **C/S架构** - 客户端/服务端模式\n\n### 通信流程\n```\nClient 请求\n    ↓\nBinder Proxy\n    ↓\nBinder Driver (一次拷贝)\n    ↓\nBinder Stub\n    ↓\nServer 处理\n    ↓\n返回结果\n```",
+      "difficulty": 3,
+      "tags": [
+        "Binder",
+        "IPC"
+      ],
+      "day": 5
+    },
+    {
+      "id": "D5_002",
+      "question": "Handler 机制的原理是什么？",
+      "answer": "## Handler 机制\n\n### 核心组件\n```\n┌─────────────────────────────────────┐\n│              Handler                │\n│     发送消息、处理消息               │\n└─────────────┬───────────────────────┘\n              │ sendMessage()\n              ▼\n┌─────────────────────────────────────┐\n│           MessageQueue              │\n│        消息队列(链表)                │\n└─────────────┬───────────────────────┘\n              │ next()\n              ▼\n┌─────────────────────────────────────┐\n│              Looper                 │\n│        消息循环器                   │\n└─────────────────────────────────────┘\n```\n\n### 主线程 Looper\n```java\n// ActivityThread.main()\nLooper.prepareMainLooper();\nLooper.loop();  // 死循环\n```\n\n### 为什么不阻塞？\n- MessageQueue.next() 使用 epoll\n- 没有消息时挂起，不占用 CPU\n- 有消息时唤醒处理",
+      "difficulty": 2,
+      "tags": [
+        "Handler",
+        "消息机制"
+      ],
+      "day": 5
+    },
+    {
+      "id": "D5_003",
+      "question": "Zygote 进程的作用是什么？",
+      "answer": "## Zygote 进程\n\n### 作用\n1. 预加载系统资源和类\n2. 作为 App 进程的模板\n3. 通过 fork 创建 App 进程\n\n### 启动流程\n```\ninit 进程\n    ↓\nZygote 进程\n    ├── 预加载资源\n    ├── 预加载类\n    └── 进入 socket 监听\n          ↓\n      收到启动请求\n          ↓\n      fork App 进程\n```\n\n### 为什么用 Zygote？\n1. **快速启动** - 复制已有进程，更快\n2. **资源共享** - 预加载的资源可共享\n3. **内存节省** - Copy-on-Write 机制\n\n### App 启动\n```bash\n# 通过 socket 与 Zygote 通信\n# Zygote fork 出新进程\n```",
+      "difficulty": 2,
+      "tags": [
+        "Zygote",
+        "进程"
+      ],
+      "day": 5
+    },
+    {
+      "id": "D5_004",
+      "question": "AMS (ActivityManagerService) 的作用是什么？",
+      "answer": "## AMS\n\n### 职责\n1. 管理所有 Activity 生命周期\n2. 维护 Activity 栈\n3. 进程管理和调度\n4. 内存管理\n\n### 关键方法\n```java\n// Activity 启动\nstartActivity()\n\n// 生命周期调度\nscheduleTransaction()\n\n// 进程管理\nstartProcessLocked()\n```\n\n### ActivityRecord\n每个 Activity 在 AMS 中对应一个 ActivityRecord\n\n```\n┌───────────────────────┐\n│    ActivityRecord     │\n│  - token              │\n│  - packageName        │\n│  - activityClass      │\n│  - state              │\n└───────────────────────┘\n```\n\n### 与 App 通信\n通过 ApplicationThread (Binder) 与 App 通信",
+      "difficulty": 2,
+      "tags": [
+        "AMS",
+        "系统服务"
+      ],
+      "day": 5
+    },
+    {
+      "id": "D5_005",
+      "question": "App 启动流程是怎样的？",
+      "answer": "## App 启动流程\n\n### 冷启动流程\n```\n1. 点击图标\n     ↓\n2. Launcher 发送 Intent\n     ↓\n3. AMS 处理启动请求\n     ↓\n4. AMS 请求 Zygote fork 进程\n     ↓\n5. Zygote fork 新进程\n     ↓\n6. 创建 Application\n     ↓\n7. 创建 Activity\n     ↓\n8. 生命周期回调\n```\n\n### 关键时间点\n```\n┌─────────────────────────────────────────┐\n│ Application 构造函数                     │\n├─────────────────────────────────────────┤\n│ Application.attach()                    │\n├─────────────────────────────────────────┤\n│ Application.onCreate()                  │\n├─────────────────────────────────────────┤\n│ Activity 构造函数                        │\n├─────────────────────────────────────────┤\n│ Activity.onCreate()                     │\n├─────────────────────────────────────────┤\n│ Activity.onResume()                     │\n└─────────────────────────────────────────┘\n```\n\n### 优化点\n- 延迟初始化非关键组件\n- 使用 App Startup 库\n- 避免主线程 IO",
+      "difficulty": 2,
+      "tags": [
+        "启动流程",
+        "性能"
+      ],
+      "day": 5
+    },
+    {
+      "id": "D5_001",
+      "question": "Android 系统架构分层？",
+      "answer": "## 架构分层\n\n1. 应用层 - App\n2. 应用框架层 - API\n3. 系统运行层 - Native\n4. Linux内核层",
+      "difficulty": 1,
+      "tags": [
+        "架构",
+        "分层"
+      ],
+      "day": 5
+    },
+    {
+      "id": "D5_002",
+      "question": "WMS 的作用是什么？",
+      "answer": "## WMS\n\n- 窗口管理服务\n- 管理所有窗口\n- 负责窗口动画\n- 输入事件分发",
+      "difficulty": 2,
+      "tags": [
+        "WMS",
+        "系统服务"
+      ],
+      "day": 5
+    },
+    {
+      "id": "D5_003",
+      "question": "PMS 的作用是什么？",
+      "answer": "## PMS\n\n- 包管理服务\n- APK安装卸载\n- 权限管理\n- 组件解析",
+      "difficulty": 2,
+      "tags": [
+        "PMS",
+        "系统服务"
+      ],
+      "day": 5
+    },
+    {
+      "id": "D5_004",
+      "question": "AIDL 的使用场景？",
+      "answer": "## AIDL\n\n跨进程通信接口定义语言\n```aidl\ninterface IMyService {\n    void doSomething();\n}\n```",
+      "difficulty": 2,
+      "tags": [
+        "AIDL",
+        "IPC"
+      ],
+      "day": 5
+    },
+    {
+      "id": "D5_010",
+      "question": "Binder机制的核心原理是什么？",
+      "answer": "## Binder机制\n\n### 核心要点\n\nBinder机制是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 1,
+      "tags": [
+        "Binder机制"
+      ],
+      "day": 5
+    },
+    {
+      "id": "D5_011",
+      "question": "IPC通信的核心原理是什么？",
+      "answer": "## IPC通信\n\n### 核心要点\n\nIPC通信是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 2,
+      "tags": [
+        "IPC通信"
+      ],
+      "day": 5
+    },
+    {
+      "id": "D5_012",
+      "question": "AIDL的核心原理是什么？",
+      "answer": "## AIDL\n\n### 核心要点\n\nAIDL是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 3,
+      "tags": [
+        "AIDL"
+      ],
+      "day": 5
+    },
+    {
+      "id": "D5_013",
+      "question": "Messenger的核心原理是什么？",
+      "answer": "## Messenger\n\n### 核心要点\n\nMessenger是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 1,
+      "tags": [
+        "Messenger"
+      ],
+      "day": 5
+    },
+    {
+      "id": "D5_014",
+      "question": "ContentProvider的核心原理是什么？",
+      "answer": "## ContentProvider\n\n### 核心要点\n\nContentProvider是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 2,
+      "tags": [
+        "ContentProvider"
+      ],
+      "day": 5
+    },
+    {
+      "id": "D5_015",
+      "question": "ActivityManagerService的核心原理是什么？",
+      "answer": "## ActivityManagerService\n\n### 核心要点\n\nActivityManagerService是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 3,
+      "tags": [
+        "ActivityManagerService"
+      ],
+      "day": 5
+    },
+    {
+      "id": "D5_016",
+      "question": "WindowManagerService的核心原理是什么？",
+      "answer": "## WindowManagerService\n\n### 核心要点\n\nWindowManagerService是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 1,
+      "tags": [
+        "WindowManagerService"
+      ],
+      "day": 5
+    },
+    {
+      "id": "D5_017",
+      "question": "PackageManagerService的核心原理是什么？",
+      "answer": "## PackageManagerService\n\n### 核心要点\n\nPackageManagerService是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 2,
+      "tags": [
+        "PackageManagerService"
+      ],
+      "day": 5
+    },
+    {
+      "id": "D5_018",
+      "question": "Zygote进程的核心原理是什么？",
+      "answer": "## Zygote进程\n\n### 核心要点\n\nZygote进程是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 3,
+      "tags": [
+        "Zygote进程"
+      ],
+      "day": 5
+    },
+    {
+      "id": "D5_019",
+      "question": "SystemServer的核心原理是什么？",
+      "answer": "## SystemServer\n\n### 核心要点\n\nSystemServer是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 1,
+      "tags": [
+        "SystemServer"
+      ],
+      "day": 5
+    },
+    {
+      "id": "D5_020",
+      "question": "init进程的核心原理是什么？",
+      "answer": "## init进程\n\n### 核心要点\n\ninit进程是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 2,
+      "tags": [
+        "init进程"
+      ],
+      "day": 5
+    },
+    {
+      "id": "D5_021",
+      "question": "应用启动的核心原理是什么？",
+      "answer": "## 应用启动\n\n### 核心要点\n\n应用启动是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 3,
+      "tags": [
+        "应用启动"
+      ],
+      "day": 5
+    },
+    {
+      "id": "D5_022",
+      "question": "Handler机制的核心原理是什么？",
+      "answer": "## Handler机制\n\n### 核心要点\n\nHandler机制是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 1,
+      "tags": [
+        "Handler机制"
+      ],
+      "day": 5
+    },
+    {
+      "id": "D5_023",
+      "question": "MessageQueue的核心原理是什么？",
+      "answer": "## MessageQueue\n\n### 核心要点\n\nMessageQueue是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 2,
+      "tags": [
+        "MessageQueue"
+      ],
+      "day": 5
+    },
+    {
+      "id": "D5_024",
+      "question": "Looper的核心原理是什么？",
+      "answer": "## Looper\n\n### 核心要点\n\nLooper是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 3,
+      "tags": [
+        "Looper"
+      ],
+      "day": 5
+    },
+    {
+      "id": "D5_025",
+      "question": "Message的核心原理是什么？",
+      "answer": "## Message\n\n### 核心要点\n\nMessage是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 1,
+      "tags": [
+        "Message"
+      ],
+      "day": 5
+    },
+    {
+      "id": "D5_026",
+      "question": "线程通信的核心原理是什么？",
+      "answer": "## 线程通信\n\n### 核心要点\n\n线程通信是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 2,
+      "tags": [
+        "线程通信"
+      ],
+      "day": 5
+    },
+    {
+      "id": "D5_027",
+      "question": "SurfaceFlinger的核心原理是什么？",
+      "answer": "## SurfaceFlinger\n\n### 核心要点\n\nSurfaceFlinger是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 3,
+      "tags": [
+        "SurfaceFlinger"
+      ],
+      "day": 5
+    },
+    {
+      "id": "D5_028",
+      "question": "输入系统的核心原理是什么？",
+      "answer": "## 输入系统\n\n### 核心要点\n\n输入系统是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 1,
+      "tags": [
+        "输入系统"
+      ],
+      "day": 5
+    },
+    {
+      "id": "D5_029",
+      "question": "VSync的核心原理是什么？",
+      "answer": "## VSync\n\n### 核心要点\n\nVSync是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 2,
+      "tags": [
+        "VSync"
+      ],
+      "day": 5
+    },
+    {
+      "id": "D5_030",
+      "question": "Choreographer的核心原理是什么？",
+      "answer": "## Choreographer\n\n### 核心要点\n\nChoreographer是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 3,
+      "tags": [
+        "Choreographer"
+      ],
+      "day": 5
+    },
+    {
+      "id": "D5_031",
+      "question": "Binder机制的核心原理是什么？",
+      "answer": "## Binder机制\n\n### 核心要点\n\nBinder机制是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 1,
+      "tags": [
+        "Binder机制"
+      ],
+      "day": 5
+    },
+    {
+      "id": "D5_032",
+      "question": "IPC通信的核心原理是什么？",
+      "answer": "## IPC通信\n\n### 核心要点\n\nIPC通信是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 2,
+      "tags": [
+        "IPC通信"
+      ],
+      "day": 5
+    },
+    {
+      "id": "D5_033",
+      "question": "AIDL的核心原理是什么？",
+      "answer": "## AIDL\n\n### 核心要点\n\nAIDL是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 3,
+      "tags": [
+        "AIDL"
+      ],
+      "day": 5
+    },
+    {
+      "id": "D5_034",
+      "question": "Messenger的核心原理是什么？",
+      "answer": "## Messenger\n\n### 核心要点\n\nMessenger是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 1,
+      "tags": [
+        "Messenger"
+      ],
+      "day": 5
+    },
+    {
+      "id": "D5_035",
+      "question": "ContentProvider的核心原理是什么？",
+      "answer": "## ContentProvider\n\n### 核心要点\n\nContentProvider是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 2,
+      "tags": [
+        "ContentProvider"
+      ],
+      "day": 5
+    },
+    {
+      "id": "D5_036",
+      "question": "ActivityManagerService的核心原理是什么？",
+      "answer": "## ActivityManagerService\n\n### 核心要点\n\nActivityManagerService是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 3,
+      "tags": [
+        "ActivityManagerService"
+      ],
+      "day": 5
+    },
+    {
+      "id": "D5_037",
+      "question": "WindowManagerService的核心原理是什么？",
+      "answer": "## WindowManagerService\n\n### 核心要点\n\nWindowManagerService是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 1,
+      "tags": [
+        "WindowManagerService"
+      ],
+      "day": 5
+    },
+    {
+      "id": "D5_038",
+      "question": "PackageManagerService的核心原理是什么？",
+      "answer": "## PackageManagerService\n\n### 核心要点\n\nPackageManagerService是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 2,
+      "tags": [
+        "PackageManagerService"
+      ],
+      "day": 5
+    },
+    {
+      "id": "D5_039",
+      "question": "Zygote进程的核心原理是什么？",
+      "answer": "## Zygote进程\n\n### 核心要点\n\nZygote进程是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 3,
+      "tags": [
+        "Zygote进程"
+      ],
+      "day": 5
+    },
+    {
+      "id": "D5_040",
+      "question": "SystemServer的核心原理是什么？",
+      "answer": "## SystemServer\n\n### 核心要点\n\nSystemServer是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 1,
+      "tags": [
+        "SystemServer"
+      ],
+      "day": 5
+    }
+  ]
+}

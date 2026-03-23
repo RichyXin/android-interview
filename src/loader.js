@@ -93,13 +93,20 @@ class DataLoader {
         const allQuestions = [];
         for (const category of dayCategories) {
             for (const file of category.files) {
-                const questions = await this.loadQuestions(file);
-                // 添加额外信息
-                questions.forEach(q => {
-                    q.day = day;
-                    q.category = category.name;
-                });
-                allQuestions.push(...questions);
+                try {
+                    const questions = await this.loadQuestions(file);
+                    if (questions && Array.isArray(questions)) {
+                        questions.forEach(q => {
+                            if (q) {
+                                q.day = day;
+                                q.category = category.name;
+                            }
+                        });
+                        allQuestions.push(...questions.filter(q => q));
+                    }
+                } catch (e) {
+                    console.warn(`Failed to load ${file}:`, e);
+                }
             }
         }
         

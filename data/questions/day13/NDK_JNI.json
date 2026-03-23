@@ -1,0 +1,309 @@
+{
+  "metadata": {
+    "category": "NDK_JNI",
+    "day": 13,
+    "total_questions": 30
+  },
+  "questions": [
+    {
+      "id": "D13_001",
+      "question": "JNI基础是什么？",
+      "answer": "## JNI基础\n\nJNI基础是重要的知识点。\n\n### 要点\n1. 基本概念\n2. 使用方法\n3. 注意事项",
+      "difficulty": 1,
+      "tags": [
+        "JNI基础"
+      ],
+      "day": 13
+    },
+    {
+      "id": "D13_002",
+      "question": "Native方法是什么？",
+      "answer": "## Native方法\n\nNative方法是重要的知识点。\n\n### 要点\n1. 基本概念\n2. 使用方法\n3. 注意事项",
+      "difficulty": 2,
+      "tags": [
+        "Native方法"
+      ],
+      "day": 13
+    },
+    {
+      "id": "D13_003",
+      "question": "Java调用C++是什么？",
+      "answer": "## Java调用C++\n\nJava调用C++是重要的知识点。\n\n### 要点\n1. 基本概念\n2. 使用方法\n3. 注意事项",
+      "difficulty": 3,
+      "tags": [
+        "Java调用C++"
+      ],
+      "day": 13
+    },
+    {
+      "id": "D13_004",
+      "question": "C++调用Java是什么？",
+      "answer": "## C++调用Java\n\nC++调用Java是重要的知识点。\n\n### 要点\n1. 基本概念\n2. 使用方法\n3. 注意事项",
+      "difficulty": 1,
+      "tags": [
+        "C++调用Java"
+      ],
+      "day": 13
+    },
+    {
+      "id": "D13_005",
+      "question": "字符串转换是什么？",
+      "answer": "## 字符串转换\n\n字符串转换是重要的知识点。\n\n### 要点\n1. 基本概念\n2. 使用方法\n3. 注意事项",
+      "difficulty": 2,
+      "tags": [
+        "字符串转换"
+      ],
+      "day": 13
+    },
+    {
+      "id": "D13_006",
+      "question": "数组操作是什么？",
+      "answer": "## 数组操作\n\n数组操作是重要的知识点。\n\n### 要点\n1. 基本概念\n2. 使用方法\n3. 注意事项",
+      "difficulty": 3,
+      "tags": [
+        "数组操作"
+      ],
+      "day": 13
+    },
+    {
+      "id": "D13_007",
+      "question": "对象操作是什么？",
+      "answer": "## 对象操作\n\n对象操作是重要的知识点。\n\n### 要点\n1. 基本概念\n2. 使用方法\n3. 注意事项",
+      "difficulty": 1,
+      "tags": [
+        "对象操作"
+      ],
+      "day": 13
+    },
+    {
+      "id": "D13_008",
+      "question": "异常处理是什么？",
+      "answer": "## 异常处理\n\n异常处理是重要的知识点。\n\n### 要点\n1. 基本概念\n2. 使用方法\n3. 注意事项",
+      "difficulty": 2,
+      "tags": [
+        "异常处理"
+      ],
+      "day": 13
+    },
+    {
+      "id": "D13_009",
+      "question": "本地引用是什么？",
+      "answer": "## 本地引用\n\n本地引用是重要的知识点。\n\n### 要点\n1. 基本概念\n2. 使用方法\n3. 注意事项",
+      "difficulty": 3,
+      "tags": [
+        "本地引用"
+      ],
+      "day": 13
+    },
+    {
+      "id": "D13_010",
+      "question": "全局引用是什么？",
+      "answer": "## 全局引用\n\n全局引用是重要的知识点。\n\n### 要点\n1. 基本概念\n2. 使用方法\n3. 注意事项",
+      "difficulty": 1,
+      "tags": [
+        "全局引用"
+      ],
+      "day": 13
+    },
+    {
+      "id": "D13_011",
+      "question": "JNI_OnLoad是什么？",
+      "answer": "## JNI_OnLoad\n\nJNI_OnLoad是重要的知识点。\n\n### 要点\n1. 基本概念\n2. 使用方法\n3. 注意事项",
+      "difficulty": 2,
+      "tags": [
+        "JNI_OnLoad"
+      ],
+      "day": 13
+    },
+    {
+      "id": "D13_012",
+      "question": "RegisterNatives是什么？",
+      "answer": "## RegisterNatives\n\nRegisterNatives是重要的知识点。\n\n### 要点\n1. 基本概念\n2. 使用方法\n3. 注意事项",
+      "difficulty": 3,
+      "tags": [
+        "RegisterNatives"
+      ],
+      "day": 13
+    },
+    {
+      "id": "D13_013",
+      "question": "CMake构建是什么？",
+      "answer": "## CMake构建\n\nCMake构建是重要的知识点。\n\n### 要点\n1. 基本概念\n2. 使用方法\n3. 注意事项",
+      "difficulty": 1,
+      "tags": [
+        "CMake构建"
+      ],
+      "day": 13
+    },
+    {
+      "id": "D13_014",
+      "question": "NDK配置是什么？",
+      "answer": "## NDK配置\n\nNDK配置是重要的知识点。\n\n### 要点\n1. 基本概念\n2. 使用方法\n3. 注意事项",
+      "difficulty": 2,
+      "tags": [
+        "NDK配置"
+      ],
+      "day": 13
+    },
+    {
+      "id": "D13_015",
+      "question": "ABI是什么？",
+      "answer": "## ABI\n\nABI是重要的知识点。\n\n### 要点\n1. 基本概念\n2. 使用方法\n3. 注意事项",
+      "difficulty": 3,
+      "tags": [
+        "ABI"
+      ],
+      "day": 13
+    },
+    {
+      "id": "D13_016",
+      "question": "so库是什么？",
+      "answer": "## so库\n\nso库是重要的知识点。\n\n### 要点\n1. 基本概念\n2. 使用方法\n3. 注意事项",
+      "difficulty": 1,
+      "tags": [
+        "so库"
+      ],
+      "day": 13
+    },
+    {
+      "id": "D13_017",
+      "question": "Native线程是什么？",
+      "answer": "## Native线程\n\nNative线程是重要的知识点。\n\n### 要点\n1. 基本概念\n2. 使用方法\n3. 注意事项",
+      "difficulty": 2,
+      "tags": [
+        "Native线程"
+      ],
+      "day": 13
+    },
+    {
+      "id": "D13_018",
+      "question": "线程同步是什么？",
+      "answer": "## 线程同步\n\n线程同步是重要的知识点。\n\n### 要点\n1. 基本概念\n2. 使用方法\n3. 注意事项",
+      "difficulty": 3,
+      "tags": [
+        "线程同步"
+      ],
+      "day": 13
+    },
+    {
+      "id": "D13_019",
+      "question": "内存管理是什么？",
+      "answer": "## 内存管理\n\n内存管理是重要的知识点。\n\n### 要点\n1. 基本概念\n2. 使用方法\n3. 注意事项",
+      "difficulty": 1,
+      "tags": [
+        "内存管理"
+      ],
+      "day": 13
+    },
+    {
+      "id": "D13_020",
+      "question": "Native异常是什么？",
+      "answer": "## Native异常\n\nNative异常是重要的知识点。\n\n### 要点\n1. 基本概念\n2. 使用方法\n3. 注意事项",
+      "difficulty": 2,
+      "tags": [
+        "Native异常"
+      ],
+      "day": 13
+    },
+    {
+      "id": "D13_021",
+      "question": "性能优化是什么？",
+      "answer": "## 性能优化\n\n性能优化是重要的知识点。\n\n### 要点\n1. 基本概念\n2. 使用方法\n3. 注意事项",
+      "difficulty": 3,
+      "tags": [
+        "性能优化"
+      ],
+      "day": 13
+    },
+    {
+      "id": "D13_022",
+      "question": "Native崩溃是什么？",
+      "answer": "## Native崩溃\n\nNative崩溃是重要的知识点。\n\n### 要点\n1. 基本概念\n2. 使用方法\n3. 注意事项",
+      "difficulty": 1,
+      "tags": [
+        "Native崩溃"
+      ],
+      "day": 13
+    },
+    {
+      "id": "D13_023",
+      "question": "调试技巧是什么？",
+      "answer": "## 调试技巧\n\n调试技巧是重要的知识点。\n\n### 要点\n1. 基本概念\n2. 使用方法\n3. 注意事项",
+      "difficulty": 2,
+      "tags": [
+        "调试技巧"
+      ],
+      "day": 13
+    },
+    {
+      "id": "D13_024",
+      "question": "Android.mk是什么？",
+      "answer": "## Android.mk\n\nAndroid.mk是重要的知识点。\n\n### 要点\n1. 基本概念\n2. 使用方法\n3. 注意事项",
+      "difficulty": 3,
+      "tags": [
+        "Android.mk"
+      ],
+      "day": 13
+    },
+    {
+      "id": "D13_025",
+      "question": "Application.mk是什么？",
+      "answer": "## Application.mk\n\nApplication.mk是重要的知识点。\n\n### 要点\n1. 基本概念\n2. 使用方法\n3. 注意事项",
+      "difficulty": 1,
+      "tags": [
+        "Application.mk"
+      ],
+      "day": 13
+    },
+    {
+      "id": "D13_026",
+      "question": "LLDB调试是什么？",
+      "answer": "## LLDB调试\n\nLLDB调试是重要的知识点。\n\n### 要点\n1. 基本概念\n2. 使用方法\n3. 注意事项",
+      "difficulty": 2,
+      "tags": [
+        "LLDB调试"
+      ],
+      "day": 13
+    },
+    {
+      "id": "D13_027",
+      "question": "AddressSanitizer是什么？",
+      "answer": "## AddressSanitizer\n\nAddressSanitizer是重要的知识点。\n\n### 要点\n1. 基本概念\n2. 使用方法\n3. 注意事项",
+      "difficulty": 3,
+      "tags": [
+        "AddressSanitizer"
+      ],
+      "day": 13
+    },
+    {
+      "id": "D13_028",
+      "question": "Profiling是什么？",
+      "answer": "## Profiling\n\nProfiling是重要的知识点。\n\n### 要点\n1. 基本概念\n2. 使用方法\n3. 注意事项",
+      "difficulty": 1,
+      "tags": [
+        "Profiling"
+      ],
+      "day": 13
+    },
+    {
+      "id": "D13_029",
+      "question": "SIMD优化是什么？",
+      "answer": "## SIMD优化\n\nSIMD优化是重要的知识点。\n\n### 要点\n1. 基本概念\n2. 使用方法\n3. 注意事项",
+      "difficulty": 2,
+      "tags": [
+        "SIMD优化"
+      ],
+      "day": 13
+    },
+    {
+      "id": "D13_030",
+      "question": "NEON指令是什么？",
+      "answer": "## NEON指令\n\nNEON指令是重要的知识点。\n\n### 要点\n1. 基本概念\n2. 使用方法\n3. 注意事项",
+      "difficulty": 3,
+      "tags": [
+        "NEON指令"
+      ],
+      "day": 13
+    }
+  ]
+}

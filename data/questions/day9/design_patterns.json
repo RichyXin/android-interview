@@ -1,0 +1,421 @@
+{
+  "metadata": {
+    "category": "设计模式",
+    "day": 9,
+    "total_questions": 40
+  },
+  "questions": [
+    {
+      "id": "D9_001",
+      "question": "单例模式有几种实现方式？各有什么优缺点？",
+      "answer": "## 单例模式实现\n\n### 1. 饿汉式\n```java\npublic class Singleton {\n    private static final Singleton INSTANCE = new Singleton();\n    private Singleton() {}\n    public static Singleton getInstance() { return INSTANCE; }\n}\n```\n- 优点：简单、线程安全\n- 缺点：类加载时就初始化\n\n### 2. 懒汉式\n```java\npublic class Singleton {\n    private static Singleton instance;\n    private Singleton() {}\n    public static synchronized Singleton getInstance() {\n        if (instance == null) instance = new Singleton();\n        return instance;\n    }\n}\n```\n- 优点：延迟初始化\n- 缺点：每次同步，效率低\n\n### 3. 双重检查锁\n```java\npublic class Singleton {\n    private static volatile Singleton instance;\n    private Singleton() {}\n    public static Singleton getInstance() {\n        if (instance == null) {\n            synchronized (Singleton.class) {\n                if (instance == null) instance = new Singleton();\n            }\n        }\n        return instance;\n    }\n}\n```\n- 优点：延迟初始化、线程安全、效率高\n- 注意：需要 volatile\n\n### 4. 静态内部类\n```java\npublic class Singleton {\n    private Singleton() {}\n    private static class Holder { static final Singleton INSTANCE = new Singleton(); }\n    public static Singleton getInstance() { return Holder.INSTANCE; }\n}\n```\n- 推荐：线程安全、延迟加载、简单",
+      "difficulty": 2,
+      "tags": [
+        "设计模式",
+        "单例"
+      ],
+      "day": 9
+    },
+    {
+      "id": "D9_002",
+      "question": "观察者模式的应用场景是什么？如何在 Android 中使用？",
+      "answer": "## 观察者模式\n\n### 定义\n定义对象间的一对多依赖，当一个对象状态改变，所有依赖者收到通知。\n\n### 结构\n```\nSubject (被观察者)\n    │\n    ├── registerObserver()\n    ├── removeObserver()\n    └── notifyObservers()\n         │\n         ▼\nObserver (观察者)\n    └── update()\n```\n\n### Android 应用\n\n**1. LiveData**\n```kotlin\nval data = MutableLiveData<String>()\ndata.observe(lifecycleOwner) { value ->\n    // 收到通知\n}\n```\n\n**2. RxJava**\n```kotlin\nObservable.just(\"data\")\n    .subscribe { value ->\n        // 收到通知\n    }\n```\n\n**3. BroadcastReceiver**\n```kotlin\nval receiver = object : BroadcastReceiver() {\n    override fun onReceive(context: Context, intent: Intent) {\n        // 收到通知\n    }\n}\n```",
+      "difficulty": 2,
+      "tags": [
+        "设计模式",
+        "观察者"
+      ],
+      "day": 9
+    },
+    {
+      "id": "D9_003",
+      "question": "MVVM 架构的优缺点是什么？",
+      "answer": "## MVVM 架构\n\n### 组成\n- **Model**: 数据层\n- **View**: UI层\n- **ViewModel**: 业务逻辑层，连接 Model 和 View\n\n### 数据流\n```\nView ←→ ViewModel ←→ Model\n     (数据绑定)\n```\n\n### 优点\n1. **解耦**：View 和 Model 无直接关联\n2. **可测试**：ViewModel 独立于 View\n3. **生命周期安全**：ViewModel 在配置变更时保留\n\n### 缺点\n1. **学习成本**：需要理解数据绑定\n2. **调试困难**：绑定关系不直观\n3. **过度设计**：简单场景可能不需要\n\n### Android 实现\n```kotlin\nclass MyViewModel : ViewModel() {\n    private val _data = MutableLiveData<String>()\n    val data: LiveData<String> = _data\n}\n\nclass MainActivity : AppCompatActivity() {\n    private val viewModel: MyViewModel by viewModels()\n    override fun onCreate(savedInstanceState: Bundle?) {\n        viewModel.data.observe(this) { updateUI(it) }\n    }\n}\n```",
+      "difficulty": 2,
+      "tags": [
+        "设计模式",
+        "MVVM",
+        "架构"
+      ],
+      "day": 9
+    },
+    {
+      "id": "D9_004",
+      "question": "Builder 模式的使用场景是什么？",
+      "answer": "## Builder 模式\n\n### 使用场景\n1. 构造函数参数过多\n2. 参数有默认值\n3. 参数有约束条件\n4. 需要分步构建\n\n### 示例\n```kotlin\nclass AlertDialog private constructor(\n    val title: String?,\n    val message: String?,\n    val positiveText: String?\n) {\n    class Builder {\n        private var title: String? = null\n        private var message: String? = null\n        private var positiveText: String? = null\n        \n        fun setTitle(title: String) = apply { this.title = title }\n        fun setMessage(message: String) = apply { this.message = message }\n        fun setPositive(text: String) = apply { this.positiveText = text }\n        \n        fun build() = AlertDialog(title, message, positiveText)\n    }\n}\n\n// 使用\nval dialog = AlertDialog.Builder()\n    .setTitle(\"标题\")\n    .setMessage(\"内容\")\n    .setPositive(\"确定\")\n    .build()\n```\n\n### Kotlin DSL 替代\n```kotlin\ndata class AlertDialog(\n    val title: String? = null,\n    val message: String? = null\n)\n\nval dialog = AlertDialog(\n    title = \"标题\",\n    message = \"内容\"\n)\n```",
+      "difficulty": 2,
+      "tags": [
+        "设计模式",
+        "Builder"
+      ],
+      "day": 9
+    },
+    {
+      "id": "D9_005",
+      "question": "代理模式和装饰器模式有什么区别？",
+      "answer": "## 代理 vs 装饰器\n\n### 代理模式\n控制对对象的访问\n```java\ninterface Image { void display(); }\n\nclass RealImage implements Image {\n    public void display() { /* 显示图片 */ }\n}\n\nclass ProxyImage implements Image {\n    private RealImage realImage;\n    public void display() {\n        if (realImage == null) realImage = new RealImage();\n        realImage.display();\n    }\n}\n```\n\n### 装饰器模式\n动态添加功能\n```java\nclass BorderDecorator implements Image {\n    private Image image;\n    public void display() {\n        drawBorder();\n        image.display();\n    }\n}\n```\n\n### 对比\n| 特性 | 代理 | 装饰器 |\n|------|------|--------|\n| 目的 | 控制访问 | 增强功能 |\n| 创建对象 | 代理创建 | 客户端传入 |\n| 功能变化 | 不变 | 可叠加 |\n| 透明度 | 对客户端透明 | 客户端知道 |",
+      "difficulty": 2,
+      "tags": [
+        "设计模式",
+        "代理",
+        "装饰器"
+      ],
+      "day": 9
+    },
+    {
+      "id": "D9_100",
+      "question": "工厂模式的使用场景？",
+      "answer": "## 工厂模式\n\n- 创建逻辑复杂时\n- 需要统一创建接口\n- 解耦创建和使用",
+      "difficulty": 1,
+      "tags": [
+        "设计模式",
+        "工厂"
+      ],
+      "day": 9
+    },
+    {
+      "id": "D9_101",
+      "question": "策略模式如何实现？",
+      "answer": "## 策略模式\n\n定义算法族，让它们可以互相替换:\n```kotlin\ninterface Strategy {\n    fun execute()\n}\n```",
+      "difficulty": 2,
+      "tags": [
+        "设计模式",
+        "策略"
+      ],
+      "day": 9
+    },
+    {
+      "id": "D9_102",
+      "question": "MVP和MVVM区别？",
+      "answer": "## MVP vs MVVM\n\n- MVP: Presenter持有View引用\n- MVVM: ViewModel不持有View\n- MVVM更好支持数据绑定",
+      "difficulty": 2,
+      "tags": [
+        "设计模式",
+        "架构"
+      ],
+      "day": 9
+    },
+    {
+      "id": "D9_103",
+      "question": "依赖注入的好处？",
+      "answer": "## DI优势\n\n1. 解耦组件\n2. 方便测试\n3. 集中管理依赖\n4. 减少样板代码",
+      "difficulty": 1,
+      "tags": [
+        "设计模式",
+        "DI"
+      ],
+      "day": 9
+    },
+    {
+      "id": "D9_104",
+      "question": "Clean Architecture是什么？",
+      "answer": "## Clean架构\n\n分层:\n- Entities\n- Use Cases\n- Interface Adapters\n- Frameworks",
+      "difficulty": 2,
+      "tags": [
+        "设计模式",
+        "架构"
+      ],
+      "day": 9
+    },
+    {
+      "id": "D9_011",
+      "question": "单例模式的核心原理是什么？",
+      "answer": "## 单例模式\n\n### 核心要点\n\n单例模式是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 1,
+      "tags": [
+        "单例模式"
+      ],
+      "day": 9
+    },
+    {
+      "id": "D9_012",
+      "question": "工厂模式的核心原理是什么？",
+      "answer": "## 工厂模式\n\n### 核心要点\n\n工厂模式是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 2,
+      "tags": [
+        "工厂模式"
+      ],
+      "day": 9
+    },
+    {
+      "id": "D9_013",
+      "question": "Builder模式的核心原理是什么？",
+      "answer": "## Builder模式\n\n### 核心要点\n\nBuilder模式是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 3,
+      "tags": [
+        "Builder模式"
+      ],
+      "day": 9
+    },
+    {
+      "id": "D9_014",
+      "question": "观察者模式的核心原理是什么？",
+      "answer": "## 观察者模式\n\n### 核心要点\n\n观察者模式是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 1,
+      "tags": [
+        "观察者模式"
+      ],
+      "day": 9
+    },
+    {
+      "id": "D9_015",
+      "question": "策略模式的核心原理是什么？",
+      "answer": "## 策略模式\n\n### 核心要点\n\n策略模式是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 2,
+      "tags": [
+        "策略模式"
+      ],
+      "day": 9
+    },
+    {
+      "id": "D9_016",
+      "question": "适配器模式的核心原理是什么？",
+      "answer": "## 适配器模式\n\n### 核心要点\n\n适配器模式是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 3,
+      "tags": [
+        "适配器模式"
+      ],
+      "day": 9
+    },
+    {
+      "id": "D9_017",
+      "question": "装饰器模式的核心原理是什么？",
+      "answer": "## 装饰器模式\n\n### 核心要点\n\n装饰器模式是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 1,
+      "tags": [
+        "装饰器模式"
+      ],
+      "day": 9
+    },
+    {
+      "id": "D9_018",
+      "question": "代理模式的核心原理是什么？",
+      "answer": "## 代理模式\n\n### 核心要点\n\n代理模式是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 2,
+      "tags": [
+        "代理模式"
+      ],
+      "day": 9
+    },
+    {
+      "id": "D9_019",
+      "question": "命令模式的核心原理是什么？",
+      "answer": "## 命令模式\n\n### 核心要点\n\n命令模式是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 3,
+      "tags": [
+        "命令模式"
+      ],
+      "day": 9
+    },
+    {
+      "id": "D9_020",
+      "question": "模板方法的核心原理是什么？",
+      "answer": "## 模板方法\n\n### 核心要点\n\n模板方法是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 1,
+      "tags": [
+        "模板方法"
+      ],
+      "day": 9
+    },
+    {
+      "id": "D9_021",
+      "question": "MVVM的核心原理是什么？",
+      "answer": "## MVVM\n\n### 核心要点\n\nMVVM是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 2,
+      "tags": [
+        "MVVM"
+      ],
+      "day": 9
+    },
+    {
+      "id": "D9_022",
+      "question": "MVP的核心原理是什么？",
+      "answer": "## MVP\n\n### 核心要点\n\nMVP是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 3,
+      "tags": [
+        "MVP"
+      ],
+      "day": 9
+    },
+    {
+      "id": "D9_023",
+      "question": "MVI的核心原理是什么？",
+      "answer": "## MVI\n\n### 核心要点\n\nMVI是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 1,
+      "tags": [
+        "MVI"
+      ],
+      "day": 9
+    },
+    {
+      "id": "D9_024",
+      "question": "Clean Architecture的核心原理是什么？",
+      "answer": "## Clean Architecture\n\n### 核心要点\n\nClean Architecture是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 2,
+      "tags": [
+        "Clean Architecture"
+      ],
+      "day": 9
+    },
+    {
+      "id": "D9_025",
+      "question": "Repository模式的核心原理是什么？",
+      "answer": "## Repository模式\n\n### 核心要点\n\nRepository模式是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 3,
+      "tags": [
+        "Repository模式"
+      ],
+      "day": 9
+    },
+    {
+      "id": "D9_026",
+      "question": "依赖注入的核心原理是什么？",
+      "answer": "## 依赖注入\n\n### 核心要点\n\n依赖注入是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 1,
+      "tags": [
+        "依赖注入"
+      ],
+      "day": 9
+    },
+    {
+      "id": "D9_027",
+      "question": "SOLID原则的核心原理是什么？",
+      "answer": "## SOLID原则\n\n### 核心要点\n\nSOLID原则是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 2,
+      "tags": [
+        "SOLID原则"
+      ],
+      "day": 9
+    },
+    {
+      "id": "D9_028",
+      "question": "开闭原则的核心原理是什么？",
+      "answer": "## 开闭原则\n\n### 核心要点\n\n开闭原则是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 3,
+      "tags": [
+        "开闭原则"
+      ],
+      "day": 9
+    },
+    {
+      "id": "D9_029",
+      "question": "单一职责的核心原理是什么？",
+      "answer": "## 单一职责\n\n### 核心要点\n\n单一职责是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 1,
+      "tags": [
+        "单一职责"
+      ],
+      "day": 9
+    },
+    {
+      "id": "D9_030",
+      "question": "单例模式的核心原理是什么？",
+      "answer": "## 单例模式\n\n### 核心要点\n\n单例模式是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 2,
+      "tags": [
+        "单例模式"
+      ],
+      "day": 9
+    },
+    {
+      "id": "D9_031",
+      "question": "工厂模式的核心原理是什么？",
+      "answer": "## 工厂模式\n\n### 核心要点\n\n工厂模式是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 3,
+      "tags": [
+        "工厂模式"
+      ],
+      "day": 9
+    },
+    {
+      "id": "D9_032",
+      "question": "Builder模式的核心原理是什么？",
+      "answer": "## Builder模式\n\n### 核心要点\n\nBuilder模式是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 1,
+      "tags": [
+        "Builder模式"
+      ],
+      "day": 9
+    },
+    {
+      "id": "D9_033",
+      "question": "观察者模式的核心原理是什么？",
+      "answer": "## 观察者模式\n\n### 核心要点\n\n观察者模式是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 2,
+      "tags": [
+        "观察者模式"
+      ],
+      "day": 9
+    },
+    {
+      "id": "D9_034",
+      "question": "策略模式的核心原理是什么？",
+      "answer": "## 策略模式\n\n### 核心要点\n\n策略模式是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 3,
+      "tags": [
+        "策略模式"
+      ],
+      "day": 9
+    },
+    {
+      "id": "D9_035",
+      "question": "适配器模式的核心原理是什么？",
+      "answer": "## 适配器模式\n\n### 核心要点\n\n适配器模式是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 1,
+      "tags": [
+        "适配器模式"
+      ],
+      "day": 9
+    },
+    {
+      "id": "D9_036",
+      "question": "装饰器模式的核心原理是什么？",
+      "answer": "## 装饰器模式\n\n### 核心要点\n\n装饰器模式是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 2,
+      "tags": [
+        "装饰器模式"
+      ],
+      "day": 9
+    },
+    {
+      "id": "D9_037",
+      "question": "代理模式的核心原理是什么？",
+      "answer": "## 代理模式\n\n### 核心要点\n\n代理模式是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 3,
+      "tags": [
+        "代理模式"
+      ],
+      "day": 9
+    },
+    {
+      "id": "D9_038",
+      "question": "命令模式的核心原理是什么？",
+      "answer": "## 命令模式\n\n### 核心要点\n\n命令模式是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 1,
+      "tags": [
+        "命令模式"
+      ],
+      "day": 9
+    },
+    {
+      "id": "D9_039",
+      "question": "模板方法的核心原理是什么？",
+      "answer": "## 模板方法\n\n### 核心要点\n\n模板方法是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 2,
+      "tags": [
+        "模板方法"
+      ],
+      "day": 9
+    },
+    {
+      "id": "D9_040",
+      "question": "MVVM的核心原理是什么？",
+      "answer": "## MVVM\n\n### 核心要点\n\nMVVM是Android开发中的重要知识点。\n\n### 关键点\n1. 理解基本原理\n2. 掌握使用方法\n3. 注意性能影响\n4. 遵循最佳实践",
+      "difficulty": 3,
+      "tags": [
+        "MVVM"
+      ],
+      "day": 9
+    }
+  ]
+}

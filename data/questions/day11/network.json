@@ -1,0 +1,319 @@
+{
+  "metadata": {
+    "category": "网络编程",
+    "day": 11,
+    "total_questions": 30
+  },
+  "questions": [
+    {
+      "id": "D11_001",
+      "question": "HTTP 和 HTTPS 的区别？",
+      "answer": "## HTTP vs HTTPS\n\n| 特性 | HTTP | HTTPS |\n|------|------|-------|\n| 端口 | 80 | 443 |\n| 加密 | 无 | SSL/TLS |\n| 证书 | 不需要 | 需要 |\n| 安全性 | 低 | 高 |\n\n### HTTPS 握手\n```\nClient → Server: 支持的加密算法\nServer → Client: 选择的算法 + 证书\nClient → Server: 验证证书，生成密钥\nServer → Client: 确认\n    ↓\n  开始加密通信\n```\n\n### SSL/TLS\n- TLS 1.2: 目前主流\n- TLS 1.3: 更快更安全",
+      "difficulty": 1,
+      "tags": [
+        "HTTP",
+        "HTTPS"
+      ],
+      "day": 11
+    },
+    {
+      "id": "D11_002",
+      "question": "TCP 三次握手的过程？",
+      "answer": "## TCP 三次握手\n\n### 流程\n```\nClient                    Server\n   │                        │\n   │────── SYN=1 ──────────→│  第一次握手\n   │                        │\n   │←───── SYN=1,ACK=1 ─────│  第二次握手\n   │                        │\n   │────── ACK=1 ──────────→│  第三次握手\n   │                        │\n   ↓                        ↓\n 建立连接                  建立连接\n```\n\n### 为什么三次？\n- 防止历史连接\n- 同步双方序列号\n- 防止重复连接\n\n### 状态变化\n```\nCLOSED → SYN_SENT → ESTABLISHED\nCLOSED → LISTEN → SYN_RCVD → ESTABLISHED\n```",
+      "difficulty": 2,
+      "tags": [
+        "TCP",
+        "网络"
+      ],
+      "day": 11
+    },
+    {
+      "id": "D11_003",
+      "question": "TCP 和 UDP 的区别？",
+      "answer": "## TCP vs UDP\n\n| 特性 | TCP | UDP |\n|------|-----|-----|\n| 连接 | 需要 | 不需要 |\n| 可靠性 | 可靠 | 不可靠 |\n| 顺序 | 有序 | 无序 |\n| 流量控制 | 有 | 无 |\n| 拥塞控制 | 有 | 无 |\n| 速度 | 慢 | 快 |\n| 应用 | HTTP,FTP | DNS,视频 |\n\n### TCP 适用场景\n- 文件传输\n- 网页浏览\n- 邮件\n\n### UDP 适用场景\n- 视频直播\n- DNS查询\n- 游戏同步",
+      "difficulty": 1,
+      "tags": [
+        "TCP",
+        "UDP"
+      ],
+      "day": 11
+    },
+    {
+      "id": "D11_004",
+      "question": "WebSocket 与 HTTP 的区别？",
+      "answer": "## WebSocket vs HTTP\n\n### 特点\n- 全双工通信\n- 服务端可主动推送\n- 持久连接\n\n### 握手\n```\nGET /chat HTTP/1.1\nUpgrade: websocket\nConnection: Upgrade\nSec-WebSocket-Key: xxx\n```\n\n### Android 使用\n```kotlin\nval client = OkHttpClient.Builder()\n    .pingInterval(30, TimeUnit.SECONDS)\n    .build()\n\nval request = Request.Builder()\n    .url(\"ws://example.com/ws\")\n    .build()\n\nval ws = client.newWebSocket(request, object : WebSocketListener() {\n    override fun onMessage(webSocket: WebSocket, text: String) {\n        // 收到消息\n    }\n})\n```\n\n### 适用场景\n- 即时通讯\n- 实时数据\n- 游戏同步",
+      "difficulty": 2,
+      "tags": [
+        "WebSocket",
+        "网络"
+      ],
+      "day": 11
+    },
+    {
+      "id": "D11_005",
+      "question": "如何优化网络请求？",
+      "answer": "## 网络优化\n\n### 1. 请求合并\n- 批量接口\n- GraphQL\n\n### 2. 缓存策略\n```kotlin\nval cache = Cache(cacheDir, 10 * 1024 * 1024)  // 10MB\nval client = OkHttpClient.Builder()\n    .cache(cache)\n    .build()\n```\n\n### 3. 压缩\n```kotlin\nval request = Request.Builder()\n    .addHeader(\"Accept-Encoding\", \"gzip\")\n    .build()\n```\n\n### 4. 连接复用\n```kotlin\nOkHttpClient.Builder()\n    .connectionPool(ConnectionPool(5, 5, TimeUnit.MINUTES))\n    .build()\n```\n\n### 5. DNS 优化\n- HTTPDNS\n- DNS预解析\n\n### 6. CDN 加速\n- 静态资源使用 CDN",
+      "difficulty": 2,
+      "tags": [
+        "网络优化",
+        "性能"
+      ],
+      "day": 11
+    },
+    {
+      "id": "D11_100",
+      "question": "HTTP状态码含义？",
+      "answer": "## 状态码\n\n- 200: 成功\n- 301/302: 重定向\n- 400: 请求错误\n- 401: 未授权\n- 500: 服务器错误",
+      "difficulty": 1,
+      "tags": [
+        "HTTP",
+        "网络"
+      ],
+      "day": 11
+    },
+    {
+      "id": "D11_101",
+      "question": "RESTful API设计原则？",
+      "answer": "## RESTful\n\n- 使用HTTP动词\n- 资源名词URL\n- 无状态\n- 返回状态码",
+      "difficulty": 1,
+      "tags": [
+        "API",
+        "网络"
+      ],
+      "day": 11
+    },
+    {
+      "id": "D11_102",
+      "question": "HTTPS证书验证流程？",
+      "answer": "## 证书验证\n\n1. 服务器发送证书\n2. 客户端验证证书\n3. 生成对称密钥\n4. 加密通信",
+      "difficulty": 2,
+      "tags": [
+        "HTTPS",
+        "安全"
+      ],
+      "day": 11
+    },
+    {
+      "id": "D11_103",
+      "question": "DNS解析过程？",
+      "answer": "## DNS解析\n\n1. 查本地缓存\n2. 询问本地DNS\n3. 根DNS→顶级DNS→权威DNS",
+      "difficulty": 1,
+      "tags": [
+        "DNS",
+        "网络"
+      ],
+      "day": 11
+    },
+    {
+      "id": "D11_104",
+      "question": "如何实现断点续传？",
+      "answer": "## 断点续传\n\n- HTTP Range头\n- 记录已下载位置\n- 请求剩余部分\n- 文件追加写入",
+      "difficulty": 2,
+      "tags": [
+        "网络",
+        "下载"
+      ],
+      "day": 11
+    },
+    {
+      "id": "D11_011",
+      "question": "HTTP/1.0的原理是什么？",
+      "answer": "## HTTP/1.0\n\n### 核心要点\n\nHTTP/1.0是网络编程的重要内容。\n\n### 注意事项\n1. 理解原理\n2. 正确使用\n3. 性能优化",
+      "difficulty": 1,
+      "tags": [
+        "HTTP/1.0"
+      ],
+      "day": 11
+    },
+    {
+      "id": "D11_012",
+      "question": "HTTP/1.1的原理是什么？",
+      "answer": "## HTTP/1.1\n\n### 核心要点\n\nHTTP/1.1是网络编程的重要内容。\n\n### 注意事项\n1. 理解原理\n2. 正确使用\n3. 性能优化",
+      "difficulty": 2,
+      "tags": [
+        "HTTP/1.1"
+      ],
+      "day": 11
+    },
+    {
+      "id": "D11_013",
+      "question": "HTTP/2.0的原理是什么？",
+      "answer": "## HTTP/2.0\n\n### 核心要点\n\nHTTP/2.0是网络编程的重要内容。\n\n### 注意事项\n1. 理解原理\n2. 正确使用\n3. 性能优化",
+      "difficulty": 3,
+      "tags": [
+        "HTTP/2.0"
+      ],
+      "day": 11
+    },
+    {
+      "id": "D11_014",
+      "question": "HTTP/3.0的原理是什么？",
+      "answer": "## HTTP/3.0\n\n### 核心要点\n\nHTTP/3.0是网络编程的重要内容。\n\n### 注意事项\n1. 理解原理\n2. 正确使用\n3. 性能优化",
+      "difficulty": 1,
+      "tags": [
+        "HTTP/3.0"
+      ],
+      "day": 11
+    },
+    {
+      "id": "D11_015",
+      "question": "QUIC协议的原理是什么？",
+      "answer": "## QUIC协议\n\n### 核心要点\n\nQUIC协议是网络编程的重要内容。\n\n### 注意事项\n1. 理解原理\n2. 正确使用\n3. 性能优化",
+      "difficulty": 2,
+      "tags": [
+        "QUIC协议"
+      ],
+      "day": 11
+    },
+    {
+      "id": "D11_016",
+      "question": "TCP握手的原理是什么？",
+      "answer": "## TCP握手\n\n### 核心要点\n\nTCP握手是网络编程的重要内容。\n\n### 注意事项\n1. 理解原理\n2. 正确使用\n3. 性能优化",
+      "difficulty": 3,
+      "tags": [
+        "TCP握手"
+      ],
+      "day": 11
+    },
+    {
+      "id": "D11_017",
+      "question": "TCP挥手的原理是什么？",
+      "answer": "## TCP挥手\n\n### 核心要点\n\nTCP挥手是网络编程的重要内容。\n\n### 注意事项\n1. 理解原理\n2. 正确使用\n3. 性能优化",
+      "difficulty": 1,
+      "tags": [
+        "TCP挥手"
+      ],
+      "day": 11
+    },
+    {
+      "id": "D11_018",
+      "question": "TCP流量控制的原理是什么？",
+      "answer": "## TCP流量控制\n\n### 核心要点\n\nTCP流量控制是网络编程的重要内容。\n\n### 注意事项\n1. 理解原理\n2. 正确使用\n3. 性能优化",
+      "difficulty": 2,
+      "tags": [
+        "TCP流量控制"
+      ],
+      "day": 11
+    },
+    {
+      "id": "D11_019",
+      "question": "TCP拥塞控制的原理是什么？",
+      "answer": "## TCP拥塞控制\n\n### 核心要点\n\nTCP拥塞控制是网络编程的重要内容。\n\n### 注意事项\n1. 理解原理\n2. 正确使用\n3. 性能优化",
+      "difficulty": 3,
+      "tags": [
+        "TCP拥塞控制"
+      ],
+      "day": 11
+    },
+    {
+      "id": "D11_020",
+      "question": "UDP的原理是什么？",
+      "answer": "## UDP\n\n### 核心要点\n\nUDP是网络编程的重要内容。\n\n### 注意事项\n1. 理解原理\n2. 正确使用\n3. 性能优化",
+      "difficulty": 1,
+      "tags": [
+        "UDP"
+      ],
+      "day": 11
+    },
+    {
+      "id": "D11_021",
+      "question": "WebSocket的原理是什么？",
+      "answer": "## WebSocket\n\n### 核心要点\n\nWebSocket是网络编程的重要内容。\n\n### 注意事项\n1. 理解原理\n2. 正确使用\n3. 性能优化",
+      "difficulty": 2,
+      "tags": [
+        "WebSocket"
+      ],
+      "day": 11
+    },
+    {
+      "id": "D11_022",
+      "question": "Socket编程的原理是什么？",
+      "answer": "## Socket编程\n\n### 核心要点\n\nSocket编程是网络编程的重要内容。\n\n### 注意事项\n1. 理解原理\n2. 正确使用\n3. 性能优化",
+      "difficulty": 3,
+      "tags": [
+        "Socket编程"
+      ],
+      "day": 11
+    },
+    {
+      "id": "D11_023",
+      "question": "DNS解析的原理是什么？",
+      "answer": "## DNS解析\n\n### 核心要点\n\nDNS解析是网络编程的重要内容。\n\n### 注意事项\n1. 理解原理\n2. 正确使用\n3. 性能优化",
+      "difficulty": 1,
+      "tags": [
+        "DNS解析"
+      ],
+      "day": 11
+    },
+    {
+      "id": "D11_024",
+      "question": "CDN加速的原理是什么？",
+      "answer": "## CDN加速\n\n### 核心要点\n\nCDN加速是网络编程的重要内容。\n\n### 注意事项\n1. 理解原理\n2. 正确使用\n3. 性能优化",
+      "difficulty": 2,
+      "tags": [
+        "CDN加速"
+      ],
+      "day": 11
+    },
+    {
+      "id": "D11_025",
+      "question": "HTTPS握手的原理是什么？",
+      "answer": "## HTTPS握手\n\n### 核心要点\n\nHTTPS握手是网络编程的重要内容。\n\n### 注意事项\n1. 理解原理\n2. 正确使用\n3. 性能优化",
+      "difficulty": 3,
+      "tags": [
+        "HTTPS握手"
+      ],
+      "day": 11
+    },
+    {
+      "id": "D11_026",
+      "question": "SSL/TLS的原理是什么？",
+      "answer": "## SSL/TLS\n\n### 核心要点\n\nSSL/TLS是网络编程的重要内容。\n\n### 注意事项\n1. 理解原理\n2. 正确使用\n3. 性能优化",
+      "difficulty": 1,
+      "tags": [
+        "SSL/TLS"
+      ],
+      "day": 11
+    },
+    {
+      "id": "D11_027",
+      "question": "证书验证的原理是什么？",
+      "answer": "## 证书验证\n\n### 核心要点\n\n证书验证是网络编程的重要内容。\n\n### 注意事项\n1. 理解原理\n2. 正确使用\n3. 性能优化",
+      "difficulty": 2,
+      "tags": [
+        "证书验证"
+      ],
+      "day": 11
+    },
+    {
+      "id": "D11_028",
+      "question": "请求重试的原理是什么？",
+      "answer": "## 请求重试\n\n### 核心要点\n\n请求重试是网络编程的重要内容。\n\n### 注意事项\n1. 理解原理\n2. 正确使用\n3. 性能优化",
+      "difficulty": 3,
+      "tags": [
+        "请求重试"
+      ],
+      "day": 11
+    },
+    {
+      "id": "D11_029",
+      "question": "超时设置的原理是什么？",
+      "answer": "## 超时设置\n\n### 核心要点\n\n超时设置是网络编程的重要内容。\n\n### 注意事项\n1. 理解原理\n2. 正确使用\n3. 性能优化",
+      "difficulty": 1,
+      "tags": [
+        "超时设置"
+      ],
+      "day": 11
+    },
+    {
+      "id": "D11_030",
+      "question": "连接池的原理是什么？",
+      "answer": "## 连接池\n\n### 核心要点\n\n连接池是网络编程的重要内容。\n\n### 注意事项\n1. 理解原理\n2. 正确使用\n3. 性能优化",
+      "difficulty": 2,
+      "tags": [
+        "连接池"
+      ],
+      "day": 11
+    }
+  ]
+}

@@ -682,16 +682,22 @@ class AndroidInterviewApp {
             const days = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15];
             
             for (const day of days) {
-                const dayQuestions = await this.loader.loadDay(day);
-                if (dayQuestions) {
-                    dayQuestions.forEach((q, idx) => {
-                        allQuestions.push({
-                            ...q,
-                            uniqueId: `${day}_${idx}`,
-                            day: day,
-                            cardStatus: 'new'
+                try {
+                    const dayQuestions = await this.loader.loadDay(day);
+                    if (dayQuestions && Array.isArray(dayQuestions)) {
+                        dayQuestions.forEach((q, idx) => {
+                            if (q && q.id) {
+                                allQuestions.push({
+                                    ...q,
+                                    uniqueId: `${day}_${q.id}`,
+                                    day: day,
+                                    cardStatus: 'new'
+                                });
+                            }
                         });
-                    });
+                    }
+                } catch (dayError) {
+                    console.warn(`Failed to load day ${day}:`, dayError);
                 }
             }
             
@@ -699,7 +705,7 @@ class AndroidInterviewApp {
             this.cardState.stats.total = allQuestions.length;
             
             const savedProgress = await this.db.getCardProgress();
-            if (savedProgress) {
+            if (savedProgress && savedProgress.length > 0) {
                 savedProgress.forEach(progress => {
                     const card = this.cardState.allCards.find(c => c.uniqueId === progress.id);
                     if (card) {
@@ -710,6 +716,7 @@ class AndroidInterviewApp {
             
             this.filterCards();
             this.updateCardStats();
+            console.log(`Loaded ${allQuestions.length} cards`);
         } catch (error) {
             console.error('Failed to load card data:', error);
             this.showToast('加载卡片数据失败', 'error');

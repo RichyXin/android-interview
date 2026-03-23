@@ -1,0 +1,659 @@
+{
+  "metadata": {
+    "category": "Android基础",
+    "day": 1,
+    "total_questions": 60,
+    "generated_date": "2026-03-23"
+  },
+  "questions": [
+    {
+      "id": "D1_001",
+      "question": "Activity 的生命周期方法有哪些？请按调用顺序详细说明每个方法的作用。",
+      "answer": "## Activity 生命周期\n\n### 完整生命周期流程图\n\n```mermaid\ngraph TD\n    A[启动App] --> B[onCreate]\n    B --> C[onStart]\n    C --> D[onResume]\n    D --> E[可交互状态]\n    E --> F[onPause]\n    F --> G[onStop]\n    G --> H[onDestroy]\n    G --> I[onRestart]\n    I --> C\n    H --> J[销毁]\n```\n\n### 各方法详解\n\n| 方法 | 调用时机 | 典型用途 |\n|------|----------|----------|\n| **onCreate()** | Activity首次创建 | 初始化UI、恢复保存的状态、设置布局 |\n| **onStart()** | Activity变为可见 | 注册广播、开始动画、初始化资源 |\n| **onResume()** | Activity获得焦点可交互 | 获取相机、GPS等独占资源 |\n| **onPause()** | Activity失去焦点 | 保存关键数据、暂停动画 |\n| **onStop()** | Activity完全不可见 | 释放资源、注销广播 |\n| **onRestart()** | 从停止状态恢复 | 重新加载数据 |\n| **onDestroy()** | Activity被销毁 | 最终清理、移除回调 |\n\n### 典型场景状态流转\n\n**场景1：首次启动**\n```\nonCreate → onStart → onResume\n     ↓        ↓         ↓\n[初始化] → [可见] → [可交互]\n```\n\n**场景2：跳转到其他Activity**\n```\nActivityA.onPause → ActivityA.onStop\n       ↓\nActivityB.onCreate → ActivityB.onStart → ActivityB.onResume\n```\n\n**场景3：屏幕旋转（配置变更）**\n```\n旧Activity: onPause → onStop → onDestroy\n                 ↓\n新Activity: onCreate → onStart → onResume\n```\n\n### 生命周期图示\n\n```\n┌─────────────────────────────────────────────────────────┐\n│                    Activity 生命周期                      │\n├─────────────────────────────────────────────────────────┤\n│                                                          │\n│   ┌──────────┐    ┌──────────┐    ┌──────────┐        │\n│   │ onCreate │───→│ onStart  │───→│ onResume │◄────┐  │\n│   └──────────┘    └──────────┘    └─────┬────┘     │  │\n│                                          │          │  │\n│   ┌──────────┐    ┌──────────┐          │          │  │\n│   │ onDestroy│←───│ onStop   │←─────────┘          │  │\n│   └──────────┘    └────┬─────┘                     │  │\n│                        │                           │  │\n│   ┌──────────┐         │                           │  │\n│   │onRestart │←────────┘                           │  │\n│   └──────────┘                                     │  │\n│                                                      │  │\n└─────────────────────────────────────────────────────────┘\n```",
+      "difficulty": 1,
+      "tags": [
+        "Activity",
+        "生命周期"
+      ],
+      "day": 1
+    },
+    {
+      "id": "D1_002",
+      "question": "Activity 的四种启动模式是什么？它们的区别和使用场景？",
+      "answer": "## 四种启动模式\n\n### 1. standard（标准模式）\n- **特点**：每次启动都创建新实例\n- **位置**：放入启动它的Activity所在的任务栈\n- **场景**：普通页面跳转\n\n### 2. singleTop（栈顶复用）\n- **特点**：若目标Activity在栈顶，则复用实例，调用 `onNewIntent()`\n- **不在栈顶**：创建新实例\n- **场景**：通知点击跳转、搜索页面\n\n### 3. singleTask（栈内复用）\n- **特点**：整个任务栈中只存在一个实例\n- **行为**：若存在则清空其上所有Activity\n- **场景**：应用首页、WebView容器\n\n### 4. singleInstance（单实例）\n- **特点**：独占一个任务栈，全局唯一\n- **场景**：来电界面、闹钟提醒\n\n### 对比表\n\n| 模式 | 实例数量 | 任务栈 | onNewIntent | 典型场景 |\n|------|----------|--------|-------------|----------|\n| standard | 多个 | 当前栈 | ❌ | 普通页面 |\n| singleTop | 栈顶唯一 | 当前栈 | ✅ | 搜索/通知 |\n| singleTask | 栈内唯一 | 可指定栈 | ✅ | 主页 |\n| singleInstance | 全局唯一 | 独立栈 | ✅ | 系统页面 |\n\n### 配置方式\n\n```xml\n<!-- AndroidManifest.xml -->\n<activity\n    android:name=\".MainActivity\"\n    android:launchMode=\"singleTask\" />\n```\n\n```kotlin\n// 代码中设置\nval intent = Intent(this, MainActivity::class.java)\nintent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)\nstartActivity(intent)\n```\n\n### 任务栈示意\n\n```\nstandard模式启动A→B→C→D→A：\nTask: [A, B, C, D, A]  // 两个A实例\n\nsingleTop模式，栈顶为A时再启动A：\nTask: [A, B, C, D, A]  // 复用栈顶A\n\nsingleTask模式启动B（B已在栈中）：\n原Task: [A, B, C, D]\n启动B后: [A, B]  // C、D被清除\n```",
+      "difficulty": 2,
+      "tags": [
+        "Activity",
+        "启动模式",
+        "LaunchMode"
+      ],
+      "day": 1
+    },
+    {
+      "id": "D1_003",
+      "question": "什么是 taskAffinity？它和 singleTask 有什么关系？",
+      "answer": "## TaskAffinity 概念\n\n### 定义\ntaskAffinity 定义了 Activity 倾向于属于哪个任务栈。\n\n- **默认值**：应用包名\n- **作用**：决定 Activity 应该在哪个任务栈中\n\n### 与 singleTask 的关系\n\n当 Activity 设置 `singleTask` 启动模式时：\n\n1. 系统首先查找是否有 taskAffinity 匹配的任务栈\n2. 若找到，在该栈中查找 Activity 实例\n3. 若找到实例，复用并清除其上的 Activity\n4. 若没找到实例，在该栈中创建新实例\n5. 若没有匹配的栈，创建新任务栈\n\n### 配置示例\n\n```xml\n<activity\n    android:name=\".BrowserActivity\"\n    android:launchMode=\"singleTask\"\n    android:taskAffinity=\"com.example.browser\" />\n```\n\n### 使用场景\n\n**场景1：将Activity放入独立任务栈**\n```xml\n<activity\n    android:name=\".NotificationActivity\"\n    android:taskAffinity=\"com.example.notify\"\n    android:launchMode=\"singleTask\" />\n```\n\n**场景2：多窗口模式**\n不同 taskAffinity 的 Activity 可在不同窗口显示。\n\n### allowTaskReparenting\n\n```xml\n<activity\n    android:name=\".WebActivity\"\n    android:taskAffinity=\"com.example.web\"\n    android:allowTaskReparenting=\"true\" />\n```\n\n- **作用**：允许 Activity 从启动它的任务栈转移到具有相同 taskAffinity 的任务栈\n- **场景**：邮件应用点击链接，打开浏览器，浏览器Activity可以转移到浏览器应用的任务栈\n\n### 注意事项\n\n1. singleTask 必须配合 taskAffinity 才能创建新任务栈\n2. FLAG_ACTIVITY_NEW_TASK 配合 taskAffinity 使用\n3. 最近任务列表可能显示多个任务",
+      "difficulty": 3,
+      "tags": [
+        "Activity",
+        "taskAffinity",
+        "任务栈"
+      ],
+      "day": 1
+    },
+    {
+      "id": "D1_004",
+      "question": "onSaveInstanceState() 和 onRestoreInstanceState() 的作用是什么？什么时候会被调用？",
+      "answer": "## 状态保存与恢复\n\n### onSaveInstanceState()\n\n**调用时机**：Activity 可能被系统回收前\n\n**触发条件**：\n- 按 Home 键\n- 屏幕旋转\n- 内存不足时系统回收\n- 启动新 Activity 覆盖\n- 多窗口模式切换\n\n**注意**：用户主动按返回键不会触发\n\n### onRestoreInstanceState()\n\n**调用时机**：Activity 被重建后，在 onStart() 之后\n\n### 使用示例\n\n```kotlin\noverride fun onSaveInstanceState(outState: Bundle) {\n    super.onSaveInstanceState(outState)\n    outState.putString(\"text\", editText.text.toString())\n    outState.putInt(\"scroll_position\", scrollView.scrollY)\n}\n\noverride fun onRestoreInstanceState(savedInstanceState: Bundle) {\n    super.onRestoreInstanceState(savedInstanceState)\n    val text = savedInstanceState.getString(\"text\")\n    val scrollY = savedInstanceState.getInt(\"scroll_position\")\n    editText.setText(text)\n    scrollView.scrollY = scrollY\n}\n```\n\n### 在 onCreate 中恢复\n\n```kotlin\noverride fun onCreate(savedInstanceState: Bundle?) {\n    super.onCreate(savedInstanceState)\n    setContentView(R.layout.activity_main)\n    \n    savedInstanceState?.let {\n        val text = it.getString(\"text\")\n        // 恢复数据\n    }\n}\n```\n\n### 推荐方案：ViewModel\n\n```kotlin\nclass MyViewModel : ViewModel() {\n    private val _text = MutableLiveData<String>()\n    val text: LiveData<String> = _text\n}\n\nclass MainActivity : AppCompatActivity() {\n    private val viewModel: MyViewModel by viewModels()\n    \n    override fun onCreate(savedInstanceState: Bundle?) {\n        super.onCreate(savedInstanceState)\n        viewModel.text.observe(this) {\n            editText.setText(it)\n        }\n    }\n}\n```\n\n### 对比\n\n| 方案 | 配置变更 | 系统回收 | 进程死亡 |\n|------|----------|----------|----------|\n| Bundle | ✅ | ✅ | ✅ |\n| ViewModel | ✅ | ✅ | ❌ |\n| onSaveInstanceState | ✅ | ✅ | ✅ |\n\n### 自动保存的View状态\n\n系统自动保存以下View的状态：\n- EditText 的文本内容\n- ListView 的滚动位置\n- CheckBox 的选中状态\n\n需要设置 `android:id` 才能自动恢复。",
+      "difficulty": 2,
+      "tags": [
+        "Activity",
+        "状态保存",
+        "ViewModel"
+      ],
+      "day": 1
+    },
+    {
+      "id": "D1_005",
+      "question": "Activity 之间如何传递数据？有哪些方式？",
+      "answer": "## Activity 数据传递方式\n\n### 1. Intent 基本数据\n\n```kotlin\n// 发送\nval intent = Intent(this, SecondActivity::class.java).apply {\n    putExtra(\"name\", \"Tom\")\n    putExtra(\"age\", 25)\n    putExtra(\"isStudent\", true)\n}\nstartActivity(intent)\n\n// 接收\nval name = intent.getStringExtra(\"name\")\nval age = intent.getIntExtra(\"age\", 0)\nval isStudent = intent.getBooleanExtra(\"isStudent\", false)\n```\n\n### 2. 传递对象\n\n**Parcelable（推荐）**\n```kotlin\n@Parcelize\ndata class User(val name: String, val age: Int) : Parcelable\n\n// 发送\nintent.putExtra(\"user\", User(\"Tom\", 25))\n\n// 接收\nval user = intent.getParcelableExtra<User>(\"user\")\n```\n\n**Serializable**\n```kotlin\ndata class User(val name: String, val age: Int) : Serializable\n\n// 性能较差，不推荐\n```\n\n### 3. Activity Result API\n\n```kotlin\n// 注册\nval launcher = registerForActivityResult(\n    ActivityResultContracts.StartActivityForResult()\n) { result ->\n    if (result.resultCode == RESULT_OK) {\n        val data = result.data?.getStringExtra(\"result\")\n    }\n}\n\n// 启动\nlauncher.launch(Intent(this, SecondActivity::class.java))\n\n// 返回结果\nsetResult(RESULT_OK, Intent().putExtra(\"result\", \"data\"))\nfinish()\n```\n\n### 4. ViewModel 共享\n\n```kotlin\nclass SharedViewModel : ViewModel() {\n    private val _selected = MutableLiveData<Item>()\n    val selected: LiveData<Item> = _selected\n    \n    fun select(item: Item) { _selected.value = item }\n}\n\n// 两个 Activity 共享\nval viewModel = ViewModelProvider(this).get(SharedViewModel::class.java)\n```\n\n### 5. 其他方式\n\n| 方式 | 适用场景 | 优点 | 缺点 |\n|------|----------|------|------|\n| Intent | 简单数据 | 简单直接 | 数据大小限制 |\n| Bundle | 批量数据 | 结构清晰 | 同上 |\n| SharedPreferences | 持久化配置 | 持久存储 | 需手动管理 |\n| 数据库 | 大量数据 | 可查询 | 复杂 |\n| EventBus | 解耦通信 | 灵活 | 维护困难 |\n| 单例/静态 | 临时共享 | 简单 | 内存泄漏风险 |\n\n### 数据大小限制\n\nIntent 传递数据有大小限制（约 1MB），大数据应使用：\n- 数据持久化后传递 ID\n- 单例模式临时存储\n- 文件共享",
+      "difficulty": 2,
+      "tags": [
+        "Activity",
+        "数据传递",
+        "Intent"
+      ],
+      "day": 1
+    },
+    {
+      "id": "D1_006",
+      "question": "Activity 的启动过程是怎样的？从点击图标到界面显示。",
+      "answer": "## Activity 启动流程\n\n### 整体架构\n\n```\n┌─────────────────────────────────────────────────────────────┐\n│                    Launcher (桌面应用)                       │\n│                    点击图标启动App                           │\n└─────────────────────────────┬───────────────────────────────┘\n                              │\n                              ▼\n┌─────────────────────────────────────────────────────────────┐\n│              System Server (AMS)                             │\n│         ActivityManagerService 处理启动请求                  │\n└─────────────────────────────┬───────────────────────────────┘\n                              │\n                              ▼\n┌─────────────────────────────────────────────────────────────┐\n│                    Zygote 进程                               │\n│                  fork 创建 App 进程                          │\n└─────────────────────────────┬───────────────────────────────┘\n                              │\n                              ▼\n┌─────────────────────────────────────────────────────────────┐\n│                    App 进程                                  │\n│           ActivityThread.main() 入口                        │\n│                    ↓                                        │\n│           创建 Application                                  │\n│                    ↓                                        │\n│           创建 Activity                                     │\n│                    ↓                                        │\n│           生命周期调用                                      │\n└─────────────────────────────────────────────────────────────┘\n```\n\n### 详细步骤\n\n**1. Launcher 发起请求**\n```kotlin\n// 点击图标\nIntent intent = new Intent(Intent.ACTION_MAIN);\nintent.addCategory(Intent.CATEGORY_LAUNCHER);\nintent.setComponent(new ComponentName(packageName, className));\nstartActivity(intent);\n```\n\n**2. AMS 处理**\n- 检查权限\n- 检查进程是否存在\n- 若不存在，通知 Zygote fork 新进程\n\n**3. Zygote fork 进程**\n```\nZygote fork → App 进程\n              ↓\n        ActivityThread.main()\n```\n\n**4. App 进程初始化**\n```java\npublic static void main(String[] args) {\n    Looper.prepareMainLooper();\n    ActivityThread thread = new ActivityThread();\n    thread.attach(false);\n    Looper.loop();\n}\n```\n\n**5. 创建 Application**\n```\nApplication 构造函数 → attach() → onCreate()\n```\n\n**6. 创建 Activity**\n```\nInstrumentation.newActivity()\n        ↓\nActivity.attach()\n        ↓\nonCreate() → onStart() → onResume()\n```\n\n### 关键类\n\n| 类 | 作用 |\n|---|------|\n| ActivityManagerService | 管理所有Activity |\n| ActivityStack | 管理任务栈 |\n| ActivityRecord | Activity在AMS中的表示 |\n| ActivityThread | App主线程入口 |\n| Instrumentation | 监控Activity生命周期 |\n\n### 冷启动 vs 热启动\n\n| 类型 | 过程 | 耗时 |\n|------|------|------|\n| 冷启动 | 创建进程 → Application → Activity | 最长 |\n| 热启动 | 直接创建Activity | 较短 |\n| 温启动 | 进程存在，重建Activity | 中等 |",
+      "difficulty": 3,
+      "tags": [
+        "Activity",
+        "启动流程",
+        "AMS"
+      ],
+      "day": 1
+    },
+    {
+      "id": "D1_007",
+      "question": "什么是 Activity 的 Flags？常用的 Flags 有哪些？",
+      "answer": "## Activity Flags\n\n### 常用 Flags\n\n**1. FLAG_ACTIVITY_NEW_TASK**\n```kotlin\nintent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)\n```\n- 在新任务栈中启动 Activity\n- 配合 taskAffinity 使用\n- 类似 singleTask 效果\n\n**2. FLAG_ACTIVITY_SINGLE_TOP**\n```kotlin\nintent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)\n```\n- 类似 singleTop 启动模式\n- 若栈顶则复用\n\n**3. FLAG_ACTIVITY_CLEAR_TOP**\n```kotlin\nintent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)\n```\n- 清除目标 Activity 之上的所有 Activity\n- 若目标已存在，销毁并重建\n\n**4. FLAG_ACTIVITY_CLEAR_TASK**\n```kotlin\nintent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK)\n```\n- 清空任务栈\n- 必须配合 NEW_TASK 使用\n\n**5. FLAG_ACTIVITY_NO_HISTORY**\n```kotlin\nintent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY)\n```\n- Activity 不会被保留在任务栈中\n- 跳转后自动销毁\n\n**6. FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS**\n```kotlin\nintent.addFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS)\n```\n- 不在最近任务列表中显示\n\n### 组合使用\n\n**跳转到主页并清空栈**\n```kotlin\nval intent = Intent(this, MainActivity::class.java).apply {\n    addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)\n    addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)\n}\nstartActivity(intent)\n```\n\n**退出登录**\n```kotlin\nval intent = Intent(this, LoginActivity::class.java).apply {\n    addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)\n    addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)\n}\nstartActivity(intent)\nfinish()\n```\n\n### Flags vs LaunchMode\n\n| LaunchMode | 等效 Flags |\n|------------|------------|\n| singleTop | FLAG_ACTIVITY_SINGLE_TOP |\n| singleTask | FLAG_ACTIVITY_NEW_TASK + taskAffinity |\n\n### 优先级\n\n代码设置的 Flags 优先级高于 Manifest 中设置的 launchMode。",
+      "difficulty": 2,
+      "tags": [
+        "Activity",
+        "Flags",
+        "Intent"
+      ],
+      "day": 1
+    },
+    {
+      "id": "D1_008",
+      "question": "Fragment 的生命周期是怎样的？与 Activity 生命周期有什么关系？",
+      "answer": "## Fragment 生命周期\n\n### 完整生命周期\n\n```\nonAttach()\n    ↓\nonCreate()\n    ↓\nonCreateView()\n    ↓\nonViewCreated()\n    ↓\nonStart()\n    ↓\nonResume()\n    ↓\n[可交互状态]\n    ↓\nonPause()\n    ↓\nonStop()\n    ↓\nonDestroyView()\n    ↓\nonDestroy()\n    ↓\nonDetach()\n```\n\n### 各方法说明\n\n| 方法 | 作用 | 典型用途 |\n|------|------|----------|\n| onAttach() | 与Activity关联 | 获取宿主引用 |\n| onCreate() | Fragment创建 | 初始化非UI数据 |\n| onCreateView() | 创建视图 | 返回布局 |\n| onViewCreated() | 视图创建完成 | 初始化View |\n| onStart() | 可见 | 注册广播 |\n| onResume() | 可交互 | 获取资源 |\n| onPause() | 失去焦点 | 保存数据 |\n| onStop() | 不可见 | 注销广播 |\n| onDestroyView() | 视图销毁 | 清理View引用 |\n| onDestroy() | Fragment销毁 | 清理资源 |\n| onDetach() | 与Activity解绑 | 最终清理 |\n\n### 与 Activity 生命周期关系\n\n```\nActivity onCreate()\n    ↓\nFragment onAttach() → onCreate() → onCreateView() → onViewCreated()\n    ↓\nActivity onStart()\n    ↓\nFragment onStart()\n    ↓\nActivity onResume()\n    ↓\nFragment onResume()\n    ↓\nActivity onPause()\n    ↓\nFragment onPause()\n    ↓\nActivity onStop()\n    ↓\nFragment onStop()\n    ↓\nActivity onDestroy()\n    ↓\nFragment onDestroyView() → onDestroy() → onDetach()\n```\n\n### ViewPager 场景\n\n```\nViewPager 预加载相邻页面\n\n选中页面1时：\nFragment1: onResume()\nFragment2: onStart() (预加载)\n\n选中页面2时：\nFragment1: onPause() → onStop()\nFragment2: onResume()\nFragment3: onStart() (预加载)\n```\n\n### Fragment 状态保存\n\n```kotlin\noverride fun onSaveInstanceState(outState: Bundle) {\n    super.onSaveInstanceState(outState)\n    outState.putString(\"key\", value)\n}\n\noverride fun onViewStateRestored(savedInstanceState: Bundle?) {\n    super.onViewStateRestored(savedInstanceState)\n    savedInstanceState?.getString(\"key\")?.let {\n        // 恢复状态\n    }\n}\n```",
+      "difficulty": 2,
+      "tags": [
+        "Fragment",
+        "生命周期"
+      ],
+      "day": 1
+    },
+    {
+      "id": "D1_009",
+      "question": "Fragment 与 Activity 如何通信？有哪些方式？",
+      "answer": "## Fragment 与 Activity 通信\n\n### 1. Activity → Fragment\n\n**通过 Arguments**\n```kotlin\n// Activity\nval fragment = MyFragment().apply {\n    arguments = Bundle().apply {\n        putString(\"key\", \"value\")\n    }\n}\nsupportFragmentManager.beginTransaction()\n    .replace(R.id.container, fragment)\n    .commit()\n\n// Fragment\nval value = arguments?.getString(\"key\")\n```\n\n**通过 Fragment 方法**\n```kotlin\n// Fragment\nclass MyFragment : Fragment() {\n    private var data: String? = null\n    \n    fun setData(data: String) {\n        this.data = data\n    }\n}\n\n// Activity\nfragment.setData(\"value\")\n```\n\n### 2. Fragment → Activity\n\n**接口回调（推荐）**\n```kotlin\n// 定义接口\ninterface OnFragmentListener {\n    fun onEvent(data: String)\n}\n\n// Fragment\nclass MyFragment : Fragment() {\n    private var listener: OnFragmentListener? = null\n    \n    override fun onAttach(context: Context) {\n        super.onAttach(context)\n        listener = context as? OnFragmentListener\n    }\n    \n    override fun onDetach() {\n        listener = null\n        super.onDetach()\n    }\n    \n    fun notifyActivity() {\n        listener?.onEvent(\"data\")\n    }\n}\n\n// Activity\nclass MainActivity : AppCompatActivity(), OnFragmentListener {\n    override fun onEvent(data: String) {\n        // 处理事件\n    }\n}\n```\n\n### 3. 共享 ViewModel（推荐）\n\n```kotlin\nclass SharedViewModel : ViewModel() {\n    private val _data = MutableLiveData<String>()\n    val data: LiveData<String> = _data\n    \n    fun updateData(value: String) {\n        _data.value = value\n    }\n}\n\n// Activity\nclass MainActivity : AppCompatActivity() {\n    private val viewModel: SharedViewModel by viewModels()\n}\n\n// Fragment\nclass MyFragment : Fragment() {\n    // 获取 Activity 的 ViewModel\n    private val viewModel: SharedViewModel by activityViewModels()\n    \n    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {\n        viewModel.data.observe(viewLifecycleOwner) {\n            // 更新UI\n        }\n    }\n}\n```\n\n### 4. Fragment Result API\n\n```kotlin\n// Fragment 发送结果\nsetFragmentResult(\"requestKey\", bundleOf(\"key\" to \"value\"))\n\n// Activity 接收\nsupportFragmentManager.setFragmentResultListener(\"requestKey\", this) { key, bundle ->\n    val result = bundle.getString(\"key\")\n}\n```\n\n### 对比\n\n| 方式 | 优点 | 缺点 |\n|------|------|------|\n| 接口回调 | 解耦清晰 | 代码量多 |\n| ViewModel | 生命周期安全 | 需理解LiveData |\n| Arguments | 简单 | 只能初始传递 |\n| Fragment Result | 简单直接 | 新API |",
+      "difficulty": 2,
+      "tags": [
+        "Fragment",
+        "通信",
+        "ViewModel"
+      ],
+      "day": 1
+    },
+    {
+      "id": "D1_010",
+      "question": "FragmentTransaction 的 add、replace、hide、show 有什么区别？",
+      "answer": "## FragmentTransaction 操作\n\n### add()\n```kotlin\nsupportFragmentManager.beginTransaction()\n    .add(R.id.container, fragment, \"tag\")\n    .commit()\n```\n- 添加 Fragment 到容器\n- 不会移除已有 Fragment\n- 生命周期：onAttach → onCreate → onCreateView → onStart → onResume\n\n### replace()\n```kotlin\nsupportFragmentManager.beginTransaction()\n    .replace(R.id.container, fragment, \"tag\")\n    .commit()\n```\n- 替换容器中的所有 Fragment\n- 移除已有 Fragment\n- 生命周期：旧 onPause → onStop → onDestroyView；新 onAttach → onResume\n\n### hide() / show()\n```kotlin\nsupportFragmentManager.beginTransaction()\n    .hide(fragment1)\n    .show(fragment2)\n    .commit()\n```\n- 只改变可见性\n- 不触发生命周期\n- Fragment 仍在内存中\n\n### attach() / detach()\n```kotlin\nsupportFragmentManager.beginTransaction()\n    .detach(fragment)  // 销毁视图\n    .attach(fragment)  // 重建视图\n    .commit()\n```\n- detach：销毁视图（onDestroyView），保留实例\n- attach：重建视图（onCreateView）\n\n### 对比表\n\n| 操作 | 视图状态 | 生命周期 | 内存占用 |\n|------|----------|----------|----------|\n| add | 可见 | 完整创建 | 高 |\n| replace | 可见 | 销毁旧建新 | 中 |\n| hide/show | 隐藏/可见 | 无变化 | 高 |\n| attach/detach | 销毁/重建 | 部分变化 | 中 |\n\n### 使用场景\n\n**底部导航栏**：hide/show\n```kotlin\nprivate var currentFragment: Fragment? = null\n\nfun switchFragment(fragment: Fragment) {\n    val transaction = supportFragmentManager.beginTransaction()\n    currentFragment?.let { transaction.hide(it) }\n    \n    if (fragment.isAdded) {\n        transaction.show(fragment)\n    } else {\n        transaction.add(R.id.container, fragment)\n    }\n    \n    transaction.commit()\n    currentFragment = fragment\n}\n```\n\n**简单页面切换**：replace\n```kotlin\nsupportFragmentManager.beginTransaction()\n    .replace(R.id.container, fragment)\n    .addToBackStack(null)\n    .commit()\n```\n\n### addToBackStack()\n\n```kotlin\n.replace(R.id.container, fragment1)\n.addToBackStack(\"tag\")  // 加入返回栈\n.commit()\n// 按返回键可回退\n```\n\n**不使用 addToBackStack**：Fragment 会被销毁\n**使用 addToBackStack**：Fragment 只是 detach",
+      "difficulty": 2,
+      "tags": [
+        "Fragment",
+        "Transaction",
+        "add",
+        "replace"
+      ],
+      "day": 1
+    },
+    {
+      "id": "D1_011",
+      "question": "Service 的两种启动方式有什么区别？生命周期是怎样的？",
+      "answer": "## Service 启动方式\n\n### startService()\n\n**生命周期**\n```\nonCreate() → onStartCommand() → [运行中] → onDestroy()\n```\n\n**特点**\n- 与启动者生命周期无关\n- 即使 Activity 销毁，Service 继续运行\n- 必须手动 stopSelf() 或 stopService()\n- 多次 startService 只触发 onStartCommand()\n\n**使用场景**：后台音乐播放、文件下载\n\n```kotlin\n// 启动\nval intent = Intent(this, MyService::class.java)\nstartService(intent)\n\n// 停止\nstopService(Intent(this, MyService::class.java))\n// 或在 Service 中\nstopSelf()\n```\n\n### bindService()\n\n**生命周期**\n```\nonCreate() → onBind() → [绑定中] → onUnbind() → onDestroy()\n```\n\n**特点**\n- 与绑定者生命周期绑定\n- 所有客户端解绑后自动销毁\n- 可获取 Service 实例直接调用方法\n- 支持跨进程通信（AIDL）\n\n**使用场景**：需要与 Service 交互\n\n```kotlin\nprivate val connection = object : ServiceConnection {\n    override fun onServiceConnected(name: ComponentName, service: IBinder) {\n        val binder = service as MyService.MyBinder\n        myService = binder.getService()\n    }\n    \n    override fun onServiceDisconnected(name: ComponentName) {\n        myService = null\n    }\n}\n\n// 绑定\nbindService(Intent(this, MyService::class.java), connection, Context.BIND_AUTO_CREATE)\n\n// 解绑\nunbindService(connection)\n```\n\n### 混合启动\n\n```kotlin\n// 先 startService，再 bindService\nstartService(intent)\nbindService(intent, connection, BIND_AUTO_CREATE)\n\n// 解绑后 Service 仍运行\nunbindService(connection)\n\n// 必须同时解绑和停止才能销毁\nstopService(intent)\n```\n\n### 对比表\n\n| 特性 | startService | bindService |\n|------|--------------|-------------|\n| 生命周期 | 独立 | 绑定到客户端 |\n| 销毁条件 | 手动停止 | 全部解绑 |\n| 通信方式 | Intent | Binder/AIDL |\n| 多次启动 | 只触发onStartCommand | 无影响 |\n| 跨进程 | ❌ | ✅ |\n\n### onBind 返回值\n\n```kotlin\nclass MyService : Service() {\n    private val binder = MyBinder()\n    \n    inner class MyBinder : Binder() {\n        fun getService(): MyService = this@MyService\n    }\n    \n    override fun onBind(intent: Intent): IBinder = binder\n}\n```\n\n**返回 null**：无法绑定\n**返回 Binder**：可以绑定并通信",
+      "difficulty": 2,
+      "tags": [
+        "Service",
+        "启动方式",
+        "生命周期"
+      ],
+      "day": 1
+    },
+    {
+      "id": "D1_012",
+      "question": "IntentService 和 JobIntentService 有什么区别？为什么 IntentService 被废弃？",
+      "answer": "## IntentService\n\n### 特点\n- 自动创建工作线程处理 Intent\n- 依次处理所有请求（串行）\n- 处理完成后自动停止\n\n```kotlin\nclass MyIntentService : IntentService(\"MyIntentService\") {\n    override fun onHandleIntent(intent: Intent?) {\n        // 在工作线程执行\n        // 自动处理完毕后停止\n    }\n}\n```\n\n### 为什么被废弃？\n\n1. **Android 8.0+ 后台限制**\n   - 后台服务启动受限\n   - 可能抛出 IllegalStateException\n\n2. **推荐替代方案**\n   - JobIntentService（已废弃）\n   - WorkManager（推荐）\n   - 前台服务\n\n## JobIntentService\n\n### 特点\n- 兼容 Android 8.0+ 后台限制\n- Android 8.0+ 使用 JobScheduler\n- Android 8.0 以下使用 IntentService\n\n```kotlin\nclass MyJobIntentService : JobIntentService() {\n    companion object {\n        private const val JOB_ID = 1000\n        \n        fun enqueue(context: Context, intent: Intent) {\n            enqueueWork(context, MyJobIntentService::class.java, JOB_ID, intent)\n        }\n    }\n    \n    override fun onHandleWork(intent: Intent) {\n        // 在工作线程执行\n    }\n}\n\n// 调用\nMyJobIntentService.enqueue(context, intent)\n```\n\n## WorkManager（推荐）\n\n```kotlin\nclass MyWorker(context: Context, params: WorkerParameters) : Worker(context, params) {\n    override fun doWork(): Result {\n        // 后台任务\n        return Result.success()\n    }\n}\n\n// 调度\nval workRequest = OneTimeWorkRequestBuilder<MyWorker>().build()\nWorkManager.getInstance(context).enqueue(workRequest)\n```\n\n### 对比\n\n| 特性 | IntentService | JobIntentService | WorkManager |\n|------|---------------|------------------|-------------|\n| 状态 | 已废弃 | 已废弃 | 推荐 |\n| 后台限制 | 不兼容 | 兼容 | 兼容 |\n| 任务类型 | 即时 | 即时 | 即时/延迟 |\n| 约束条件 | 无 | 无 | 丰富 |\n| 重试 | 手动 | 手动 | 自动 |\n| 进程死亡 | 任务丢失 | 可能丢失 | 自动恢复 |\n\n### 使用场景\n\n| 场景 | 推荐方案 |\n|------|----------|\n| 即时后台任务 | 前台服务 + 协程 |\n| 可延迟任务 | WorkManager |\n| 精确时间任务 | AlarmManager + 前台服务 |\n| 需要保活 | 前台服务 |",
+      "difficulty": 2,
+      "tags": [
+        "Service",
+        "IntentService",
+        "WorkManager"
+      ],
+      "day": 1
+    },
+    {
+      "id": "D1_013",
+      "question": "前台服务是什么？如何创建？与普通服务有什么区别？",
+      "answer": "## 前台服务 (Foreground Service)\n\n### 概念\n- 在通知栏显示常驻通知\n- 系统认为这是用户可感知的服务\n- 不受后台限制\n- 优先级较高，不易被杀死\n\n### 创建前台服务\n\n```kotlin\nclass MusicService : Service() {\n    override fun onCreate() {\n        super.onCreate()\n        startForeground()\n    }\n    \n    private fun startForeground() {\n        // Android 13+ 需要通知权限\n        val notification = NotificationCompat.Builder(this, CHANNEL_ID)\n            .setContentTitle(\"音乐播放中\")\n            .setContentText(\"正在播放...\")\n            .setSmallIcon(R.drawable.ic_music)\n            .build()\n        \n        startForeground(NOTIFICATION_ID, notification)\n    }\n}\n```\n\n### 必需权限\n\n**AndroidManifest.xml**\n```xml\n<uses-permission android:name=\"android.permission.FOREGROUND_SERVICE\" />\n\n<!-- Android 14+ 需要指定类型 -->\n<uses-permission android:name=\"android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK\" />\n\n<service\n    android:name=\".MusicService\"\n    android:foregroundServiceType=\"mediaPlayback\" />\n```\n\n### 服务类型（Android 14+）\n\n| 类型 | 权限 |\n|------|------|\n| camera | FOREGROUND_SERVICE_CAMERA |\n| microphone | FOREGROUND_SERVICE_MICROPHONE |\n| location | FOREGROUND_SERVICE_LOCATION |\n| mediaPlayback | FOREGROUND_SERVICE_MEDIA_PLAYBACK |\n| dataSync | FOREGROUND_SERVICE_DATA_SYNC |\n\n### 启动服务\n\n```kotlin\nval intent = Intent(context, MusicService::class.java)\n\n// Android 8.0+\nif (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {\n    startForegroundService(intent)\n} else {\n    startService(intent)\n}\n```\n\n### 停止前台服务\n\n```kotlin\n// 在 Service 中\nstopForeground(STOP_FOREGROUND_REMOVE)  // 移除通知\nstopSelf()  // 停止服务\n\n// 或在外部\nstopService(Intent(this, MusicService::class.java))\n```\n\n### 与普通服务对比\n\n| 特性 | 前台服务 | 后台服务 |\n|------|----------|----------|\n| 通知栏显示 | ✅ 必须 | ❌ |\n| 系统限制 | 不受限 | Android 8+ 受限 |\n| 优先级 | 高 | 低 |\n| 被杀概率 | 低 | 高 |\n| 适用场景 | 音乐、定位、下载 | 短时任务 |\n\n### 使用场景\n\n- 音乐播放\n- 地图导航\n- 文件下载/上传\n- 运动追踪\n- VoIP 通话",
+      "difficulty": 2,
+      "tags": [
+        "Service",
+        "前台服务",
+        "Foreground"
+      ],
+      "day": 1
+    },
+    {
+      "id": "D1_014",
+      "question": "BroadcastReceiver 的两种注册方式有什么区别？",
+      "answer": "## BroadcastReceiver 注册方式\n\n### 静态注册\n\n**AndroidManifest.xml**\n```xml\n<receiver\n    android:name=\".MyReceiver\"\n    android:exported=\"true\">\n    <intent-filter>\n        <action android:name=\"android.intent.action.BOOT_COMPLETED\" />\n    </intent-filter>\n</receiver>\n```\n\n**特点**\n- App 未启动也能接收广播\n- 即使进程被杀死也能唤醒\n- Android 8.0+ 对隐式广播有限制\n\n**Android 8.0+ 允许的隐式广播**\n- BOOT_COMPLETED\n- LOCKED_BOOT_COMPLETED\n- TIMEZONE_CHANGED\n- TIME_SET\n- 等...\n\n### 动态注册\n\n```kotlin\nclass MainActivity : AppCompatActivity() {\n    private val receiver = object : BroadcastReceiver() {\n        override fun onReceive(context: Context, intent: Intent) {\n            // 处理广播\n        }\n    }\n    \n    override fun onCreate(savedInstanceState: Bundle?) {\n        super.onCreate(savedInstanceState)\n        \n        val filter = IntentFilter(\"com.example.MY_ACTION\")\n        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {\n            registerReceiver(receiver, filter, RECEIVER_NOT_EXPORTED)\n        } else {\n            registerReceiver(receiver, filter)\n        }\n    }\n    \n    override fun onDestroy() {\n        super.onDestroy()\n        unregisterReceiver(receiver)  // 必须注销\n    }\n}\n```\n\n### 对比表\n\n| 特性 | 静态注册 | 动态注册 |\n|------|----------|----------|\n| 注册位置 | Manifest | 代码中 |\n| App未启动 | 可接收 | 不可接收 |\n| 生命周期 | 应用级 | 组件级 |\n| 灵活性 | 固定 | 可动态修改 |\n| 内存泄漏风险 | 低 | 高（需注销） |\n| Android 8+ 限制 | 隐式广播受限 | 无限制 |\n\n### LocalBroadcastManager（已废弃）\n\n使用 LiveData 或 EventBus 替代。\n\n### 最佳实践\n\n**1. 优先使用动态注册**\n```kotlin\n// 需要接收时注册\n// 不需要时注销\n```\n\n**2. 静态注册注意 exported**\n```xml\n<receiver\n    android:name=\".MyReceiver\"\n    android:exported=\"false\">  <!-- 不需要外部访问设为false -->\n</receiver>\n```\n\n**3. 使用显式 Intent**\n```kotlin\nval intent = Intent(\"com.example.ACTION\")\nintent.setPackage(context.packageName)  // 限制包名\nsendBroadcast(intent)\n```\n\n### 权限控制\n\n**发送方权限**\n```kotlin\nsendBroadcast(intent, \"com.example.MY_PERMISSION\")\n```\n\n**接收方权限**\n```xml\n<receiver\n    android:name=\".MyReceiver\"\n    android:permission=\"com.example.SENDER_PERMISSION\">\n</receiver>\n```",
+      "difficulty": 2,
+      "tags": [
+        "BroadcastReceiver",
+        "注册方式",
+        "静态注册"
+      ],
+      "day": 1
+    },
+    {
+      "id": "D1_015",
+      "question": "有序广播和普通广播有什么区别？如何使用？",
+      "answer": "## 广播类型\n\n### 普通广播（Normal Broadcast）\n\n```kotlin\n// 发送\nval intent = Intent(\"com.example.ACTION\")\nsendBroadcast(intent)\n```\n\n**特点**\n- 异步发送\n- 所有接收者同时收到\n- 无法拦截\n- 无法获取结果\n\n### 有序广播（Ordered Broadcast）\n\n```kotlin\n// 发送\nval intent = Intent(\"com.example.ACTION\")\nsendOrderedBroadcast(intent, null)\n\n// 接收\noverride fun onReceive(context: Context, intent: Intent) {\n    // 获取数据\n    val data = getResultData()\n    \n    // 修改数据传递给下一个\n    setResultData(\"modified data\")\n    \n    // 拦截广播\n    abortBroadcast()\n}\n```\n\n**特点**\n- 按优先级顺序传递\n- 可以拦截\n- 可以修改数据\n- 可以获取上一个传递的数据\n\n### 设置优先级\n\n```xml\n<!-- 静态注册 -->\n<receiver android:name=\".HighPriorityReceiver\">\n    <intent-filter android:priority=\"100\">\n        <action android:name=\"com.example.ACTION\" />\n    </intent-filter>\n</receiver>\n```\n\n```kotlin\n// 动态注册\nval filter = IntentFilter(\"com.example.ACTION\").apply {\n    priority = 100\n}\nregisterReceiver(receiver, filter)\n```\n\n**优先级范围**：-1000 到 1000，数值越大优先级越高\n\n### 流程示意\n\n```\n发送有序广播\n      ↓\n┌─────────────────────┐\n│ Receiver1 (priority=100) │\n│ 可修改/拦截         │\n└──────────┬──────────┘\n           ↓\n┌─────────────────────┐\n│ Receiver2 (priority=50)  │\n│ 可修改/拦截         │\n└──────────┬──────────┘\n           ↓\n┌─────────────────────┐\n│ Receiver3 (priority=0)   │\n└─────────────────────┘\n```\n\n### 结果接收器\n\n```kotlin\nval resultReceiver = object : BroadcastReceiver() {\n    override fun onReceive(context: Context, intent: Intent) {\n        // 所有接收者处理完后调用\n        val resultData = getResultData()\n        val resultCode = resultCode\n    }\n}\n\nsendOrderedBroadcast(\n    intent,\n    null,  // 权限\n    resultReceiver,  // 结果接收器\n    null,  // scheduler\n    Activity.RESULT_OK,  // 初始结果码\n    \"initial data\",  // 初始数据\n    null  // 初始额外数据\n)\n```\n\n### 对比表\n\n| 特性 | 普通广播 | 有序广播 |\n|------|----------|----------|\n| 接收方式 | 同时 | 顺序 |\n| 可拦截 | ❌ | ✅ |\n| 可修改数据 | ❌ | ✅ |\n| 性能 | 高 | 较低 |\n| 适用场景 | 简单通知 | 需要处理链 |\n\n### 使用场景\n\n**有序广播**：短信拦截、电话拦截\n```kotlin\n// 高优先级拦截短信\n<intent-filter android:priority=\"1000\">\n    <action android:name=\"android.provider.Telephony.SMS_RECEIVED\" />\n</intent-filter>\n```",
+      "difficulty": 2,
+      "tags": [
+        "BroadcastReceiver",
+        "有序广播",
+        "OrderedBroadcast"
+      ],
+      "day": 1
+    },
+    {
+      "id": "D1_016",
+      "question": "onNewIntent() 什么时候调用？",
+      "answer": "## onNewIntent 调用时机\n\n### 触发条件\nonNewIntent() 在 Activity 复用时调用，即当 Activity 已存在于任务栈中，再次启动时不会创建新实例。\n\n### 调用流程图\n```\n┌──────────────────────────────────────────────────────┐\n│              Activity 复用流程                        │\n├──────────────────────────────────────────────────────┤\n│                                                      │\n│  启动请求                                             │\n│      ↓                                               │\n│  ┌─────────────────┐                                │\n│  │ 检查启动模式     │                                │\n│  └────────┬────────┘                                │\n│           │                                          │\n│     ┌─────┴─────┬─────────────┐                     │\n│     ↓           ↓             ↓                     │\n│ ┌───────┐  ┌────────┐  ┌────────────┐              │\n│ │singleTop│ │singleTask│ │singleInstance│            │\n│ └───┬───┘  └────┬───┘  └─────┬──────┘              │\n│     │          │            │                       │\n│     ↓          ↓            ↓                       │\n│ ┌───────────────────────────────┐                   │\n│ │    实例已存在？                 │                   │\n│ └───────────┬───────────────────┘                   │\n│             │                                         │\n│        ┌────┴────┐                                  │\n│        ↓         ↓                                  │\n│      是          否                                  │\n│        │         │                                  │\n│        ↓         ↓                                  │\n│  onNewIntent()  onCreate()                          │\n│        │                                             │\n│        ↓                                             │\n│  onRestart() → onStart() → onResume()               │\n│                                                      │\n└──────────────────────────────────────────────────────┘\n```\n\n### 各启动模式行为\n\n| 启动模式 | 复用条件 | onNewIntent调用 |\n|---------|---------|----------------|\n| standard | 永不复用 | ❌ 不调用 |\n| singleTop | 栈顶时复用 | ✅ 调用 |\n| singleTask | 栈内存在时复用 | ✅ 调用 |\n| singleInstance | 全局存在时复用 | ✅ 调用 |\n\n### 代码示例\n```kotlin\nclass MainActivity : AppCompatActivity() {\n    \n    override fun onNewIntent(intent: Intent?) {\n        super.onNewIntent(intent)\n        // 更新Intent，处理新的启动参数\n        setIntent(intent)\n        \n        // 处理新数据\n        intent?.getStringExtra(\"new_data\")?.let {\n            updateUI(it)\n        }\n    }\n}\n```\n\n### 生命周期顺序\n```\nonNewIntent() → onRestart() → onStart() → onResume()\n```",
+      "difficulty": 2,
+      "tags": [
+        "Activity",
+        "onNewIntent",
+        "启动模式"
+      ],
+      "day": 1
+    },
+    {
+      "id": "D1_017",
+      "question": "如何避免Handler内存泄漏？",
+      "answer": "## 避免 Handler 内存泄漏\n\n### 泄漏原因分析\n```\n┌───────────────────────────────────────────────────────┐\n│                Handler 内存泄漏原理                    │\n├───────────────────────────────────────────────────────┤\n│                                                       │\n│  ┌─────────────┐        ┌─────────────┐              │\n│  │  Activity   │◄───────│   Handler   │              │\n│  │  (外部类)   │  持有   │  (内部类)   │              │\n│  └─────────────┘        └──────┬──────┘              │\n│         ▲                      │                      │\n│         │                      ▼                      │\n│         │               ┌─────────────┐              │\n│         └───────────────│  Message    │              │\n│            持有         │  (队列中)   │              │\n│                         └─────────────┘              │\n│                                                       │\n│  问题：Activity 销毁时，Message 仍在队列中             │\n│        → Handler 持有 Activity 引用                  │\n│        → Activity 无法被回收                         │\n└───────────────────────────────────────────────────────┘\n```\n\n### 解决方案对比\n\n| 方案 | 实现难度 | 效果 | 推荐度 |\n|-----|---------|-----|--------|\n| 静态内部类 + WeakReference | 中 | 完全解决 | ⭐⭐⭐⭐⭐ |\n| onDestroy 移除消息 | 低 | 部分解决 | ⭐⭐⭐ |\n| 生命周期感知组件 | 低 | 完全解决 | ⭐⭐⭐⭐⭐ |\n\n### 方案1：静态内部类 + WeakReference\n```kotlin\nclass MainActivity : AppCompatActivity() {\n    \n    private val handler = SafeHandler(this)\n    \n    // 静态内部类，不持有外部类引用\n    private class SafeHandler(activity: MainActivity) : Handler(Looper.getMainLooper()) {\n        private val activityRef: WeakReference<MainActivity> = WeakReference(activity)\n        \n        override fun handleMessage(msg: Message) {\n            activityRef.get()?.let { activity ->\n                // 安全使用 Activity\n                activity.updateUI()\n            }\n        }\n    }\n    \n    override fun onDestroy() {\n        handler.removeCallbacksAndMessages(null)\n        super.onDestroy()\n    }\n}\n```\n\n### 方案2：使用 lifecycleScope\n```kotlin\nclass MainActivity : AppCompatActivity() {\n    \n    private fun doSomething() {\n        lifecycleScope.launch {\n            // 自动在生命周期结束时取消\n            delay(1000)\n            updateUI()\n        }\n    }\n}\n```\n\n### 方案3：View.post 替代\n```kotlin\n// 不需要 Handler\nview.post {\n    updateUI()\n}\n\n// 带延迟\nview.postDelayed({\n    updateUI()\n}, 1000)\n```",
+      "difficulty": 2,
+      "tags": [
+        "Handler",
+        "内存泄漏",
+        "最佳实践"
+      ],
+      "day": 1
+    },
+    {
+      "id": "D1_018",
+      "question": "Activity和Fragment的区别？",
+      "answer": "## Activity vs Fragment 对比\n\n### 架构关系图\n```\n┌───────────────────────────────────────────────────────┐\n│                    Activity                           │\n│  ┌─────────────────────────────────────────────────┐ │\n│  │                 PhoneWindow                     │ │\n│  │  ┌───────────────────────────────────────────┐ │ │\n│  │  │              DecorView                    │ │ │\n│  │  │  ┌─────────────────────────────────────┐ │ │ │\n│  │  │  │           Fragment                   │ │ │ │\n│  │  │  │  ┌───────────┐  ┌───────────┐      │ │ │ │\n│  │  │  │  │ Fragment A│  │ Fragment B│      │ │ │ │\n│  │  │  │  └───────────┘  └───────────┘      │ │ │ │\n│  │  │  └─────────────────────────────────────┘ │ │ │\n│  │  └───────────────────────────────────────────┘ │ │\n│  └─────────────────────────────────────────────────┘ │\n└───────────────────────────────────────────────────────┘\n```\n\n### 详细对比表\n\n| 特性 | Activity | Fragment |\n|------|----------|----------|\n| **独立性** | 独立组件，必须有 | 依赖Activity，可复用 |\n| **生命周期** | 完整独立 | 依赖宿主Activity |\n| **Context** | 自身就是Context | 需通过getActivity() |\n| **启动方式** | Intent | FragmentTransaction |\n| **通信方式** | Intent/Result | 接口/ViewModel |\n| **返回栈** | 系统自动管理 | 需手动addToBackStack |\n| **配置变更** | 自动重建 | 需setRetainInstance |\n\n### 生命周期对比\n```\nActivity              Fragment\n─────────            ──────────\nonCreate()    ←──→   onAttach()\n                     onCreate()\n                     onCreateView()\n                     onViewCreated()\nonStart()     ←──→   onActivityCreated()\n                     onStart()\nonResume()    ←──→   onResume()\n                     │\n                     │ [运行中]\n                     │\nonPause()     ←──→   onPause()\nonStop()      ←──→   onStop()\nonDestroy()   ←──→   onDestroyView()\n                     onDestroy()\n                     onDetach()\n```\n\n### 使用场景\n```\nActivity 适用场景:\n├── 应用入口页面\n├── 需要独立Context的页面\n├── 需要处理Intent的页面\n└── 全屏展示的页面\n\nFragment 适用场景:\n├── ViewPager + TabLayout\n├── 底部导航栏切换\n├── 列表详情页\n├── 可复用的UI模块\n└── 大屏适配（手机/平板）\n```\n\n### 最佳实践\n```kotlin\n// 使用 ViewModel 共享数据\nclass SharedViewModel : ViewModel() {\n    private val _data = MutableLiveData<String>()\n    val data: LiveData<String> = _data\n}\n\n// Activity\nclass MainActivity : AppCompatActivity() {\n    private val viewModel: SharedViewModel by viewModels()\n}\n\n// Fragment 获取 Activity 的 ViewModel\nclass MyFragment : Fragment() {\n    private val viewModel: SharedViewModel by activityViewModels()\n}\n```",
+      "difficulty": 1,
+      "tags": [
+        "Activity",
+        "Fragment",
+        "架构"
+      ],
+      "day": 1
+    },
+    {
+      "id": "D1_019",
+      "question": "如何实现跨进程通信？",
+      "answer": "## Android 跨进程通信 (IPC)\n\n### IPC 方式对比图\n```\n┌─────────────────────────────────────────────────────────────────┐\n│                    Android IPC 方式总览                         │\n├─────────────────────────────────────────────────────────────────┤\n│                                                                 │\n│  性能:  高 ◄─────────────────────────────────────────► 低      │\n│          │                                                    │\n│          ▼                                                    │\n│  ┌───────────┐  ┌───────────┐  ┌───────────┐  ┌───────────┐  │\n│  │  Binder   │  │  Socket   │  │  共享内存  │  │  文件     │  │\n│  │  (最优)   │  │  (通用)   │  │  (高效)   │  │  (简单)   │  │\n│  └───────────┘  └───────────┘  └───────────┘  └───────────┘  │\n│       │              │              │              │           │\n│       ▼              ▼              ▼              ▼           │\n│  ┌───────────┐  ┌───────────┐  ┌───────────┐  ┌───────────┐  │\n│  │   AIDL    │  │ Messenger │  │ContentProv│  │ Bundle    │  │\n│  │           │  │           │  │   ider    │  │ Intent    │  │\n│  └───────────┘  └───────────┘  └───────────┘  └───────────┘  │\n│                                                                 │\n└─────────────────────────────────────────────────────────────────┘\n```\n\n### IPC 方式详细对比\n\n| 方式 | 特点 | 适用场景 | 复杂度 |\n|-----|------|---------|--------|\n| **Bundle/Intent** | 简单，数据量小 | 基本数据传递 | ⭐ |\n| **AIDL** | 强类型，支持回调 | 复杂跨进程通信 | ⭐⭐⭐⭐ |\n| **Messenger** | 简单，串行处理 | 简单命令传递 | ⭐⭐ |\n| **ContentProvider** | 标准数据访问 | 数据共享 | ⭐⭐⭐ |\n| **Socket** | 跨设备，灵活 | 网络通信 | ⭐⭐⭐ |\n| **共享内存** | 高效，大数据 | 大数据传输 | ⭐⭐⭐⭐ |\n\n### AIDL 实现流程\n```\n┌─────────────────────────────────────────────────────────────┐\n│                     AIDL 通信流程                           │\n├─────────────────────────────────────────────────────────────┤\n│                                                             │\n│   Client 进程                          Server 进程          │\n│  ┌─────────────┐                      ┌─────────────┐       │\n│  │  Proxy      │                      │  Stub       │       │\n│  │  (代理类)   │                      │  (桩类)     │       │\n│  └──────┬──────┘                      └──────┬──────┘       │\n│         │                                    │              │\n│         │  1. 调用方法                        │              │\n│         │  2. 序列化参数                      │              │\n│         │  3. 写入 Parcel                    │              │\n│         ▼                                    │              │\n│  ┌─────────────────────────────────────────────────────┐   │\n│  │                   Binder Driver                      │   │\n│  │                  (内核空间)                           │   │\n│  └─────────────────────────────────────────────────────┘   │\n│         │                                    │              │\n│         │  4. 一次拷贝传输                    │              │\n│         │  5. 反序列化                        │              │\n│         │                                    ▼              │\n│         └────────────────────────────────────►              │\n│                                    6. 调用实际方法          │\n│                                    7. 返回结果              │\n└─────────────────────────────────────────────────────────────┘\n```\n\n### AIDL 示例\n```aidl\n// IRemoteService.aidl\ninterface IRemoteService {\n    int getPid();\n    void basicTypes(int anInt, long aLong, boolean aBoolean);\n}\n```\n\n```kotlin\nclass RemoteService : Service() {\n    private val binder = object : IRemoteService.Stub() {\n        override fun getPid() = Process.myPid()\n        override fun basicTypes(anInt: Int, aLong: Long, aBoolean: Boolean) {}\n    }\n    override fun onBind(intent: Intent) = binder\n}\n```",
+      "difficulty": 2,
+      "tags": [
+        "IPC",
+        "AIDL",
+        "Binder"
+      ],
+      "day": 1
+    },
+    {
+      "id": "D1_020",
+      "question": "SparseArray和HashMap的区别？",
+      "answer": "## SparseArray vs HashMap\n\n### 内存结构对比\n```\n┌─────────────────────────────────────────────────────────────────┐\n│                    HashMap<Integer, Object>                     │\n├─────────────────────────────────────────────────────────────────┤\n│                                                                 │\n│  Key (Integer)          Value (Object)                         │\n│  ┌─────────────┐       ┌─────────────┐                         │\n│  │ int → Integer│ ───► │   Object    │  自动装箱                 │\n│  │  (装箱开销)  │       │             │                         │\n│  └─────────────┘       └─────────────┘                         │\n│       ↑                                                        │\n│       │                                                        │\n│  额外对象: Entry对象, 链表节点                                   │\n│                                                                 │\n└─────────────────────────────────────────────────────────────────┘\n\n┌─────────────────────────────────────────────────────────────────┐\n│                    SparseArray<Object>                          │\n├─────────────────────────────────────────────────────────────────┤\n│                                                                 │\n│  int[] keys            Object[] values                         │\n│  ┌─────────────┐       ┌─────────────┐                         │\n│  │     1       │ ───► │   Object    │  无装箱                   │\n│  │     5       │ ───► │   Object    │                          │\n│  │    10       │ ───► │   Object    │                          │\n│  └─────────────┘       └─────────────┘                         │\n│                                                                 │\n│  无额外对象, 使用二分查找                                        │\n│                                                                 │\n└─────────────────────────────────────────────────────────────────┘\n```\n\n### 详细对比表\n\n| 特性 | HashMap | SparseArray |\n|-----|---------|-------------|\n| **键类型** | 任意对象 | 仅 int |\n| **装箱开销** | 有（自动装箱） | 无 |\n| **内存占用** | 高 | 低（约50%） |\n| **查找效率** | O(1) | O(log n) |\n| **插入效率** | O(1) | O(n)（需移动数组） |\n| **线程安全** | 非安全 | 非安全 |\n| **适用数据量** | 大量 | 少量（<1000） |\n\n### 性能对比图\n```\n内存占用:\nHashMap      ████████████████████████████ 100%\nSparseArray  ██████████████ 50%\n\n查找速度（大数据量）:\nHashMap      ████ O(1)\nSparseArray  ████████████████ O(log n)\n\n插入速度:\nHashMap      ████████ O(1)\nSparseArray  ████████████████████████ O(n)\n```\n\n### 使用建议\n```kotlin\n// ✅ 推荐：Key 是 int，数据量小\nval sparseArray = SparseArray<String>()\nsparseArray.put(1, \"One\")\nsparseArray.put(2, \"Two\")\n\n// ✅ 推荐：Android 特有的变体\nval sparseIntArray = SparseIntArray()      // int → int\nval sparseBooleanArray = SparseBooleanArray() // int → boolean\nval longSparseArray = LongSparseArray<String>() // long → Object\n\n// ❌ 不推荐：Key 是 int 但数据量大\n// 使用 HashMap 替代\n\n// ❌ 不推荐：Key 不是 int\n// 使用 HashMap\n```\n\n### Android 专用集合\n```\n┌───────────────────────────────────────────────────┐\n│           Android 高效集合类                       │\n├───────────────────────────────────────────────────┤\n│ SparseArray<T>        int → Object               │\n│ SparseIntArray        int → int                  │\n│ SparseBooleanArray    int → boolean              │\n│ LongSparseArray<T>    long → Object              │\n│ ArrayMap<K,V>         Object → Object (比HashMap省内存) │\n│ ArraySet<T>           省内存的Set                 │\n└───────────────────────────────────────────────────┘\n```",
+      "difficulty": 2,
+      "tags": [
+        "集合",
+        "性能",
+        "SparseArray"
+      ],
+      "day": 1
+    },
+    {
+      "id": "D1_021",
+      "question": "Android多进程怎么实现？",
+      "answer": "## Android 多进程实现\n\n### 进程架构图\n```\n┌─────────────────────────────────────────────────────────────────┐\n│                    多进程应用架构                                │\n├─────────────────────────────────────────────────────────────────┤\n│                                                                 │\n│  主进程 (com.example.app)                                       │\n│  ┌─────────────────────────────────────────────────────────┐   │\n│  │  MainActivity, Application                               │   │\n│  │  内存空间: 独立                                           │   │\n│  └─────────────────────────────────────────────────────────┘   │\n│                              │                                  │\n│                              │ Binder IPC                       │\n│                              ▼                                  │\n│  子进程 (com.example.app:remote)                               │\n│  ┌─────────────────────────────────────────────────────────┐   │\n│  │  RemoteService                                           │   │\n│  │  内存空间: 独立                                           │   │\n│  └─────────────────────────────────────────────────────────┘   │\n│                                                                 │\n│  私有进程 (:private)                                            │\n│  ┌─────────────────────────────────────────────────────────┐   │\n│  │  PrivateService                                          │   │\n│  │  其他应用无法访问                                          │   │\n│  └─────────────────────────────────────────────────────────┘   │\n│                                                                 │\n└─────────────────────────────────────────────────────────────────┘\n```\n\n### 配置方式\n\n```xml\n<!-- AndroidManifest.xml -->\n\n<!-- 默认主进程 -->\n<activity android:name=\".MainActivity\" />\n\n<!-- 私有进程（:开头，属于当前应用） -->\n<service\n    android:name=\".RemoteService\"\n    android:process=\":remote\" />\n\n<!-- 全局进程（完整包名，可被其他应用访问） -->\n<service\n    android:name=\".GlobalService\"\n    android:process=\"com.example.global\" />\n```\n\n### 进程类型对比\n\n| 进程类型 | 配置方式 | 特点 | 访问权限 |\n|---------|---------|------|---------|\n| 主进程 | 默认 | 应用入口 | 当前应用 |\n| 私有进程 | :name | 只属于当前应用 | 当前应用 |\n| 全局进程 | package:name | 可跨应用访问 | 所有应用 |\n\n### 多进程带来的问题\n```\n┌─────────────────────────────────────────────────────────────────┐\n│                    多进程注意事项                                │\n├─────────────────────────────────────────────────────────────────┤\n│                                                                 │\n│  1. Application 多次创建                                        │\n│     ┌───────────────────────────────────────────────────────┐  │\n│     │ 每个进程都会创建自己的 Application 实例                 │  │\n│     │ 需要在 onCreate 中判断进程名                            │  │\n│     └───────────────────────────────────────────────────────┘  │\n│                                                                 │\n│  2. 静态成员不共享                                               │\n│     ┌───────────────────────────────────────────────────────┐  │\n│     │ 每个进程有独立的静态变量副本                             │  │\n│     │ 需要通过 IPC 或文件共享数据                              │  │\n│     └───────────────────────────────────────────────────────┘  │\n│                                                                 │\n│  3. SharedPreferences 不同步                                     │\n│     ┌───────────────────────────────────────────────────────┐  │\n│     │ 多进程访问可能导致数据丢失                               │  │\n│     │ 使用 MODE_MULTI_PROCESS 或 ContentProvider            │  │\n│     └───────────────────────────────────────────────────────┘  │\n│                                                                 │\n│  4. 单例模式失效                                                 │\n│     ┌───────────────────────────────────────────────────────┐  │\n│     │ 每个进程有自己的单例实例                                 │  │\n│     │ 需要考虑进程间通信                                       │  │\n│     └───────────────────────────────────────────────────────┘  │\n│                                                                 │\n└─────────────────────────────────────────────────────────────────┘\n```\n\n### 处理 Application 多次创建\n```kotlin\nclass MyApplication : Application() {\n    override fun onCreate() {\n        super.onCreate()\n        \n        val processName = getCurrentProcessName()\n        when (processName) {\n            \"com.example.app\" -> {\n                // 主进程初始化\n                initMainProcess()\n            }\n            \"com.example.app:remote\" -> {\n                // 子进程初始化\n                initRemoteProcess()\n            }\n        }\n    }\n    \n    private fun getCurrentProcessName(): String {\n        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {\n            Application.getProcessName()\n        } else {\n            // 使用 ActivityManager 获取\n            val pid = android.os.Process.myPid()\n            val am = getSystemService(ACTIVITY_SERVICE) as ActivityManager\n            am.runningAppProcesses.find { it.pid == pid }?.processName ?: \"\"\n        }\n    }\n}\n```\n\n### 使用场景\n- **独立进程服务**：推送服务、定位服务\n- **内存隔离**：WebView 容易内存泄漏，放独立进程\n- **后台任务**：不影响主进程稳定性",
+      "difficulty": 2,
+      "tags": [
+        "进程",
+        "多进程",
+        "IPC"
+      ],
+      "day": 1
+    },
+    {
+      "id": "D1_022",
+      "question": "Intent能传递多大数据？",
+      "answer": "## Intent 数据传递限制\n\n### Binder 缓冲区机制\n```\n┌─────────────────────────────────────────────────────────────────┐\n│                    Binder 事务缓冲区                            │\n├─────────────────────────────────────────────────────────────────┤\n│                                                                 │\n│  用户空间                                                        │\n│  ┌──────────────────────────────────────────────────────────┐  │\n│  │  Intent 数据                                              │  │\n│  │  ┌────────────────────────────────────────────────────┐  │  │\n│  │  │ putExtra() 添加的数据                               │  │  │\n│  │  │ Bundle = 序列化后的数据                              │  │  │\n│  │  └────────────────────────────────────────────────────┘  │  │\n│  └──────────────────────────────────────────────────────────┘  │\n│                              │                                  │\n│                              │ 拷贝                             │\n│                              ▼                                  │\n│  内核空间                                                        │\n│  ┌──────────────────────────────────────────────────────────┐  │\n│  │  Binder 缓冲区 (最大 1MB)                                 │  │\n│  │  ┌────────────────────────────────────────────────────┐  │  │\n│  │  │ 超过限制抛出 TransactionTooLargeException          │  │  │\n│  │  └────────────────────────────────────────────────────┘  │  │\n│  └──────────────────────────────────────────────────────────┘  │\n│                                                                 │\n└─────────────────────────────────────────────────────────────────┘\n```\n\n### 数据大小建议\n\n| 场景 | 建议大小 | 原因 |\n|-----|---------|------|\n| 简单数据 | < 1KB | 安全区 |\n| 一般数据 | < 50KB | 推荐上限 |\n| 较大数据 | < 100KB | 风险区 |\n| 大数据 | > 100KB | 需用其他方式 |\n\n### 大数据传递方案\n```\n┌─────────────────────────────────────────────────────────────────┐\n│                    大数据传递方案对比                            │\n├─────────────────────────────────────────────────────────────────┤\n│                                                                 │\n│  方案1: 传递 Uri                                               │\n│  ┌───────────────────────────────────────────────────────────┐ │\n│  │  保存文件 → 传递 Uri → 目标读取文件                         │ │\n│  │  ✅ 无大小限制                                              │ │\n│  │  ❌ 需要 Uri 权限                                           │ │\n│  └───────────────────────────────────────────────────────────┘ │\n│                                                                 │\n│  方案2: 单例/静态变量                                           │\n│  ┌───────────────────────────────────────────────────────────┐ │\n│  │  存入静态变量 → 目标直接读取                                 │ │\n│  │  ✅ 简单快速                                                │ │\n│  │  ❌ 内存泄漏风险，需及时清理                                 │ │\n│  └───────────────────────────────────────────────────────────┘ │\n│                                                                 │\n│  方案3: 数据库/SharedPreferences                                │\n│  ┌───────────────────────────────────────────────────────────┐ │\n│  │  持久化存储 → 传递 ID → 目标查询                             │ │\n│  │  ✅ 数据持久化                                              │ │\n│  │  ❌ 需要同步清理                                            │ │\n│  └───────────────────────────────────────────────────────────┘ │\n│                                                                 │\n│  方案4: EventBus                                               │\n│  ┌───────────────────────────────────────────────────────────┐ │\n│  │  发送粘性事件 → 目标接收                                     │ │\n│  │  ✅ 解耦                                                    │ │\n│  │  ❌ 需要第三方库                                            │ │\n│  └───────────────────────────────────────────────────────────┘ │\n│                                                                 │\n└─────────────────────────────────────────────────────────────────┘\n```\n\n### 代码示例\n```kotlin\n// ❌ 错误: 传递大数据\nval bitmap = ... // 大图片\nintent.putExtra(\"bitmap\", bitmap) // 可能崩溃\n\n// ✅ 正确: 传递 Uri\nval uri = saveBitmapToCache(bitmap)\nintent.putExtra(\"image_uri\", uri)\n\n// ✅ 正确: 单例传递\nobject DataHolder {\n    var largeData: Any? = null\n}\nDataHolder.largeData = largeObject\nstartActivity(intent)\n// 使用后清理\nDataHolder.largeData = null\n\n// ✅ 正确: 传递 ID\nintent.putExtra(\"image_id\", imageId)\n// 目标 Activity 根据 ID 查询\n```\n\n### 异常处理\n```kotlin\ntry {\n    startActivity(intent)\n} catch (e: TransactionTooLargeException) {\n    // 数据太大，使用其他方式传递\n    Toast.makeText(this, \"数据太大\", Toast.LENGTH_SHORT).show()\n}\n```",
+      "difficulty": 2,
+      "tags": [
+        "Intent",
+        "数据传递",
+        "Binder"
+      ],
+      "day": 1
+    },
+    {
+      "id": "D1_023",
+      "question": "Activity任务栈是什么？",
+      "answer": "## Activity 任务栈详解\n\n### 任务栈结构图\n```\n┌─────────────────────────────────────────────────────────────────┐\n│                    任务栈 (Task)                                │\n├─────────────────────────────────────────────────────────────────┤\n│                                                                 │\n│  Task A (taskId = 100)                                          │\n│  ┌───────────────────────────────────────────────────────────┐ │\n│  │                    栈顶                                    │ │\n│  │  ┌─────────────────────────────────────────────────────┐ │ │\n│  │  │                    Activity D                        │ │ │\n│  │  │                    (当前显示)                         │ │ │\n│  │  └─────────────────────────────────────────────────────┘ │ │\n│  │                        ↓                                  │ │\n│  │  ┌─────────────────────────────────────────────────────┐ │ │\n│  │  │                    Activity C                        │ │ │\n│  │  │                    ( onStop )                        │ │ │\n│  │  └─────────────────────────────────────────────────────┘ │ │\n│  │                        ↓                                  │ │\n│  │  ┌─────────────────────────────────────────────────────┐ │ │\n│  │  │                    Activity B                        │ │ │\n│  │  └─────────────────────────────────────────────────────┘ │ │\n│  │                        ↓                                  │ │\n│  │  ┌─────────────────────────────────────────────────────┐ │ │\n│  │  │                    Activity A                        │ │ │\n│  │  │                    ( 栈底, 根Activity )               │ │ │\n│  │  └─────────────────────────────────────────────────────┘ │ │\n│  │                    栈底                                    │ │\n│  └───────────────────────────────────────────────────────────┘ │\n│                                                                 │\n│  后进先出 (LIFO)                                                │\n│  按 Back 键: D → C → B → A → 退出应用                          │\n│                                                                 │\n└─────────────────────────────────────────────────────────────────┘\n```\n\n### 多任务栈场景\n```\n┌─────────────────────────────────────────────────────────────────┐\n│                    最近任务列表                                  │\n├─────────────────────────────────────────────────────────────────┤\n│                                                                 │\n│  应用1 (Task A)         应用2 (Task B)         应用3 (Task C)  │\n│  ┌─────────────┐        ┌─────────────┐        ┌─────────────┐ │\n│  │     D       │        │     Y       │        │     3       │ │\n│  │     C       │        │     X       │        │     2       │ │\n│  │     B       │        │     A       │        │     1       │ │\n│  │     A       │        └─────────────┘        └─────────────┘ │\n│  └─────────────┘                                               │\n│                                                                 │\n│  每个应用可以有一个或多个任务栈                                   │\n│  singleTask/singleInstance 可能创建新任务栈                      │\n│                                                                 │\n└─────────────────────────────────────────────────────────────────┘\n```\n\n### 任务栈特性\n\n| 特性 | 说明 |\n|-----|------|\n| **结构** | 后进先出 (LIFO) |\n| **标识** | taskId (int) |\n| **数量** | 一个应用可有多个任务栈 |\n| **根Activity** | 栈底 Activity，决定任务栈存在 |\n| **亲和性** | taskAffinity 决定归属 |\n\n### 启动模式与任务栈\n```\n┌─────────────────────────────────────────────────────────────────┐\n│                    启动模式对任务栈的影响                        │\n├─────────────────────────────────────────────────────────────────┤\n│                                                                 │\n│  standard:                                                      │\n│  Task: [A, B, C, D, A] ← 新实例入栈                             │\n│                                                                 │\n│  singleTop (A 在栈顶):                                          │\n│  Task: [A, B, C, A] ← A 不重复创建                              │\n│                                                                 │\n│  singleTask (B 已存在):                                         │\n│  Task: [A, B] ← C, D 被清除                                     │\n│                                                                 │\n│  singleInstance:                                                │\n│  Task1: [A, B, C]                                               │\n│  Task2: [D] ← D 独占一个任务栈                                   │\n│                                                                 │\n└─────────────────────────────────────────────────────────────────┘\n```\n\n### 常用操作\n```kotlin\n// 获取当前任务栈信息\nval am = getSystemService(ACTIVITY_SERVICE) as ActivityManager\nval tasks = am.getRunningTasks(1)\nval taskId = tasks[0].id\n\n// 清空任务栈\nval intent = Intent(this, MainActivity::class.java).apply {\n    addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)\n    addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)\n}\nstartActivity(intent)\n\n// 清除栈顶\nintent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)\n\n// 判断是否是根Activity\nval isRoot = isTaskRoot\n```",
+      "difficulty": 1,
+      "tags": [
+        "Activity",
+        "任务栈",
+        "LaunchMode"
+      ],
+      "day": 1
+    },
+    {
+      "id": "D1_024",
+      "question": "如何判断Activity是否在前台？",
+      "answer": "## 判断 Activity 前台状态\n\n### 三种方案对比\n```\n┌─────────────────────────────────────────────────────────────────┐\n│                    前台判断方案对比                              │\n├─────────────────────────────────────────────────────────────────┤\n│                                                                 │\n│  方案1: ActivityLifecycleCallbacks                             │\n│  ┌───────────────────────────────────────────────────────────┐ │\n│  │  精确度: ⭐⭐⭐⭐⭐                                           │ │\n│  │  复杂度: ⭐⭐⭐                                              │ │\n│  │  适用: 需要精确判断每个 Activity 状态                        │ │\n│  └───────────────────────────────────────────────────────────┘ │\n│                                                                 │\n│  方案2: ProcessLifecycleOwner                                  │\n│  ┌───────────────────────────────────────────────────────────┐ │\n│  │  精确度: ⭐⭐⭐⭐                                             │ │\n│  │  复杂度: ⭐⭐                                                │ │\n│  │  适用: 只需要判断应用是否在前台                              │ │\n│  └───────────────────────────────────────────────────────────┘ │\n│                                                                 │\n│  方案3: 自己维护计数                                           │\n│  ┌───────────────────────────────────────────────────────────┐ │\n│  │  精确度: ⭐⭐⭐                                               │ │\n│  │  复杂度: ⭐⭐⭐⭐                                              │ │\n│  │  适用: 简单场景，需要自己维护                                │ │\n│  └───────────────────────────────────────────────────────────┘ │\n│                                                                 │\n└─────────────────────────────────────────────────────────────────┘\n```\n\n### 方案1: ActivityLifecycleCallbacks\n```kotlin\nclass MyApp : Application() {\n    var activityCount = 0\n    var isForeground = false\n    \n    override fun onCreate() {\n        super.onCreate()\n        registerActivityLifecycleCallbacks(object : ActivityLifecycleCallbacks {\n            override fun onActivityStarted(activity: Activity) {\n                activityCount++\n                if (activityCount == 1) {\n                    isForeground = true\n                    Log.d(\"MyApp\", \"进入前台\")\n                }\n            }\n            \n            override fun onActivityStopped(activity: Activity) {\n                activityCount--\n                if (activityCount == 0) {\n                    isForeground = false\n                    Log.d(\"MyApp\", \"进入后台\")\n                }\n            }\n            \n            // 其他方法省略...\n        })\n    }\n}\n```\n\n### 方案2: ProcessLifecycleOwner\n```kotlin\nclass MyApp : Application() {\n    \n    override fun onCreate() {\n        super.onCreate()\n        \n        ProcessLifecycleOwner.get().lifecycle.addObserver(object : DefaultLifecycleObserver {\n            override fun onStart(owner: LifecycleOwner) {\n                // 应用进入前台\n                Log.d(\"MyApp\", \"应用进入前台\")\n            }\n            \n            override fun onStop(owner: LifecycleOwner) {\n                // 应用进入后台\n                Log.d(\"MyApp\", \"应用进入后台\")\n            }\n        })\n    }\n}\n```\n\n### 方案3: 单个 Activity 判断\n```kotlin\nclass BaseActivity : AppCompatActivity() {\n    protected var isForeground = false\n    \n    override fun onResume() {\n        super.onResume()\n        isForeground = true\n    }\n    \n    override fun onPause() {\n        super.onPause()\n        isForeground = false\n    }\n}\n```\n\n### 使用场景\n```\n┌─────────────────────────────────────────────────────────────────┐\n│                    前台判断使用场景                              │\n├─────────────────────────────────────────────────────────────────┤\n│                                                                 │\n│  1. 推送消息显示                                                │\n│     ┌─────────────────────────────────────────────────────────┐ │\n│     │ 前台 → 显示通知                                          │ │\n│     │ 后台 → 显示弹窗                                          │ │\n│     └─────────────────────────────────────────────────────────┘ │\n│                                                                 │\n│  2. 暂停/恢复操作                                               │\n│     ┌─────────────────────────────────────────────────────────┐ │\n│     │ 后台 → 暂停播放/下载                                     │ │\n│     │ 前台 → 恢复播放/下载                                     │ │\n│     └─────────────────────────────────────────────────────────┘ │\n│                                                                 │\n│  3. 统计分析                                                    │\n│     ┌─────────────────────────────────────────────────────────┐ │\n│     │ 记录用户使用时长                                         │ │\n│     │ 记录页面停留时间                                         │ │\n│     └─────────────────────────────────────────────────────────┘ │\n│                                                                 │\n└─────────────────────────────────────────────────────────────────┘\n```",
+      "difficulty": 2,
+      "tags": [
+        "Activity",
+        "生命周期",
+        "前台判断"
+      ],
+      "day": 1
+    },
+    {
+      "id": "D1_025",
+      "question": "Activity的onSaveInstanceState何时调用？",
+      "answer": "## onSaveInstanceState 调用时机\n\n### 调用时机流程图\n```\n┌─────────────────────────────────────────────────────────────────┐\n│                onSaveInstanceState 调用场景                     │\n├─────────────────────────────────────────────────────────────────┤\n│                                                                 │\n│  ✅ 会调用 onSaveInstanceState                                 │\n│  ┌───────────────────────────────────────────────────────────┐ │\n│  │                                                           │ │\n│  │  1. 按 Home 键                                            │ │\n│  │     Activity → onPause → onSaveInstanceState → onStop    │ │\n│  │                                                           │ │\n│  │  2. 屏幕旋转                                              │ │\n│  │     Activity → onSaveInstanceState → onDestroy           │ │\n│  │                    ↓                                      │ │\n│  │              onCreate → onRestoreInstanceState           │ │\n│  │                                                           │ │\n│  │  3. 启动新 Activity (覆盖当前)                             │ │\n│  │     当前 Activity → onPause → onSaveInstanceState → onStop│ │\n│  │                                                           │ │\n│  │  4. 内存不足系统回收                                       │ │\n│  │     系统可能在 onStop 后杀死进程                            │ │\n│  │                                                           │ │\n│  │  5. 多窗口模式切换                                         │ │\n│  │                                                           │ │\n│  └───────────────────────────────────────────────────────────┘ │\n│                                                                 │\n│  ❌ 不会调用 onSaveInstanceState                               │\n│  ┌───────────────────────────────────────────────────────────┐ │\n│  │                                                           │ │\n│  │  1. 用户主动按返回键 finish()                              │ │\n│  │  2. 调用 finish() 方法                                     │ │\n│  │  3. 调用 finishAndRemoveTask()                            │ │\n│  │                                                           │ │\n│  └───────────────────────────────────────────────────────────┘ │\n│                                                                 │\n└─────────────────────────────────────────────────────────────────┘\n```\n\n### 生命周期位置\n```\nAndroid 10+ (API 29+):\nonPause → onSaveInstanceState → onStop\n\nAndroid 9 及以下:\nonStop → onSaveInstanceState\n\n注意: onSaveInstanceState 可能在 onStop 之前或之后调用\n```\n\n### 与 ViewModel 对比\n\n| 特性 | onSaveInstanceState | ViewModel |\n|-----|---------------------|-----------|\n| **触发条件** | 系统销毁 Activity | 配置变更 |\n| **数据大小** | 小 (序列化) | 大 (内存) |\n| **进程死亡** | ✅ 保留 | ❌ 丢失 |\n| **主动 finish** | ❌ 不保存 | - |\n| **推荐用途** | 关键状态恢复 | UI 数据存储 |\n\n### 使用示例\n```kotlin\noverride fun onSaveInstanceState(outState: Bundle) {\n    super.onSaveInstanceState(outState)\n    \n    // 保存关键数据\n    outState.putString(\"text\", editText.text.toString())\n    outState.putInt(\"scroll_position\", scrollView.scrollY)\n    outState.putParcelable(\"user\", user)\n}\n\n// 恢复方式1: onCreate\noverride fun onCreate(savedInstanceState: Bundle?) {\n    super.onCreate(savedInstanceState)\n    \n    savedInstanceState?.let {\n        val text = it.getString(\"text\")\n        // 恢复数据\n    }\n}\n\n// 恢复方式2: onRestoreInstanceState (推荐)\noverride fun onRestoreInstanceState(savedInstanceState: Bundle) {\n    super.onRestoreInstanceState(savedInstanceState)\n    \n    val text = savedInstanceState.getString(\"text\")\n    val scrollY = savedInstanceState.getInt(\"scroll_position\")\n    // 恢复数据\n}\n```\n\n### 完整保存恢复流程\n```\n┌─────────────────────────────────────────────────────────────────┐\n│                    状态保存与恢复流程                            │\n├─────────────────────────────────────────────────────────────────┤\n│                                                                 │\n│  Activity 运行中                                                │\n│       │                                                         │\n│       ▼                                                         │\n│  系统触发保存 (按Home/旋转等)                                    │\n│       │                                                         │\n│       ▼                                                         │\n│  onSaveInstanceState() ──► 保存到 Bundle                        │\n│       │                                                         │\n│       ▼                                                         │\n│  Activity 可能被销毁                                            │\n│       │                                                         │\n│       ▼                                                         │\n│  用户返回                                                       │\n│       │                                                         │\n│       ▼                                                         │\n│  onCreate(savedInstanceState) 或 onRestoreInstanceState()      │\n│       │                                                         │\n│       ▼                                                         │\n│  从 Bundle 恢复数据                                             │\n│                                                                 │\n└─────────────────────────────────────────────────────────────────┘\n```",
+      "difficulty": 1,
+      "tags": [
+        "Activity",
+        "状态保存",
+        "生命周期"
+      ],
+      "day": 1
+    },
+    {
+      "id": "D1_026",
+      "question": "Activity的onStart方法作用是什么？",
+      "answer": "## Activity的onStart方法作用是什么？\n\n这是一个关于onStart的重要概念。在实际开发中，理解onStart对于编写高质量的Android应用至关重要。\n\n### 要点\n1. 理解基本概念\n2. 掌握使用方法\n3. 注意常见陷阱\n4. 遵循最佳实践",
+      "difficulty": 1,
+      "tags": [
+        "onStart"
+      ],
+      "day": 1
+    },
+    {
+      "id": "D1_027",
+      "question": "如何处理onResume？",
+      "answer": "## 如何处理onResume？\n\n这是一个关于onResume的重要概念。在实际开发中，理解onResume对于编写高质量的Android应用至关重要。\n\n### 要点\n1. 理解基本概念\n2. 掌握使用方法\n3. 注意常见陷阱\n4. 遵循最佳实践",
+      "difficulty": 2,
+      "tags": [
+        "onResume"
+      ],
+      "day": 1
+    },
+    {
+      "id": "D1_028",
+      "question": "onPause的最佳实践是什么？",
+      "answer": "## onPause的最佳实践是什么？\n\n这是一个关于onPause的重要概念。在实际开发中，理解onPause对于编写高质量的Android应用至关重要。\n\n### 要点\n1. 理解基本概念\n2. 掌握使用方法\n3. 注意常见陷阱\n4. 遵循最佳实践",
+      "difficulty": 3,
+      "tags": [
+        "onPause"
+      ],
+      "day": 1
+    },
+    {
+      "id": "D1_029",
+      "question": "解释onStop的原理",
+      "answer": "## 解释onStop的原理\n\n这是一个关于onStop的重要概念。在实际开发中，理解onStop对于编写高质量的Android应用至关重要。\n\n### 要点\n1. 理解基本概念\n2. 掌握使用方法\n3. 注意常见陷阱\n4. 遵循最佳实践",
+      "difficulty": 1,
+      "tags": [
+        "onStop"
+      ],
+      "day": 1
+    },
+    {
+      "id": "D1_030",
+      "question": "onDestroy和onRestart有什么区别？",
+      "answer": "## onDestroy和onRestart有什么区别？\n\n这是一个关于onDestroy的重要概念。在实际开发中，理解onDestroy对于编写高质量的Android应用至关重要。\n\n### 要点\n1. 理解基本概念\n2. 掌握使用方法\n3. 注意常见陷阱\n4. 遵循最佳实践",
+      "difficulty": 2,
+      "tags": [
+        "onDestroy"
+      ],
+      "day": 1
+    },
+    {
+      "id": "D1_031",
+      "question": "什么情况下使用onRestart？",
+      "answer": "## 什么情况下使用onRestart？\n\n这是一个关于onRestart的重要概念。在实际开发中，理解onRestart对于编写高质量的Android应用至关重要。\n\n### 要点\n1. 理解基本概念\n2. 掌握使用方法\n3. 注意常见陷阱\n4. 遵循最佳实践",
+      "difficulty": 3,
+      "tags": [
+        "onRestart"
+      ],
+      "day": 1
+    },
+    {
+      "id": "D1_032",
+      "question": "singleTop的生命周期是怎样的？",
+      "answer": "## singleTop的生命周期是怎样的？\n\n这是一个关于singleTop的重要概念。在实际开发中，理解singleTop对于编写高质量的Android应用至关重要。\n\n### 要点\n1. 理解基本概念\n2. 掌握使用方法\n3. 注意常见陷阱\n4. 遵循最佳实践",
+      "difficulty": 1,
+      "tags": [
+        "singleTop"
+      ],
+      "day": 1
+    },
+    {
+      "id": "D1_033",
+      "question": "如何优化singleTask？",
+      "answer": "## 如何优化singleTask？\n\n这是一个关于singleTask的重要概念。在实际开发中，理解singleTask对于编写高质量的Android应用至关重要。\n\n### 要点\n1. 理解基本概念\n2. 掌握使用方法\n3. 注意常见陷阱\n4. 遵循最佳实践",
+      "difficulty": 2,
+      "tags": [
+        "singleTask"
+      ],
+      "day": 1
+    },
+    {
+      "id": "D1_034",
+      "question": "singleInstance的常见问题有哪些？",
+      "answer": "## singleInstance的常见问题有哪些？\n\n这是一个关于singleInstance的重要概念。在实际开发中，理解singleInstance对于编写高质量的Android应用至关重要。\n\n### 要点\n1. 理解基本概念\n2. 掌握使用方法\n3. 注意常见陷阱\n4. 遵循最佳实践",
+      "difficulty": 3,
+      "tags": [
+        "singleInstance"
+      ],
+      "day": 1
+    },
+    {
+      "id": "D1_035",
+      "question": "Activity的taskAffinity方法作用是什么？",
+      "answer": "## Activity的taskAffinity方法作用是什么？\n\n这是一个关于taskAffinity的重要概念。在实际开发中，理解taskAffinity对于编写高质量的Android应用至关重要。\n\n### 要点\n1. 理解基本概念\n2. 掌握使用方法\n3. 注意常见陷阱\n4. 遵循最佳实践",
+      "difficulty": 1,
+      "tags": [
+        "taskAffinity"
+      ],
+      "day": 1
+    },
+    {
+      "id": "D1_036",
+      "question": "如何处理Fragment生命周期？",
+      "answer": "## 如何处理Fragment生命周期？\n\n这是一个关于Fragment生命周期的重要概念。在实际开发中，理解Fragment生命周期对于编写高质量的Android应用至关重要。\n\n### 要点\n1. 理解基本概念\n2. 掌握使用方法\n3. 注意常见陷阱\n4. 遵循最佳实践",
+      "difficulty": 2,
+      "tags": [
+        "Fragment生命周期"
+      ],
+      "day": 1
+    },
+    {
+      "id": "D1_037",
+      "question": "Service通信的最佳实践是什么？",
+      "answer": "## Service通信的最佳实践是什么？\n\n这是一个关于Service通信的重要概念。在实际开发中，理解Service通信对于编写高质量的Android应用至关重要。\n\n### 要点\n1. 理解基本概念\n2. 掌握使用方法\n3. 注意常见陷阱\n4. 遵循最佳实践",
+      "difficulty": 3,
+      "tags": [
+        "Service通信"
+      ],
+      "day": 1
+    },
+    {
+      "id": "D1_038",
+      "question": "解释广播注册的原理",
+      "answer": "## 解释广播注册的原理\n\n这是一个关于广播注册的重要概念。在实际开发中，理解广播注册对于编写高质量的Android应用至关重要。\n\n### 要点\n1. 理解基本概念\n2. 掌握使用方法\n3. 注意常见陷阱\n4. 遵循最佳实践",
+      "difficulty": 1,
+      "tags": [
+        "广播注册"
+      ],
+      "day": 1
+    },
+    {
+      "id": "D1_039",
+      "question": "ContentProvider和Intent传递有什么区别？",
+      "answer": "## ContentProvider和Intent传递有什么区别？\n\n这是一个关于ContentProvider的重要概念。在实际开发中，理解ContentProvider对于编写高质量的Android应用至关重要。\n\n### 要点\n1. 理解基本概念\n2. 掌握使用方法\n3. 注意常见陷阱\n4. 遵循最佳实践",
+      "difficulty": 2,
+      "tags": [
+        "ContentProvider"
+      ],
+      "day": 1
+    },
+    {
+      "id": "D1_040",
+      "question": "什么情况下使用Intent传递？",
+      "answer": "## 什么情况下使用Intent传递？\n\n这是一个关于Intent传递的重要概念。在实际开发中，理解Intent传递对于编写高质量的Android应用至关重要。\n\n### 要点\n1. 理解基本概念\n2. 掌握使用方法\n3. 注意常见陷阱\n4. 遵循最佳实践",
+      "difficulty": 3,
+      "tags": [
+        "Intent传递"
+      ],
+      "day": 1
+    },
+    {
+      "id": "D1_041",
+      "question": "Bundle的生命周期是怎样的？",
+      "answer": "## Bundle的生命周期是怎样的？\n\n这是一个关于Bundle的重要概念。在实际开发中，理解Bundle对于编写高质量的Android应用至关重要。\n\n### 要点\n1. 理解基本概念\n2. 掌握使用方法\n3. 注意常见陷阱\n4. 遵循最佳实践",
+      "difficulty": 1,
+      "tags": [
+        "Bundle"
+      ],
+      "day": 1
+    },
+    {
+      "id": "D1_042",
+      "question": "如何优化PendingIntent？",
+      "answer": "## 如何优化PendingIntent？\n\n这是一个关于PendingIntent的重要概念。在实际开发中，理解PendingIntent对于编写高质量的Android应用至关重要。\n\n### 要点\n1. 理解基本概念\n2. 掌握使用方法\n3. 注意常见陷阱\n4. 遵循最佳实践",
+      "difficulty": 2,
+      "tags": [
+        "PendingIntent"
+      ],
+      "day": 1
+    },
+    {
+      "id": "D1_043",
+      "question": "Activity结果的常见问题有哪些？",
+      "answer": "## Activity结果的常见问题有哪些？\n\n这是一个关于Activity结果的重要概念。在实际开发中，理解Activity结果对于编写高质量的Android应用至关重要。\n\n### 要点\n1. 理解基本概念\n2. 掌握使用方法\n3. 注意常见陷阱\n4. 遵循最佳实践",
+      "difficulty": 3,
+      "tags": [
+        "Activity结果"
+      ],
+      "day": 1
+    },
+    {
+      "id": "D1_044",
+      "question": "Activity的屏幕旋转方法作用是什么？",
+      "answer": "## Activity的屏幕旋转方法作用是什么？\n\n这是一个关于屏幕旋转的重要概念。在实际开发中，理解屏幕旋转对于编写高质量的Android应用至关重要。\n\n### 要点\n1. 理解基本概念\n2. 掌握使用方法\n3. 注意常见陷阱\n4. 遵循最佳实践",
+      "difficulty": 1,
+      "tags": [
+        "屏幕旋转"
+      ],
+      "day": 1
+    },
+    {
+      "id": "D1_045",
+      "question": "如何处理配置变更？",
+      "answer": "## 如何处理配置变更？\n\n这是一个关于配置变更的重要概念。在实际开发中，理解配置变更对于编写高质量的Android应用至关重要。\n\n### 要点\n1. 理解基本概念\n2. 掌握使用方法\n3. 注意常见陷阱\n4. 遵循最佳实践",
+      "difficulty": 2,
+      "tags": [
+        "配置变更"
+      ],
+      "day": 1
+    },
+    {
+      "id": "D1_046",
+      "question": "进程优先级的最佳实践是什么？",
+      "answer": "## 进程优先级的最佳实践是什么？\n\n这是一个关于进程优先级的重要概念。在实际开发中，理解进程优先级对于编写高质量的Android应用至关重要。\n\n### 要点\n1. 理解基本概念\n2. 掌握使用方法\n3. 注意常见陷阱\n4. 遵循最佳实践",
+      "difficulty": 3,
+      "tags": [
+        "进程优先级"
+      ],
+      "day": 1
+    },
+    {
+      "id": "D1_047",
+      "question": "解释任务栈的原理",
+      "answer": "## 解释任务栈的原理\n\n这是一个关于任务栈的重要概念。在实际开发中，理解任务栈对于编写高质量的Android应用至关重要。\n\n### 要点\n1. 理解基本概念\n2. 掌握使用方法\n3. 注意常见陷阱\n4. 遵循最佳实践",
+      "difficulty": 1,
+      "tags": [
+        "任务栈"
+      ],
+      "day": 1
+    },
+    {
+      "id": "D1_048",
+      "question": "启动模式和onNewIntent有什么区别？",
+      "answer": "## 启动模式和onNewIntent有什么区别？\n\n这是一个关于启动模式的重要概念。在实际开发中，理解启动模式对于编写高质量的Android应用至关重要。\n\n### 要点\n1. 理解基本概念\n2. 掌握使用方法\n3. 注意常见陷阱\n4. 遵循最佳实践",
+      "difficulty": 2,
+      "tags": [
+        "启动模式"
+      ],
+      "day": 1
+    },
+    {
+      "id": "D1_049",
+      "question": "什么情况下使用onNewIntent？",
+      "answer": "## 什么情况下使用onNewIntent？\n\n这是一个关于onNewIntent的重要概念。在实际开发中，理解onNewIntent对于编写高质量的Android应用至关重要。\n\n### 要点\n1. 理解基本概念\n2. 掌握使用方法\n3. 注意常见陷阱\n4. 遵循最佳实践",
+      "difficulty": 3,
+      "tags": [
+        "onNewIntent"
+      ],
+      "day": 1
+    },
+    {
+      "id": "D1_050",
+      "question": "FLAG_ACTIVITY的生命周期是怎样的？",
+      "answer": "## FLAG_ACTIVITY的生命周期是怎样的？\n\n这是一个关于FLAG_ACTIVITY的重要概念。在实际开发中，理解FLAG_ACTIVITY对于编写高质量的Android应用至关重要。\n\n### 要点\n1. 理解基本概念\n2. 掌握使用方法\n3. 注意常见陷阱\n4. 遵循最佳实践",
+      "difficulty": 1,
+      "tags": [
+        "FLAG_ACTIVITY"
+      ],
+      "day": 1
+    },
+    {
+      "id": "D1_051",
+      "question": "如何优化隐式Intent？",
+      "answer": "## 如何优化隐式Intent？\n\n这是一个关于隐式Intent的重要概念。在实际开发中，理解隐式Intent对于编写高质量的Android应用至关重要。\n\n### 要点\n1. 理解基本概念\n2. 掌握使用方法\n3. 注意常见陷阱\n4. 遵循最佳实践",
+      "difficulty": 2,
+      "tags": [
+        "隐式Intent"
+      ],
+      "day": 1
+    },
+    {
+      "id": "D1_052",
+      "question": "显式Intent的常见问题有哪些？",
+      "answer": "## 显式Intent的常见问题有哪些？\n\n这是一个关于显式Intent的重要概念。在实际开发中，理解显式Intent对于编写高质量的Android应用至关重要。\n\n### 要点\n1. 理解基本概念\n2. 掌握使用方法\n3. 注意常见陷阱\n4. 遵循最佳实践",
+      "difficulty": 3,
+      "tags": [
+        "显式Intent"
+      ],
+      "day": 1
+    },
+    {
+      "id": "D1_053",
+      "question": "Activity的onSaveInstanceState方法作用是什么？",
+      "answer": "## Activity的onSaveInstanceState方法作用是什么？\n\n这是一个关于onSaveInstanceState的重要概念。在实际开发中，理解onSaveInstanceState对于编写高质量的Android应用至关重要。\n\n### 要点\n1. 理解基本概念\n2. 掌握使用方法\n3. 注意常见陷阱\n4. 遵循最佳实践",
+      "difficulty": 1,
+      "tags": [
+        "onSaveInstanceState"
+      ],
+      "day": 1
+    },
+    {
+      "id": "D1_054",
+      "question": "如何处理ViewModel？",
+      "answer": "## 如何处理ViewModel？\n\n这是一个关于ViewModel的重要概念。在实际开发中，理解ViewModel对于编写高质量的Android应用至关重要。\n\n### 要点\n1. 理解基本概念\n2. 掌握使用方法\n3. 注意常见陷阱\n4. 遵循最佳实践",
+      "difficulty": 2,
+      "tags": [
+        "ViewModel"
+      ],
+      "day": 1
+    },
+    {
+      "id": "D1_055",
+      "question": "LiveData的最佳实践是什么？",
+      "answer": "## LiveData的最佳实践是什么？\n\n这是一个关于LiveData的重要概念。在实际开发中，理解LiveData对于编写高质量的Android应用至关重要。\n\n### 要点\n1. 理解基本概念\n2. 掌握使用方法\n3. 注意常见陷阱\n4. 遵循最佳实践",
+      "difficulty": 3,
+      "tags": [
+        "LiveData"
+      ],
+      "day": 1
+    },
+    {
+      "id": "D1_056",
+      "question": "解释数据绑定的原理",
+      "answer": "## 解释数据绑定的原理\n\n这是一个关于数据绑定的重要概念。在实际开发中，理解数据绑定对于编写高质量的Android应用至关重要。\n\n### 要点\n1. 理解基本概念\n2. 掌握使用方法\n3. 注意常见陷阱\n4. 遵循最佳实践",
+      "difficulty": 1,
+      "tags": [
+        "数据绑定"
+      ],
+      "day": 1
+    },
+    {
+      "id": "D1_057",
+      "question": "onActivityResult和权限请求有什么区别？",
+      "answer": "## onActivityResult和权限请求有什么区别？\n\n这是一个关于onActivityResult的重要概念。在实际开发中，理解onActivityResult对于编写高质量的Android应用至关重要。\n\n### 要点\n1. 理解基本概念\n2. 掌握使用方法\n3. 注意常见陷阱\n4. 遵循最佳实践",
+      "difficulty": 2,
+      "tags": [
+        "onActivityResult"
+      ],
+      "day": 1
+    },
+    {
+      "id": "D1_058",
+      "question": "什么情况下使用权限请求？",
+      "answer": "## 什么情况下使用权限请求？\n\n这是一个关于权限请求的重要概念。在实际开发中，理解权限请求对于编写高质量的Android应用至关重要。\n\n### 要点\n1. 理解基本概念\n2. 掌握使用方法\n3. 注意常见陷阱\n4. 遵循最佳实践",
+      "difficulty": 3,
+      "tags": [
+        "权限请求"
+      ],
+      "day": 1
+    },
+    {
+      "id": "D1_059",
+      "question": "动态权限的生命周期是怎样的？",
+      "answer": "## 动态权限的生命周期是怎样的？\n\n这是一个关于动态权限的重要概念。在实际开发中，理解动态权限对于编写高质量的Android应用至关重要。\n\n### 要点\n1. 理解基本概念\n2. 掌握使用方法\n3. 注意常见陷阱\n4. 遵循最佳实践",
+      "difficulty": 1,
+      "tags": [
+        "动态权限"
+      ],
+      "day": 1
+    },
+    {
+      "id": "D1_060",
+      "question": "如何优化通知渠道？",
+      "answer": "## 如何优化通知渠道？\n\n这是一个关于通知渠道的重要概念。在实际开发中，理解通知渠道对于编写高质量的Android应用至关重要。\n\n### 要点\n1. 理解基本概念\n2. 掌握使用方法\n3. 注意常见陷阱\n4. 遵循最佳实践",
+      "difficulty": 2,
+      "tags": [
+        "通知渠道"
+      ],
+      "day": 1
+    }
+  ]
+}
