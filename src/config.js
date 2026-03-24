@@ -20,14 +20,14 @@ const config = {
     // 应用配置
     app: {
         name: 'Android 面试题大全',
-        version: '1.1.0',
-        description: '智能学习系统 - 600+ 面试题'
+        version: '1.2.0',
+        description: '智能学习系统 - 590+ 面试题'
     },
     
     // 学习配置
     study: {
         dailyTarget: 20,
-        totalDays: 15
+        totalDays: 16
     }
 };
 

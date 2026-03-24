@@ -2,7 +2,7 @@
   "metadata": {
     "category": "Kotlin基础与协程",
     "day": 2,
-    "total_questions": 60,
+    "total_questions": 30,
     "source": "curated from multiple sources"
   },
   "questions": [
@@ -292,353 +292,43 @@
       "day": 2
     },
     {
-      "id": "D2_001",
-      "question": "Kotlin中空安全的作用是什么？",
-      "answer": "## Kotlin中空安全的作用是什么？\n\n这是一个关于空安全的重要概念。在实际开发中，理解空安全对于编写高质量的Android应用至关重要。\n\n### 要点\n1. 理解基本概念\n2. 掌握使用方法\n3. 注意常见陷阱\n4. 遵循最佳实践",
-      "difficulty": 1,
-      "tags": [
-        "空安全"
-      ],
-      "day": 2
-    },
-    {
-      "id": "D2_002",
-      "question": "Elvis操作符如何使用？",
-      "answer": "## Elvis操作符如何使用？\n\n这是一个关于Elvis操作符的重要概念。在实际开发中，理解Elvis操作符对于编写高质量的Android应用至关重要。\n\n### 要点\n1. 理解基本概念\n2. 掌握使用方法\n3. 注意常见陷阱\n4. 遵循最佳实践",
+      "id": "D2_110",
+      "question": "Kotlin Flow 是什么？与 LiveData 有什么区别？",
+      "answer": "## Kotlin Flow\n\n### 概念\nFlow 是 Kotlin 协程的响应式数据流 API，用于处理异步数据流。\n\n### 基本使用\n```kotlin\nfun getFlow(): Flow<Int> = flow {\n    for (i in 1..10) {\n        delay(100)\n        emit(i)\n    }\n}\n\n// 收集\nlifecycleScope.launch {\n    getFlow().collect { value ->\n        println(value)\n    }\n}\n```\n\n### Flow vs LiveData\n\n| 特性 | Flow | LiveData |\n|------|------|----------|\n| 线程切换 | 自动 | 主线程 |\n| 操作符 | 丰富 | 有限 |\n| 背压 | 支持 | 不支持 |\n| 协程集成 | 原生 | 需转换 |\n| 生命周期感知 | 需要 lifecycleScope | 内置 |\n\n### 冷流 vs 热流\n```kotlin\n// 冷流：每个收集者独立执行\nval coldFlow = flow { emit(1) }\n\n// 热流：SharedFlow/StateFlow\nval sharedFlow = MutableSharedFlow<Int>()\nval stateFlow = MutableStateFlow(0)\n```",
       "difficulty": 2,
-      "tags": [
-        "Elvis操作符"
-      ],
+      "tags": ["Kotlin", "Flow", "LiveData"],
       "day": 2
     },
     {
-      "id": "D2_003",
-      "question": "安全调用的优势是什么？",
-      "answer": "## 安全调用的优势是什么？\n\n这是一个关于安全调用的重要概念。在实际开发中，理解安全调用对于编写高质量的Android应用至关重要。\n\n### 要点\n1. 理解基本概念\n2. 掌握使用方法\n3. 注意常见陷阱\n4. 遵循最佳实践",
+      "id": "D2_111",
+      "question": "StateFlow 和 SharedFlow 有什么区别？",
+      "answer": "## StateFlow vs SharedFlow\n\n### StateFlow\n```kotlin\nval _state = MutableStateFlow(0)\nval state: StateFlow<Int> = _state\n\n// 更新值\n_state.value = 1\n\n// 收集\nstate.collect { value -> println(value) }\n```\n\n**特点**：\n- 必须有初始值\n- 只保留最新值\n- 新订阅者立即收到当前值\n- 类似 LiveData\n\n### SharedFlow\n```kotlin\nval _events = MutableSharedFlow<String>(\n    replay = 0,  // 重播数量\n    extraBufferCapacity = 10\n)\nval events: SharedFlow<String> = _events\n\n// 发送事件\n_events.emit(\"Hello\")\n```\n\n**特点**：\n- 无初始值要求\n- 可配置重播数量\n- 支持缓冲\n- 适合一次性事件\n\n### 使用场景\n\n| 场景 | 推荐选择 |\n|------|----------|\n| UI 状态 | StateFlow |\n| 一次性事件 | SharedFlow(replay=0) |\n| 事件总线 | SharedFlow |\n| 配置数据 | StateFlow |",
+      "difficulty": 2,
+      "tags": ["Kotlin", "StateFlow", "SharedFlow"],
+      "day": 2
+    },
+    {
+      "id": "D2_112",
+      "question": "Kotlin 中的密封接口（Sealed Interface）是什么？有什么用？",
+      "answer": "## 密封接口\n\n### 概念\n密封接口是密封类的接口版本，允许更灵活的层次结构。\n\n### 使用示例\n```kotlin\nsealed interface UiState {\n    object Loading : UiState\n    data class Success(val data: String) : UiState\n    data class Error(val message: String) : UiState\n}\n\n// 多重继承\nclass CombinedState : UiState, Parcelable\n```\n\n### 与密封类对比\n```kotlin\n// 密封类：单继承\nclass ExternalError : Error  // 不能同时继承 Error\n\n// 密封接口：多重实现\nclass NetworkError : UiState.Error, Parcelable\n```\n\n### 使用场景\n\n1. **表示有限状态集**\n```kotlin\nsealed interface Result<T> {\n    data class Success<T>(val data: T) : Result<T>\n    data class Error<T>(val exception: Throwable) : Result<T>\n}\n```\n\n2. **when 表达式穷尽检查**\n```kotlin\nwhen (state) {\n    is UiState.Loading -> {}\n    is UiState.Success -> {}\n    is UiState.Error -> {}\n}\n```",
       "difficulty": 3,
-      "tags": [
-        "安全调用"
-      ],
+      "tags": ["Kotlin", "Sealed", "Interface"],
       "day": 2
     },
     {
-      "id": "D2_004",
-      "question": "解释非空断言的概念",
-      "answer": "## 解释非空断言的概念\n\n这是一个关于非空断言的重要概念。在实际开发中，理解非空断言对于编写高质量的Android应用至关重要。\n\n### 要点\n1. 理解基本概念\n2. 掌握使用方法\n3. 注意常见陷阱\n4. 遵循最佳实践",
-      "difficulty": 1,
-      "tags": [
-        "非空断言"
-      ],
-      "day": 2
-    },
-    {
-      "id": "D2_005",
-      "question": "扩展函数和Java的扩展属性有什么区别？",
-      "answer": "## 扩展函数和Java的扩展属性有什么区别？\n\n这是一个关于扩展函数的重要概念。在实际开发中，理解扩展函数对于编写高质量的Android应用至关重要。\n\n### 要点\n1. 理解基本概念\n2. 掌握使用方法\n3. 注意常见陷阱\n4. 遵循最佳实践",
+      "id": "D2_113",
+      "question": "Kotlin 中的 by 关键字有哪些用法？",
+      "answer": "## by 关键字用法\n\n### 1. 委托属性\n```kotlin\n// 延迟初始化\nval name: String by lazy { \"Kotlin\" }\n\n// 可观察属性\nvar count: Int by Delegates.observable(0) { _, old, new ->\n    println(\"$old -> $new\")\n}\n\n// 属性存储在 Map\nclass User(map: Map<String, Any>) {\n    val name: String by map\n}\n```\n\n### 2. 类委托\n```kotlin\ninterface Base {\n    fun print()\n}\n\nclass BaseImpl : Base {\n    override fun print() = println(\"Base\")\n}\n\nclass Derived(b: Base) : Base by b\n\n// 使用\nval derived = Derived(BaseImpl())\nderived.print()  // \"Base\"\n```\n\n### 3. 委托给另一个属性\n```kotlin\nclass MyClass {\n    var newName: Int = 0\n    @Deprecated(\"Use newName\")\n    var oldName: Int by ::newName\n}\n```\n\n### 常用委托\n| 委托 | 用途 |\n|------|------|\n| lazy | 延迟初始化 |\n| observable | 属性变化监听 |\n| vetoable | 条件赋值 |\n| notNull | 非空委托 |",
       "difficulty": 2,
-      "tags": [
-        "扩展函数"
-      ],
+      "tags": ["Kotlin", "by", "委托"],
       "day": 2
     },
     {
-      "id": "D2_006",
-      "question": "什么场景使用扩展属性？",
-      "answer": "## 什么场景使用扩展属性？\n\n这是一个关于扩展属性的重要概念。在实际开发中，理解扩展属性对于编写高质量的Android应用至关重要。\n\n### 要点\n1. 理解基本概念\n2. 掌握使用方法\n3. 注意常见陷阱\n4. 遵循最佳实践",
+      "id": "D2_114",
+      "question": "Kotlin 协程中 supervisorScope 和 coroutineScope 有什么区别？",
+      "answer": "## supervisorScope vs coroutineScope\n\n### coroutineScope\n```kotlin\ncoroutineScope {\n    launch { throw Exception() }  // 异常传播，整个作用域取消\n    launch { delay(100); println(\"不会执行\") }\n}\n```\n\n**特点**：\n- 子协程异常会取消其他子协程\n- 异常向上传播\n\n### supervisorScope\n```kotlin\nsupervisorScope {\n    launch { throw Exception() }  // 异常不传播\n    launch { delay(100); println(\"会执行\") }  // 继续\n}\n```\n\n**特点**：\n- 子协程异常不影响其他子协程\n- 需要单独处理每个协程的异常\n\n### 对比\n\n| 特性 | coroutineScope | supervisorScope |\n|------|----------------|-----------------|\n| 异常传播 | 是 | 否 |\n| 子协程取消其他 | 是 | 否 |\n| 适用场景 | 依赖任务 | 独立任务 |\n\n### 使用建议\n```kotlin\n// 并行请求，一个失败不影响其他\nsupervisorScope {\n    val deferred1 = async { api.getUser() }\n    val deferred2 = async { api.getPosts() }\n    \n    val user = try { deferred1.await() } catch (e: Exception) { null }\n    val posts = try { deferred2.await() } catch (e: Exception) { emptyList() }\n}\n```",
       "difficulty": 3,
-      "tags": [
-        "扩展属性"
-      ],
-      "day": 2
-    },
-    {
-      "id": "D2_007",
-      "question": "数据类的性能特点是什么？",
-      "answer": "## 数据类的性能特点是什么？\n\n这是一个关于数据类的重要概念。在实际开发中，理解数据类对于编写高质量的Android应用至关重要。\n\n### 要点\n1. 理解基本概念\n2. 掌握使用方法\n3. 注意常见陷阱\n4. 遵循最佳实践",
-      "difficulty": 1,
-      "tags": [
-        "数据类"
-      ],
-      "day": 2
-    },
-    {
-      "id": "D2_008",
-      "question": "密封类的最佳实践？",
-      "answer": "## 密封类的最佳实践？\n\n这是一个关于密封类的重要概念。在实际开发中，理解密封类对于编写高质量的Android应用至关重要。\n\n### 要点\n1. 理解基本概念\n2. 掌握使用方法\n3. 注意常见陷阱\n4. 遵循最佳实践",
-      "difficulty": 2,
-      "tags": [
-        "密封类"
-      ],
-      "day": 2
-    },
-    {
-      "id": "D2_009",
-      "question": "枚举类常见陷阱有哪些？",
-      "answer": "## 枚举类常见陷阱有哪些？\n\n这是一个关于枚举类的重要概念。在实际开发中，理解枚举类对于编写高质量的Android应用至关重要。\n\n### 要点\n1. 理解基本概念\n2. 掌握使用方法\n3. 注意常见陷阱\n4. 遵循最佳实践",
-      "difficulty": 3,
-      "tags": [
-        "枚举类"
-      ],
-      "day": 2
-    },
-    {
-      "id": "D2_010",
-      "question": "Kotlin中对象声明的作用是什么？",
-      "answer": "## Kotlin中对象声明的作用是什么？\n\n这是一个关于对象声明的重要概念。在实际开发中，理解对象声明对于编写高质量的Android应用至关重要。\n\n### 要点\n1. 理解基本概念\n2. 掌握使用方法\n3. 注意常见陷阱\n4. 遵循最佳实践",
-      "difficulty": 1,
-      "tags": [
-        "对象声明"
-      ],
-      "day": 2
-    },
-    {
-      "id": "D2_011",
-      "question": "伴生对象如何使用？",
-      "answer": "## 伴生对象如何使用？\n\n这是一个关于伴生对象的重要概念。在实际开发中，理解伴生对象对于编写高质量的Android应用至关重要。\n\n### 要点\n1. 理解基本概念\n2. 掌握使用方法\n3. 注意常见陷阱\n4. 遵循最佳实践",
-      "difficulty": 2,
-      "tags": [
-        "伴生对象"
-      ],
-      "day": 2
-    },
-    {
-      "id": "D2_012",
-      "question": "高阶函数的优势是什么？",
-      "answer": "## 高阶函数的优势是什么？\n\n这是一个关于高阶函数的重要概念。在实际开发中，理解高阶函数对于编写高质量的Android应用至关重要。\n\n### 要点\n1. 理解基本概念\n2. 掌握使用方法\n3. 注意常见陷阱\n4. 遵循最佳实践",
-      "difficulty": 3,
-      "tags": [
-        "高阶函数"
-      ],
-      "day": 2
-    },
-    {
-      "id": "D2_013",
-      "question": "解释Lambda表达式的概念",
-      "answer": "## 解释Lambda表达式的概念\n\n这是一个关于Lambda表达式的重要概念。在实际开发中，理解Lambda表达式对于编写高质量的Android应用至关重要。\n\n### 要点\n1. 理解基本概念\n2. 掌握使用方法\n3. 注意常见陷阱\n4. 遵循最佳实践",
-      "difficulty": 1,
-      "tags": [
-        "Lambda表达式"
-      ],
-      "day": 2
-    },
-    {
-      "id": "D2_014",
-      "question": "内联函数和Java的reified有什么区别？",
-      "answer": "## 内联函数和Java的reified有什么区别？\n\n这是一个关于内联函数的重要概念。在实际开发中，理解内联函数对于编写高质量的Android应用至关重要。\n\n### 要点\n1. 理解基本概念\n2. 掌握使用方法\n3. 注意常见陷阱\n4. 遵循最佳实践",
-      "difficulty": 2,
-      "tags": [
-        "内联函数"
-      ],
-      "day": 2
-    },
-    {
-      "id": "D2_015",
-      "question": "什么场景使用reified？",
-      "answer": "## 什么场景使用reified？\n\n这是一个关于reified的重要概念。在实际开发中，理解reified对于编写高质量的Android应用至关重要。\n\n### 要点\n1. 理解基本概念\n2. 掌握使用方法\n3. 注意常见陷阱\n4. 遵循最佳实践",
-      "difficulty": 3,
-      "tags": [
-        "reified"
-      ],
-      "day": 2
-    },
-    {
-      "id": "D2_016",
-      "question": "协程的性能特点是什么？",
-      "answer": "## 协程的性能特点是什么？\n\n这是一个关于协程的重要概念。在实际开发中，理解协程对于编写高质量的Android应用至关重要。\n\n### 要点\n1. 理解基本概念\n2. 掌握使用方法\n3. 注意常见陷阱\n4. 遵循最佳实践",
-      "difficulty": 1,
-      "tags": [
-        "协程"
-      ],
-      "day": 2
-    },
-    {
-      "id": "D2_017",
-      "question": "launch的最佳实践？",
-      "answer": "## launch的最佳实践？\n\n这是一个关于launch的重要概念。在实际开发中，理解launch对于编写高质量的Android应用至关重要。\n\n### 要点\n1. 理解基本概念\n2. 掌握使用方法\n3. 注意常见陷阱\n4. 遵循最佳实践",
-      "difficulty": 2,
-      "tags": [
-        "launch"
-      ],
-      "day": 2
-    },
-    {
-      "id": "D2_018",
-      "question": "async常见陷阱有哪些？",
-      "answer": "## async常见陷阱有哪些？\n\n这是一个关于async的重要概念。在实际开发中，理解async对于编写高质量的Android应用至关重要。\n\n### 要点\n1. 理解基本概念\n2. 掌握使用方法\n3. 注意常见陷阱\n4. 遵循最佳实践",
-      "difficulty": 3,
-      "tags": [
-        "async"
-      ],
-      "day": 2
-    },
-    {
-      "id": "D2_019",
-      "question": "Kotlin中withContext的作用是什么？",
-      "answer": "## Kotlin中withContext的作用是什么？\n\n这是一个关于withContext的重要概念。在实际开发中，理解withContext对于编写高质量的Android应用至关重要。\n\n### 要点\n1. 理解基本概念\n2. 掌握使用方法\n3. 注意常见陷阱\n4. 遵循最佳实践",
-      "difficulty": 1,
-      "tags": [
-        "withContext"
-      ],
-      "day": 2
-    },
-    {
-      "id": "D2_020",
-      "question": "Dispatchers如何使用？",
-      "answer": "## Dispatchers如何使用？\n\n这是一个关于Dispatchers的重要概念。在实际开发中，理解Dispatchers对于编写高质量的Android应用至关重要。\n\n### 要点\n1. 理解基本概念\n2. 掌握使用方法\n3. 注意常见陷阱\n4. 遵循最佳实践",
-      "difficulty": 2,
-      "tags": [
-        "Dispatchers"
-      ],
-      "day": 2
-    },
-    {
-      "id": "D2_021",
-      "question": "Flow的优势是什么？",
-      "answer": "## Flow的优势是什么？\n\n这是一个关于Flow的重要概念。在实际开发中，理解Flow对于编写高质量的Android应用至关重要。\n\n### 要点\n1. 理解基本概念\n2. 掌握使用方法\n3. 注意常见陷阱\n4. 遵循最佳实践",
-      "difficulty": 3,
-      "tags": [
-        "Flow"
-      ],
-      "day": 2
-    },
-    {
-      "id": "D2_022",
-      "question": "解释StateFlow的概念",
-      "answer": "## 解释StateFlow的概念\n\n这是一个关于StateFlow的重要概念。在实际开发中，理解StateFlow对于编写高质量的Android应用至关重要。\n\n### 要点\n1. 理解基本概念\n2. 掌握使用方法\n3. 注意常见陷阱\n4. 遵循最佳实践",
-      "difficulty": 1,
-      "tags": [
-        "StateFlow"
-      ],
-      "day": 2
-    },
-    {
-      "id": "D2_023",
-      "question": "SharedFlow和Java的Channel有什么区别？",
-      "answer": "## SharedFlow和Java的Channel有什么区别？\n\n这是一个关于SharedFlow的重要概念。在实际开发中，理解SharedFlow对于编写高质量的Android应用至关重要。\n\n### 要点\n1. 理解基本概念\n2. 掌握使用方法\n3. 注意常见陷阱\n4. 遵循最佳实践",
-      "difficulty": 2,
-      "tags": [
-        "SharedFlow"
-      ],
-      "day": 2
-    },
-    {
-      "id": "D2_024",
-      "question": "什么场景使用Channel？",
-      "answer": "## 什么场景使用Channel？\n\n这是一个关于Channel的重要概念。在实际开发中，理解Channel对于编写高质量的Android应用至关重要。\n\n### 要点\n1. 理解基本概念\n2. 掌握使用方法\n3. 注意常见陷阱\n4. 遵循最佳实践",
-      "difficulty": 3,
-      "tags": [
-        "Channel"
-      ],
-      "day": 2
-    },
-    {
-      "id": "D2_025",
-      "question": "select的性能特点是什么？",
-      "answer": "## select的性能特点是什么？\n\n这是一个关于select的重要概念。在实际开发中，理解select对于编写高质量的Android应用至关重要。\n\n### 要点\n1. 理解基本概念\n2. 掌握使用方法\n3. 注意常见陷阱\n4. 遵循最佳实践",
-      "difficulty": 1,
-      "tags": [
-        "select"
-      ],
-      "day": 2
-    },
-    {
-      "id": "D2_026",
-      "question": "协程作用域的最佳实践？",
-      "answer": "## 协程作用域的最佳实践？\n\n这是一个关于协程作用域的重要概念。在实际开发中，理解协程作用域对于编写高质量的Android应用至关重要。\n\n### 要点\n1. 理解基本概念\n2. 掌握使用方法\n3. 注意常见陷阱\n4. 遵循最佳实践",
-      "difficulty": 2,
-      "tags": [
-        "协程作用域"
-      ],
-      "day": 2
-    },
-    {
-      "id": "D2_027",
-      "question": "协程上下文常见陷阱有哪些？",
-      "answer": "## 协程上下文常见陷阱有哪些？\n\n这是一个关于协程上下文的重要概念。在实际开发中，理解协程上下文对于编写高质量的Android应用至关重要。\n\n### 要点\n1. 理解基本概念\n2. 掌握使用方法\n3. 注意常见陷阱\n4. 遵循最佳实践",
-      "difficulty": 3,
-      "tags": [
-        "协程上下文"
-      ],
-      "day": 2
-    },
-    {
-      "id": "D2_028",
-      "question": "Kotlin中Job的作用是什么？",
-      "answer": "## Kotlin中Job的作用是什么？\n\n这是一个关于Job的重要概念。在实际开发中，理解Job对于编写高质量的Android应用至关重要。\n\n### 要点\n1. 理解基本概念\n2. 掌握使用方法\n3. 注意常见陷阱\n4. 遵循最佳实践",
-      "difficulty": 1,
-      "tags": [
-        "Job"
-      ],
-      "day": 2
-    },
-    {
-      "id": "D2_029",
-      "question": "Deferred如何使用？",
-      "answer": "## Deferred如何使用？\n\n这是一个关于Deferred的重要概念。在实际开发中，理解Deferred对于编写高质量的Android应用至关重要。\n\n### 要点\n1. 理解基本概念\n2. 掌握使用方法\n3. 注意常见陷阱\n4. 遵循最佳实践",
-      "difficulty": 2,
-      "tags": [
-        "Deferred"
-      ],
-      "day": 2
-    },
-    {
-      "id": "D2_030",
-      "question": "挂起函数的优势是什么？",
-      "answer": "## 挂起函数的优势是什么？\n\n这是一个关于挂起函数的重要概念。在实际开发中，理解挂起函数对于编写高质量的Android应用至关重要。\n\n### 要点\n1. 理解基本概念\n2. 掌握使用方法\n3. 注意常见陷阱\n4. 遵循最佳实践",
-      "difficulty": 3,
-      "tags": [
-        "挂起函数"
-      ],
-      "day": 2
-    },
-    {
-      "id": "D2_031",
-      "question": "解释协程异常的概念",
-      "answer": "## 解释协程异常的概念\n\n这是一个关于协程异常的重要概念。在实际开发中，理解协程异常对于编写高质量的Android应用至关重要。\n\n### 要点\n1. 理解基本概念\n2. 掌握使用方法\n3. 注意常见陷阱\n4. 遵循最佳实践",
-      "difficulty": 1,
-      "tags": [
-        "协程异常"
-      ],
-      "day": 2
-    },
-    {
-      "id": "D2_032",
-      "question": "let和Java的apply有什么区别？",
-      "answer": "## let和Java的apply有什么区别？\n\n这是一个关于let的重要概念。在实际开发中，理解let对于编写高质量的Android应用至关重要。\n\n### 要点\n1. 理解基本概念\n2. 掌握使用方法\n3. 注意常见陷阱\n4. 遵循最佳实践",
-      "difficulty": 2,
-      "tags": [
-        "let"
-      ],
-      "day": 2
-    },
-    {
-      "id": "D2_033",
-      "question": "什么场景使用apply？",
-      "answer": "## 什么场景使用apply？\n\n这是一个关于apply的重要概念。在实际开发中，理解apply对于编写高质量的Android应用至关重要。\n\n### 要点\n1. 理解基本概念\n2. 掌握使用方法\n3. 注意常见陷阱\n4. 遵循最佳实践",
-      "difficulty": 3,
-      "tags": [
-        "apply"
-      ],
-      "day": 2
-    },
-    {
-      "id": "D2_034",
-      "question": "run的性能特点是什么？",
-      "answer": "## run的性能特点是什么？\n\n这是一个关于run的重要概念。在实际开发中，理解run对于编写高质量的Android应用至关重要。\n\n### 要点\n1. 理解基本概念\n2. 掌握使用方法\n3. 注意常见陷阱\n4. 遵循最佳实践",
-      "difficulty": 1,
-      "tags": [
-        "run"
-      ],
-      "day": 2
-    },
-    {
-      "id": "D2_035",
-      "question": "also的最佳实践？",
-      "answer": "## also的最佳实践？\n\n这是一个关于also的重要概念。在实际开发中，理解also对于编写高质量的Android应用至关重要。\n\n### 要点\n1. 理解基本概念\n2. 掌握使用方法\n3. 注意常见陷阱\n4. 遵循最佳实践",
-      "difficulty": 2,
-      "tags": [
-        "also"
-      ],
+      "tags": ["Kotlin", "协程", "supervisorScope"],
       "day": 2
     }
   ]
