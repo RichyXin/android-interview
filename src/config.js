@@ -20,8 +20,8 @@ const config = {
     // 应用配置
     app: {
         name: 'Android 面试题大全',
-        version: '1.2.0',
-        description: '智能学习系统 - 590+ 面试题'
+        version: '1.2.1',
+        description: '智能学习系统 - 555+ 面试题'
     },
     
     // 学习配置

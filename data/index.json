@@ -1,14 +1,14 @@
 {
   "metadata": {
     "version": "3.0",
-    "total_questions": 590,
+    "total_questions": 555,
     "categories_count": 16,
     "days_count": 16,
     "generated_date": "2026-03-23",
     "note": "Android 面试题大全 - 16天学习计划"
   },
   "categories": [
-    {"id": "android_basic", "name": "Android 基础", "day": 1, "question_count": 60, "files": ["day1/android_basics.json"]},
+    {"id": "android_basic", "name": "Android 基础", "day": 1, "question_count": 25, "files": ["day1/android_basics.json"]},
     {"id": "kotlin", "name": "Kotlin 基础与协程", "day": 2, "question_count": 30, "files": ["day2/kotlin_interview.json"]},
     {"id": "java_concurrent", "name": "Java 并发编程", "day": 3, "question_count": 50, "files": ["day3/java_concurrency.json"]},
     {"id": "jvm", "name": "JVM 原理", "day": 4, "question_count": 50, "files": ["day4/jvm_principles.json"]},
@@ -26,7 +26,7 @@
     {"id": "car_system_ui", "name": "车载系统UI开发", "day": 16, "question_count": 20, "files": ["day16/car_system_ui.json"]}
   ],
   "days": {
-    "1": {"name": "Android 基础", "categories": ["Activity", "Fragment", "Service", "Broadcast", "ContentProvider"], "target": 60},
+    "1": {"name": "Android 基础", "categories": ["Activity", "Fragment", "Service", "Broadcast", "ContentProvider"], "target": 25},
     "2": {"name": "Kotlin 基础与协程", "categories": ["Kotlin基础", "协程", "Flow"], "target": 30},
     "3": {"name": "Java 并发编程", "categories": ["线程", "锁", "并发工具"], "target": 50},
     "4": {"name": "JVM 原理", "categories": ["内存模型", "GC", "类加载"], "target": 50},
